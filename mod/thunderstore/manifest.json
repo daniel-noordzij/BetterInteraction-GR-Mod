@@ -1,8 +1,8 @@
 {
     "name": "BetterInteraction",
-    "version_number": "0.0.0",
+    "version_number": "1.0.0",
     "website_url": "",
-    "description": "Quality of life for interacting. Pay a machine off in one press, collect the grinder's payout as a few coins instead of dozens, and stop losing a hold you started a frame early.",
+    "description": "Quality of life for interacting. No spam clicking the elevator, gumball- and upgrade machine, and stop losing a hold you started a frame early. Is required by host and all players who want it.",
     "dependencies": [
         "Thunderstore-GrainRot_UE4SS-1.0.1",
         "Thunderstore-unreal_shimloader-1.1.7"

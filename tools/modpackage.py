@@ -206,15 +206,22 @@ def stage(staged_root):
     shutil.copy2(SOURCE_LUA, os.path.join(scripts, "main.lua"))
     shutil.copy2(SOURCE_ENABLED, os.path.join(staged_root, "mod", "enabled.txt"))
 
-    # The config travels with the package for anyone reading it, and the mod
-    # also writes it on first run -- no Grain Rot package ships a cfg/ folder,
-    # so a Thunderstore install cannot rely on one appearing.
-    cfg_dir = os.path.join(staged_root, "cfg")
-    os.makedirs(cfg_dir, exist_ok=True)
-    staged_cfg = os.path.join(cfg_dir, MOD_NAME + ".cfg")
-    shutil.copy2(SOURCE_CFG, staged_cfg)
-
-    keys = check_config_is_a_file(staged_cfg)
+    # THE CONFIG IS NOT SHIPPED, and that is deliberate rather than an omission.
+    #
+    # No Grain Rot package ships a cfg/ folder, and r2modman nests a package's
+    # subfolders under the package name -- so a shipped cfg/ would most likely
+    # land at shimloader/cfg/BetterInteraction/BetterInteraction.cfg, which is
+    # NOT where the mod looks. A user editing that file would see no effect,
+    # which is worse than there being no file at all.
+    #
+    # The mod writes its own on first run instead, into a path it has just read
+    # from, and logs where it put it. Rule 5 is satisfied by the user ending up
+    # with an editable file -- not by that file having travelled in the zip.
+    #
+    # The repo copy is still checked against the mod on every build, because it
+    # is the documented reference the mod page points at, and a reference that
+    # disagrees with the code is worse than none.
+    keys = check_config_is_a_file(SOURCE_CFG)
     check_config_matches_lua(lua, keys)
     check_no_probes(staged_root)
     return keys

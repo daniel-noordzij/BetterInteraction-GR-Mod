@@ -1,65 +1,125 @@
-"""Generate the Thunderstore icon: exactly 256x256 PNG, no dependencies.
+"""Produce the Thunderstore icon: exactly 256x256, from whatever art is supplied.
 
-Thunderstore rejects anything that is not 256x256, so the size is asserted
-rather than assumed. PIL is not installed and is not worth adding for one
-image -- CLAUDE.md rule 4, the answer is almost always the stdlib -- so this
-writes the PNG by hand with zlib and struct.
+Thunderstore rejects anything that is not 256x256, and Daniel's artwork is
+650x650 -- so this resizes rather than asks him to. PIL is not installed and is
+not worth a dependency for one image (CLAUDE.md rule 4: the answer is almost
+always the stdlib), so the PNG is decoded, resampled and re-encoded here with
+zlib and struct.
 
-The design is deliberately plain: a dark rounded tile with a single bright
-interact ring, the same shape the mod spends its time drawing.
+    py tools/make_icon.py                 icon-source.png -> icon.png at 256x256
+    py tools/make_icon.py <path>          use a different source
+
+Box filter, not nearest neighbour: 650 -> 256 is a 2.54x reduction, and dropping
+pixels at that ratio visibly shreds fine detail. Alpha is PREMULTIPLIED before
+averaging and divided out afterwards, because averaging colour and alpha
+independently pulls the colour of fully transparent pixels into the edges and
+leaves a halo.
 """
 
-import math
 import os
 import struct
+import sys
 import zlib
 
 SIZE = 256
-OUT = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                   "mod", "thunderstore", "icon.png")
-
-BG = (24, 20, 17)
-TILE = (44, 34, 26)
-RING = (214, 173, 94)
-RING_DIM = (86, 68, 44)
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SOURCE = os.path.join(HERE, "mod", "thunderstore", "icon-source.png")
+OUT = os.path.join(HERE, "mod", "thunderstore", "icon.png")
 
 
-def rounded(x, y, left, top, right, bottom, radius):
-    if x < left or x > right or y < top or y > bottom:
-        return False
-    for cx, cy in ((left + radius, top + radius), (right - radius, top + radius),
-                   (left + radius, bottom - radius),
-                   (right - radius, bottom - radius)):
-        if ((x < left + radius or x > right - radius)
-                and (y < top + radius or y > bottom - radius)):
-            if math.hypot(x - cx, y - cy) <= radius:
-                return True
-            continue
-    if (left + radius <= x <= right - radius) or (top + radius <= y <= bottom - radius):
-        return True
-    return False
+def read_png(path):
+    data = open(path, "rb").read()
+    if data[:8] != b"\x89PNG\r\n\x1a\n":
+        raise SystemExit("%s is not a PNG" % path)
+    width, height = struct.unpack(">II", data[16:24])
+    depth, colour, _comp, _filt, interlace = data[24:29]
+    if depth != 8 or colour not in (2, 6) or interlace != 0:
+        raise SystemExit(
+            "only 8-bit RGB/RGBA, non-interlaced PNGs are handled; this is "
+            "depth=%d colour=%d interlace=%d" % (depth, colour, interlace))
+    channels = 4 if colour == 6 else 3
+
+    raw = b""
+    index = 8
+    while index + 8 <= len(data):
+        length = struct.unpack(">I", data[index:index + 4])[0]
+        tag = data[index + 4:index + 8]
+        if tag == b"IDAT":
+            raw += data[index + 8:index + 8 + length]
+        index += 12 + length
+        if tag == b"IEND":
+            break
+
+    return width, height, channels, unfilter(zlib.decompress(raw),
+                                             width, height, channels)
 
 
-def build():
-    mid = SIZE / 2.0
-    rows = []
-    for y in range(SIZE):
-        row = bytearray()
-        row.append(0)                        # PNG filter: none
-        for x in range(SIZE):
-            colour = BG
-            if rounded(x, y, 18, 18, SIZE - 18, SIZE - 18, 46):
-                colour = TILE
-            dist = math.hypot(x + 0.5 - mid, y + 0.5 - mid)
-            # The interact ring, with a gap at the top like a progress arc.
-            if 62 <= dist <= 86:
-                angle = math.degrees(math.atan2(y + 0.5 - mid, x + 0.5 - mid))
-                if angle < 0:
-                    angle += 360
-                colour = RING if not (250 <= angle <= 290) else RING_DIM
-            row += bytes(colour)
-        rows.append(bytes(row))
-    return b"".join(rows)
+def unfilter(stream, width, height, channels):
+    """PNG scanline filters 0-4. Each row is prefixed with its filter type."""
+    stride = width * channels
+    out = bytearray(stride * height)
+    previous = bytearray(stride)
+    pos = 0
+    for row in range(height):
+        kind = stream[pos]
+        pos += 1
+        line = bytearray(stream[pos:pos + stride])
+        pos += stride
+        if kind == 1:                                   # Sub
+            for i in range(channels, stride):
+                line[i] = (line[i] + line[i - channels]) & 0xFF
+        elif kind == 2:                                 # Up
+            for i in range(stride):
+                line[i] = (line[i] + previous[i]) & 0xFF
+        elif kind == 3:                                 # Average
+            for i in range(stride):
+                left = line[i - channels] if i >= channels else 0
+                line[i] = (line[i] + ((left + previous[i]) >> 1)) & 0xFF
+        elif kind == 4:                                 # Paeth
+            for i in range(stride):
+                left = line[i - channels] if i >= channels else 0
+                up = previous[i]
+                upleft = previous[i - channels] if i >= channels else 0
+                guess = left + up - upleft
+                da, db, dc = abs(guess - left), abs(guess - up), abs(guess - upleft)
+                near = left if (da <= db and da <= dc) else (up if db <= dc else upleft)
+                line[i] = (line[i] + near) & 0xFF
+        elif kind != 0:
+            raise SystemExit("unknown PNG filter %d on row %d" % (kind, row))
+        out[row * stride:(row + 1) * stride] = line
+        previous = line
+    return out
+
+
+def box_resize(pixels, width, height, channels, size):
+    """Average each output pixel's footprint, in premultiplied alpha."""
+    out = bytearray(size * size * 4)
+    for oy in range(size):
+        y0, y1 = oy * height // size, max(oy * height // size + 1,
+                                          (oy + 1) * height // size)
+        for ox in range(size):
+            x0, x1 = ox * width // size, max(ox * width // size + 1,
+                                             (ox + 1) * width // size)
+            r = g = b = a = n = 0
+            for sy in range(y0, y1):
+                base = (sy * width) * channels
+                for sx in range(x0, x1):
+                    i = base + sx * channels
+                    alpha = pixels[i + 3] if channels == 4 else 255
+                    r += pixels[i] * alpha
+                    g += pixels[i + 1] * alpha
+                    b += pixels[i + 2] * alpha
+                    a += alpha
+                    n += 1
+            o = (oy * size + ox) * 4
+            if a == 0:
+                out[o:o + 4] = b"\x00\x00\x00\x00"
+            else:
+                out[o] = min(255, r // a)
+                out[o + 1] = min(255, g // a)
+                out[o + 2] = min(255, b // a)
+                out[o + 3] = a // n
+    return out
 
 
 def chunk(tag, payload):
@@ -67,24 +127,39 @@ def chunk(tag, payload):
             + struct.pack(">I", zlib.crc32(tag + payload) & 0xFFFFFFFF))
 
 
-def main():
-    raw = build()
+def write_png(path, size, rgba):
+    rows = bytearray()
+    for y in range(size):
+        rows.append(0)                                  # filter: none
+        rows += rgba[y * size * 4:(y + 1) * size * 4]
     png = b"\x89PNG\r\n\x1a\n"
-    png += chunk(b"IHDR", struct.pack(">IIBBBBB", SIZE, SIZE, 8, 2, 0, 0, 0))
-    png += chunk(b"IDAT", zlib.compress(raw, 9))
+    png += chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0))
+    png += chunk(b"IDAT", zlib.compress(bytes(rows), 9))
     png += chunk(b"IEND", b"")
+    open(path, "wb").write(png)
+    return len(png)
 
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "wb") as handle:
-        handle.write(png)
 
-    # Verified, not assumed: read the dimensions back out of the file we wrote.
-    with open(OUT, "rb") as handle:
-        head = handle.read(24)
-    width, height = struct.unpack(">II", head[16:24])
-    assert (width, height) == (SIZE, SIZE), (width, height)
-    print("wrote %s  %dx%d  %d bytes" % (OUT, width, height, len(png)))
+def main(argv):
+    source = argv[0] if argv else SOURCE
+    if not os.path.isfile(source):
+        raise SystemExit("no source image at " + source)
+
+    width, height, channels, pixels = read_png(source)
+    print("source %s  %dx%d  %d channels" % (os.path.basename(source),
+                                             width, height, channels))
+    if width != height:
+        print("  NOTE: not square -- it will be squashed, not cropped")
+
+    written = write_png(OUT, SIZE, box_resize(pixels, width, height,
+                                              channels, SIZE))
+
+    # Verified by reading back what was written, not by trusting the writer.
+    check = open(OUT, "rb").read(24)
+    out_w, out_h = struct.unpack(">II", check[16:24])
+    assert (out_w, out_h) == (SIZE, SIZE), (out_w, out_h)
+    print("wrote %s  %dx%d  %d bytes" % (OUT, out_w, out_h, written))
 
 
 if __name__ == "__main__":
-    main()
+    main(sys.argv[1:])

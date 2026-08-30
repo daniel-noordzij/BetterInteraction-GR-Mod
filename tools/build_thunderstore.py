@@ -22,6 +22,7 @@ Usage:
 
 import os
 import shutil
+import struct
 import sys
 import tempfile
 import zipfile
@@ -57,6 +58,18 @@ def main(argv):
         icon = os.path.join(mp.THUNDERSTORE_DIR, "icon.png")
         if not os.path.isfile(icon):
             raise mp.PackagingError("no icon.png -- run tools/make_icon.py")
+        # Thunderstore takes 256x256 and nothing else. Daniel's artwork arrived
+        # at 650x650 and would have been rejected on upload; the build should
+        # say so rather than the website.
+        with open(icon, "rb") as handle:
+            head = handle.read(24)
+        if head[:8] != b"\x89PNG\r\n\x1a\n":
+            raise mp.PackagingError("icon.png is not a PNG")
+        width, height = struct.unpack(">II", head[16:24])
+        if (width, height) != (256, 256):
+            raise mp.PackagingError(
+                "icon.png is %dx%d; Thunderstore requires exactly 256x256. "
+                "Run: py tools/make_icon.py" % (width, height))
         shutil.copy2(icon, os.path.join(staging, "icon.png"))
 
         manifest = mp.write_manifest(

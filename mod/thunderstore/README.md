@@ -36,9 +36,10 @@ hold, the mod stays out of the way.
 
 ## Settings
 
-The config is `BetterInteraction.cfg`. If you do not have one, the mod writes it
-out the first time it runs and tells you where. Edit it and press **F4** in game
-to reload — no restart needed.
+The mod writes `BetterInteraction.cfg` itself the first time it runs, and the
+log says where it put it. Edit it and press **F4** in game to reload — no
+restart needed. Every setting is in there at its default, and a fully commented
+copy explaining each one lives with the source.
 
 **F3** writes a diagnostic report and changes nothing. If you are reporting a
 problem, press it and include `BetterInteraction.log`.
