@@ -69,7 +69,7 @@
 ]]
 
 local MOD     = "BetterInteraction"
-local VERSION = "0.26.0-hooksize"
+local VERSION = "0.26.0"
 
 -- ==========================================================================
 -- Everything version-fragile, in one place. A game patch is an edit here.

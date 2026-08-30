@@ -77,7 +77,18 @@ def read_version():
         found = re.search(r'^local VERSION\s*=\s*"([^"]+)"', handle.read(), re.M)
     if not found:
         raise PackagingError("no VERSION in " + SOURCE_LUA)
-    return found.group(1)
+    version = found.group(1)
+    # Thunderstore takes strict major.minor.patch and nothing else. The first
+    # build produced "0.26.0-hooksize" -- a development codename that would have
+    # been rejected on upload, or worse, accepted and stuck. The version is the
+    # one thing a package cannot be wrong about, so it is checked here rather
+    # than discovered later.
+    if not re.fullmatch(r"\d+\.\d+\.\d+", version):
+        raise PackagingError(
+            "VERSION is %r, which Thunderstore will not take -- it must be "
+            "major.minor.patch with no suffix. Development codenames belong in "
+            "the log line, not in the version." % version)
+    return version
 
 
 def run_lua_check():

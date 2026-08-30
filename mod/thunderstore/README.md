@@ -45,13 +45,16 @@ problem, press it and include `BetterInteraction.log`.
 
 ## Multiplayer
 
-**Solo and hosting only, for now.** Paying machines and merging coins both write
-state the server owns, so as a guest they would do nothing useful and the mod
-does not pretend otherwise. When the host runs it, the coin changes benefit
-everyone in the lobby.
+**It works in co-op, and only the host needs it.** Paying machines and merging
+coins are things only the server can really do, so the mod does them on the
+host — for whoever pressed the button. A guest pays from their own purse, in one
+press, wherever the host happens to be standing.
 
-This has not yet been tested in a real lobby. Until it has, treat multiplayer as
-unsupported rather than broken.
+If a guest runs it too, nothing conflicts: their copy notices it is not the host
+and leaves that side alone, keeping only the hold fix, which is purely local.
+
+Tested with two players on two machines. **Three or more is untested**, and so is
+running alongside mod sets other than the one it was developed with.
 
 ## What it deliberately does not do
 
