@@ -1,0 +1,68 @@
+{
+  "exe": {
+    "exists": true,
+    "path": "F:\\SteamLibrary\\steamapps\\common\\Grain Rot\\Helden\\Binaries\\Win64\\Helden-Win64-Shipping.exe",
+    "sha256": "844d2853b64d40a69cf6f14b684474e21bcced2c3e78ba341d34994028a44585",
+    "size": 155084288
+  },
+  "names": {
+    "CLASS": [
+      "HeldenCoinDispenser",
+      "HeldenGameState",
+      "HeldenInteractionSubsystem",
+      "HeldenPlayerController"
+    ],
+    "COIN": [
+      "BP_Coin_Artifact_01_C",
+      "BP_Coin_Gold_01_C"
+    ],
+    "MACHINE": [
+      "BP_Gumball_CoinDeposit_C",
+      "BP_HeldenElevator_CoinDeposit_C",
+      "BP_Upgrade_CoinDeposit_C"
+    ],
+    "PROP": [
+      "ActionInstanceData",
+      "CoinDispenser",
+      "CoinsLeftToPay",
+      "Component",
+      "CurrentInteractTarget",
+      "CurrentInteraction",
+      "DispenseCooldownRange",
+      "ElapsedProcessedTime",
+      "HoldInteractionDuration",
+      "HotInteractions",
+      "InteractComponent",
+      "InteractProximityAngle",
+      "InteractProximityDistance",
+      "InteractSettings",
+      "InteractState",
+      "InteractionWidgetComponent",
+      "InterpSpeed",
+      "LineTraceDiscardRadius",
+      "MaxArtifactsPerCoin",
+      "MaxGoldPerCoins",
+      "MaxInteractDistance",
+      "Money",
+      "Pawn",
+      "PlayerInput",
+      "Progress",
+      "ProgressBarWidget",
+      "RegisteredInteractionEntries",
+      "RelativeLocation",
+      "RemainingCost",
+      "RequiredMoney",
+      "RootComponent",
+      "StashMoney",
+      "TargetObject",
+      "TriggerEvent",
+      "Widget",
+      "bIsHoldInteraction"
+    ]
+  },
+  "steam": {
+    "appid": "4450620",
+    "buildid": "24989637",
+    "manifest": "appmanifest_4450620.acf"
+  }
+}

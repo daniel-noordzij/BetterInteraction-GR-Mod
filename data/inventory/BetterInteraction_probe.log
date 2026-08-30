@@ -1,0 +1,103 @@
+15:04:47     3.687  ---- BetterInteractionProbe phase0-2 loaded ----
+15:04:47     3.687  loaded. Read-only: it writes text files and changes nothing in the game.
+15:04:47     3.687  ALT+F7  full report -> BetterInteraction_probe.txt (+ BetterInteraction_probe_raw.txt). Freezes the game for a moment; press it standing still.
+15:04:47     3.687  ALT+F8  hot only, safe any time including in a lobby
+15:04:47     3.687  if only ONE of those two key lines appeared, the other RegisterKeyBind was rejected -- report that rather than 'the probe does nothing'.
+15:04:48     4.739  pump alive -- the game thread is reaching us
+15:05:27    43.413  ---- run 1 (HOT ONLY) begins ----
+15:05:27    43.425  first component:GetOwner() call -- unproven access, about to run
+15:05:27    43.441  first FText/FName :ToString() read -- unproven access, about to run
+15:05:27    43.447  run 1 (HOT ONLY) written to BetterInteraction_probe.txt
+15:05:27    43.447  ---- run 1 (HOT ONLY) ends ----
+15:05:35    51.693  ---- run 2 (FULL) begins ----
+15:05:35    51.704  first component:GetOwner() call -- unproven access, about to run
+15:05:35    51.704  first FText/FName :ToString() read -- unproven access, about to run
+15:05:35    51.713  reading 336 registered entries -- the game will freeze for a moment. Do not kill it.
+15:05:35    51.713  REGISTERED WALK BEGINS -- 336 entries. If the log stops inside this, the last index below is where it died.
+15:05:35    51.713    struct element access form that worked: element:get().Component
+15:05:35    51.723    registered index 100 of 336
+15:05:35    51.733    registered index 200 of 336
+15:05:35    51.743    registered index 300 of 336
+15:05:35    51.746  REGISTERED WALK ENDS -- 336 of 336 live, 0 empty
+15:05:35    51.749  run 2 (FULL) written to BetterInteraction_probe.txt
+15:05:35    51.749  ---- run 2 (FULL) ends ----
+15:06:26   102.000  ---- run 3 (HOT ONLY) begins ----
+15:06:26   102.011  first component:GetOwner() call -- unproven access, about to run
+15:06:26   102.011  first FText/FName :ToString() read -- unproven access, about to run
+15:06:26   102.012  run 3 (HOT ONLY) written to BetterInteraction_probe.txt
+15:06:26   102.012  ---- run 3 (HOT ONLY) ends ----
+15:06:29   105.485  ---- run 4 (FULL) begins ----
+15:06:29   105.498  first component:GetOwner() call -- unproven access, about to run
+15:06:29   105.498  first FText/FName :ToString() read -- unproven access, about to run
+15:06:29   105.505  reading 403 registered entries -- the game will freeze for a moment. Do not kill it.
+15:06:29   105.505  REGISTERED WALK BEGINS -- 403 entries. If the log stops inside this, the last index below is where it died.
+15:06:29   105.505    struct element access form that worked: element:get().Component
+15:06:29   105.516    registered index 100 of 403
+15:06:29   105.525    registered index 200 of 403
+15:06:29   105.535    registered index 300 of 403
+15:06:29   105.545    registered index 400 of 403
+15:06:29   105.545  REGISTERED WALK ENDS -- 403 of 403 live, 0 empty
+15:06:29   105.549  run 4 (FULL) written to BetterInteraction_probe.txt
+15:06:29   105.549  ---- run 4 (FULL) ends ----
+15:15:30     3.578  ---- BetterInteractionProbe phase0-2 loaded ----
+15:15:30     3.578  loaded. Read-only: it writes text files and changes nothing in the game.
+15:15:30     3.578  ALT+F7  full report -> BetterInteraction_probe.txt (+ BetterInteraction_probe_raw.txt). Freezes the game for a moment; press it standing still.
+15:15:30     3.578  ALT+F8  hot only, safe any time including in a lobby
+15:15:30     3.578  if only ONE of those two key lines appeared, the other RegisterKeyBind was rejected -- report that rather than 'the probe does nothing'.
+15:15:31     4.702  pump alive -- the game thread is reaching us
+15:29:13   827.361  ---- run 1 (HOT ONLY) begins ----
+15:29:13   827.373  first component:GetOwner() call -- unproven access, about to run
+15:29:13   827.373  first FText/FName :ToString() read -- unproven access, about to run
+15:29:13   827.378  run 1 (HOT ONLY) written to BetterInteraction_probe.txt
+15:29:13   827.378  ---- run 1 (HOT ONLY) ends ----
+15:29:24   837.849  ---- run 2 (HOT ONLY) begins ----
+15:29:24   837.860  first component:GetOwner() call -- unproven access, about to run
+15:29:24   837.860  first FText/FName :ToString() read -- unproven access, about to run
+15:29:24   837.865  run 2 (HOT ONLY) written to BetterInteraction_probe.txt
+15:29:24   837.865  ---- run 2 (HOT ONLY) ends ----
+15:40:30     3.679  ---- BetterInteractionProbe phase0-3 loaded ----
+15:40:30     3.680  loaded. Read-only: it writes text files and changes nothing in the game.
+15:40:30     3.680  ALT+F7  full report -> BetterInteraction_probe.txt (+ BetterInteraction_probe_raw.txt). Costs about one frame (~40ms measured).
+15:40:30     3.680  ALT+F8  hot only, safe any time including in a lobby
+15:40:30     3.680  if only ONE of those two key lines appeared, the other RegisterKeyBind was rejected -- report that rather than 'the probe does nothing'.
+15:40:31     4.557  pump alive -- the game thread is reaching us
+15:40:56    30.298  ---- run 1 (FULL) begins ----
+15:40:56    30.309  first component:GetOwner() call -- unproven access, about to run
+15:40:56    30.310  first FText/FName :ToString() read -- unproven access, about to run
+15:40:56    30.320  reading 399 registered entries (~40ms measured; the report prints the real figure for this run)
+15:40:56    30.320  REGISTERED WALK BEGINS -- 399 entries. If the log stops inside this, the last index below is where it died.
+15:40:56    30.320    struct element access form that worked: element:get().Component
+15:40:56    30.334    registered index 100 of 399
+15:40:57    30.348    registered index 200 of 399
+15:40:57    30.361    registered index 300 of 399
+15:40:57    30.375  REGISTERED WALK ENDS -- 399 of 399 live, 0 empty
+15:40:57    30.379  run 1 (FULL) written to BetterInteraction_probe.txt
+15:40:57    30.379  ---- run 1 (FULL) ends ----
+15:41:01    35.206  ---- run 2 (HOT ONLY) begins ----
+15:41:01    35.218  first component:GetOwner() call -- unproven access, about to run
+15:41:01    35.218  first FText/FName :ToString() read -- unproven access, about to run
+15:41:01    35.223  run 2 (HOT ONLY) written to BetterInteraction_probe.txt
+15:41:01    35.223  ---- run 2 (HOT ONLY) ends ----
+15:41:19    52.923  ---- run 3 (HOT ONLY) begins ----
+15:41:19    52.935  first component:GetOwner() call -- unproven access, about to run
+15:41:19    52.937  first FText/FName :ToString() read -- unproven access, about to run
+15:41:19    52.943  run 3 (HOT ONLY) written to BetterInteraction_probe.txt
+15:41:19    52.943  ---- run 3 (HOT ONLY) ends ----
+15:42:44   137.880  ---- run 4 (HOT ONLY) begins ----
+15:42:44   137.893  first component:GetOwner() call -- unproven access, about to run
+15:42:44   137.893  first FText/FName :ToString() read -- unproven access, about to run
+15:42:44   137.895  run 4 (HOT ONLY) written to BetterInteraction_probe.txt
+15:42:44   137.895  ---- run 4 (HOT ONLY) ends ----
+15:42:47   140.864  ---- run 5 (FULL) begins ----
+15:42:47   140.877  first component:GetOwner() call -- unproven access, about to run
+15:42:47   140.877  first FText/FName :ToString() read -- unproven access, about to run
+15:42:47   140.898  reading 476 registered entries (~40ms measured; the report prints the real figure for this run)
+15:42:47   140.898  REGISTERED WALK BEGINS -- 476 entries. If the log stops inside this, the last index below is where it died.
+15:42:47   140.898    struct element access form that worked: element:get().Component
+15:42:47   140.912    registered index 100 of 476
+15:42:47   140.926    registered index 200 of 476
+15:42:47   140.940    registered index 300 of 476
+15:42:47   140.954    registered index 400 of 476
+15:42:47   140.964  REGISTERED WALK ENDS -- 476 of 476 live, 0 empty
+15:42:47   140.969  run 5 (FULL) written to BetterInteraction_probe.txt
+15:42:47   140.969  ---- run 5 (FULL) ends ----

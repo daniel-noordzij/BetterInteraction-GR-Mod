@@ -1,0 +1,228 @@
+16:00:08     3.669  ---- BetterInteractionReplay replay-1 loaded ----
+16:00:08     3.669  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+16:00:08     3.669  ALT+F9   read-only: cycle the armed method and show every gate
+16:00:08     3.669  ALT+F10  FIRES ONE REAL INTERACTION. Press ALT+F9 first.
+16:00:09     4.653  report appended to BetterInteraction_replay.txt
+16:00:09     4.653  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:03:49   224.239  report appended to BetterInteraction_replay.txt
+16:03:49   224.239  armed: B  InteractableObject:Interact(pawn)  BLOCKED (1)
+16:04:58   292.753  report appended to BetterInteraction_replay.txt
+16:04:58   292.770  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:05:12   307.417  report appended to BetterInteraction_replay.txt
+16:05:12   307.417  REFUSED: nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+16:05:22   316.997  report appended to BetterInteraction_replay.txt
+16:05:22   316.997  armed: B  InteractableObject:Interact(pawn)  BLOCKED (1)
+16:05:27   322.189  report appended to BetterInteraction_replay.txt
+16:05:27   322.189  REFUSED: nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+16:17:37     3.756  ---- BetterInteractionReplay replay-3 loaded ----
+16:17:37     3.756  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+16:17:37     3.757  F9   read-only: cycle the armed method and show every gate
+16:17:37     3.757  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+16:17:38     4.685  report appended to BetterInteraction_replay.txt
+16:17:38     4.685  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:20:30     2.843  ---- BetterInteractionReplay replay-3 loaded ----
+16:20:30     2.843  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+16:20:30     2.844  F9   read-only: cycle the armed method and show every gate
+16:20:30     2.844  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+16:20:31     3.677  report appended to BetterInteraction_replay.txt
+16:20:31     3.677  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:21:19    51.498  report appended to BetterInteraction_replay.txt
+16:21:19    51.498  armed: B  InteractableObject:Interact(pawn)  READY
+16:21:23    56.004  ABOUT TO INVOKE B  InteractableObject:Interact(pawn) on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2
+16:21:23    56.004  RETURNED from B  InteractableObject:Interact(pawn)  ok=true
+16:21:23    56.004  report appended to BetterInteraction_replay.txt
+16:21:23    56.004  fire 1: B  InteractableObject:Interact(pawn) returned; watching for a delta
+16:21:24    57.028  report appended to BetterInteraction_replay.txt
+16:21:24    57.028  fire 1 watch complete
+16:21:31    63.794  report appended to BetterInteraction_replay.txt
+16:21:31    63.795  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+16:21:33    66.175  report appended to BetterInteraction_replay.txt
+16:21:33    66.175  armed: B  InteractableObject:Interact(pawn)  READY
+16:21:37    69.442  ABOUT TO INVOKE B  InteractableObject:Interact(pawn) on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2
+16:21:37    69.442  RETURNED from B  InteractableObject:Interact(pawn)  ok=true
+16:21:37    69.443  report appended to BetterInteraction_replay.txt
+16:21:37    69.443  fire 2: B  InteractableObject:Interact(pawn) returned; watching for a delta
+16:21:38    70.460  report appended to BetterInteraction_replay.txt
+16:21:38    70.460  fire 2 watch complete
+16:24:59     2.892  ---- BetterInteractionReplay replay-4 loaded ----
+16:24:59     2.892  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+16:24:59     2.892  F9   read-only: cycle the armed method and show every gate
+16:24:59     2.892  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+16:24:59     3.675  report appended to BetterInteraction_replay.txt
+16:24:59     3.675  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:26:18    82.395  report appended to BetterInteraction_replay.txt
+16:26:18    82.395  armed: B  InteractableObject:Interact(pawn)  READY
+16:26:28    92.120  report appended to BetterInteraction_replay.txt
+16:26:28    92.121  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+16:26:43   107.359  ABOUT TO INVOKE A  PlayerController:Interact_Server(pawn, component) on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2
+16:26:43   107.359  RETURNED from A  PlayerController:Interact_Server(pawn, component)  ok=true
+16:26:43   107.359  report appended to BetterInteraction_replay.txt
+16:26:43   107.359  fire 1: A  PlayerController:Interact_Server(pawn, component) returned; watching for a delta
+16:26:44   108.374  report appended to BetterInteraction_replay.txt
+16:26:44   108.374  fire 1 watch complete
+16:26:49   112.779  report appended to BetterInteraction_replay.txt
+16:26:49   112.779  armed: B  InteractableObject:Interact(pawn)  READY
+16:26:51   115.037  ABOUT TO INVOKE B  InteractableObject:Interact(pawn) on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2
+16:26:51   115.037  RETURNED from B  InteractableObject:Interact(pawn)  ok=true
+16:26:51   115.037  report appended to BetterInteraction_replay.txt
+16:26:51   115.037  fire 2: B  InteractableObject:Interact(pawn) returned; watching for a delta
+16:26:52   116.064  report appended to BetterInteraction_replay.txt
+16:26:52   116.064  fire 2 watch complete
+16:45:42     2.572  ---- BetterInteractionReplay replay-6 loaded ----
+16:45:42     2.573  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+16:45:42     2.573  F9   read-only: cycle the armed method and show every gate
+16:45:42     2.573  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+16:45:43     3.520  report appended to BetterInteraction_replay.txt
+16:45:43     3.520  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:47:10    89.928  report appended to BetterInteraction_replay.txt
+16:47:10    89.928  armed: B  InteractableObject:Interact(pawn)  READY
+16:47:11    90.951  report appended to BetterInteraction_replay.txt
+16:47:11    90.951  armed: C  pay as much as you can afford in ONE press  READY
+16:47:19    99.442  report appended to BetterInteraction_replay.txt
+16:47:19    99.442  REFUSED: no plan -- nothing in range reports how much is still owed
+16:47:38   117.763  report appended to BetterInteraction_replay.txt
+16:47:38   117.763  REFUSED: no plan -- nothing in range reports how much is still owed
+16:56:35     2.575  ---- BetterInteractionReplay replay-6 loaded ----
+16:56:35     2.575  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+16:56:35     2.575  F9   read-only: cycle the armed method and show every gate
+16:56:35     2.575  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+16:56:36     3.727  report appended to BetterInteraction_replay.txt
+16:56:36     3.727  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED (1)
+16:58:00    87.206  report appended to BetterInteraction_replay.txt
+16:58:00    87.206  armed: B  InteractableObject:Interact(pawn)  READY
+16:58:00    87.930  report appended to BetterInteraction_replay.txt
+16:58:00    87.930  armed: C  pay as much as you can afford in ONE press  READY
+16:58:01    88.855  report appended to BetterInteraction_replay.txt
+16:58:01    88.855  REFUSED: no plan -- nothing in range reports how much is still owed
+17:14:16     2.864  ---- BetterInteractionReplay replay-8 loaded ----
+17:14:16     2.865  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+17:14:16     2.865  F9   read-only: cycle the armed method and show every gate
+17:14:16     2.865  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+17:14:16     3.627  report appended to BetterInteraction_replay.txt
+17:14:16     3.627  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+17:14:26    12.649  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480878); epoch is now 1
+17:16:01   108.439  report appended to BetterInteraction_replay.txt
+17:16:01   108.440  armed: B  InteractableObject:Interact(pawn)  READY
+17:16:02   108.644  report appended to BetterInteraction_replay.txt
+17:16:02   108.645  armed: C  pay as much as you can afford in ONE press  READY
+17:16:12   119.391  ABOUT TO INVOKE C  pay as much as you can afford in ONE press on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2
+17:16:12   119.391  WRITING RequiredMoney on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2: 0S/5G/0A -> 0S/20G/0A (restoring in 15 ticks)
+17:16:12   119.392  RETURNED from C  pay as much as you can afford in ONE press  ok=true
+17:16:12   119.392  report appended to BetterInteraction_replay.txt
+17:16:12   119.392  fire 1: C  pay as much as you can afford in ONE press returned; watching for a delta
+17:16:13   120.425  report appended to BetterInteraction_replay.txt
+17:16:13   120.426  fire 1 watch complete
+17:16:14   120.937  restored RequiredMoney on BP_HeldenElevator_CoinDeposit_C_2
+17:16:14   120.937  report appended to BetterInteraction_replay.txt
+17:16:19   126.577  report appended to BetterInteraction_replay.txt
+17:16:19   126.577  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+17:22:31     2.535  ---- BetterInteractionReplay replay-8 loaded ----
+17:22:31     2.535  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+17:22:31     2.535  F9   read-only: cycle the armed method and show every gate
+17:22:31     2.535  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+17:22:32     3.523  report appended to BetterInteraction_replay.txt
+17:22:32     3.523  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+17:22:36     8.140  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480882); epoch is now 1
+17:23:46    77.748  report appended to BetterInteraction_replay.txt
+17:23:46    77.748  armed: B  InteractableObject:Interact(pawn)  READY
+17:23:46    77.954  report appended to BetterInteraction_replay.txt
+17:23:46    77.955  armed: C  pay as much as you can afford in ONE press  READY
+17:23:49    80.723  ABOUT TO INVOKE C  pay as much as you can afford in ONE press on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2
+17:23:49    80.723  WRITING RequiredMoney on BP_HeldenElevator_CoinDeposit_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.BP_HeldenElevator_CoinDeposit_C_2: 0S/5G/0A -> 0S/21G/0A (restoring in 15 ticks)
+17:23:49    80.723  RETURNED from C  pay as much as you can afford in ONE press  ok=true
+17:23:49    80.724  report appended to BetterInteraction_replay.txt
+17:23:49    80.724  fire 1: C  pay as much as you can afford in ONE press returned; watching for a delta
+17:23:50    81.754  report appended to BetterInteraction_replay.txt
+17:23:50    81.754  fire 1 watch complete
+17:23:50    82.261  restored RequiredMoney on BP_HeldenElevator_CoinDeposit_C_2
+17:23:50    82.262  report appended to BetterInteraction_replay.txt
+17:38:06     2.612  ---- BetterInteractionReplay replay-8 loaded ----
+17:38:06     2.612  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+17:38:06     2.612  F9   read-only: cycle the armed method and show every gate
+17:38:06     2.612  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+17:38:07     3.568  report appended to BetterInteraction_replay.txt
+17:38:07     3.568  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+17:39:30    86.668  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480763); epoch is now 1
+17:44:27     2.867  ---- BetterInteractionReplay replay-8 loaded ----
+17:44:27     2.867  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+17:44:27     2.867  F9   read-only: cycle the armed method and show every gate
+17:44:27     2.867  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+17:44:28     3.651  report appended to BetterInteraction_replay.txt
+17:44:28     3.652  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+17:44:48    23.531  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480864); epoch is now 1
+18:26:04     2.958  ---- BetterInteractionReplay replay-8 loaded ----
+18:26:04     2.958  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+18:26:04     2.959  F9   read-only: cycle the armed method and show every gate
+18:26:04     2.959  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+18:26:06     4.207  report appended to BetterInteraction_replay.txt
+18:26:06     4.207  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+18:26:12    11.105  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481478 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480880); epoch is now 1
+18:26:22    20.900  report appended to BetterInteraction_replay.txt
+18:26:22    20.900  armed: B  InteractableObject:Interact(pawn)  READY
+18:26:35    33.499  report appended to BetterInteraction_replay.txt
+18:26:35    33.499  armed: C  pay as much as you can afford in ONE press  BLOCKED
+18:26:36    34.205  report appended to BetterInteraction_replay.txt
+18:26:36    34.205  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+18:26:43    41.353  ABOUT TO INVOKE A  PlayerController:Interact_Server(pawn, component) on Chair_01_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.Chair_01_C_2147479865
+18:26:43    41.353  RETURNED from A  PlayerController:Interact_Server(pawn, component)  ok=true
+18:26:43    41.353  report appended to BetterInteraction_replay.txt
+18:26:43    41.353  fire 1: A  PlayerController:Interact_Server(pawn, component) returned; watching for a delta
+18:26:44    42.378  report appended to BetterInteraction_replay.txt
+18:26:44    42.378  fire 1 watch complete
+19:05:14     2.854  ---- BetterInteractionReplay replay-8 loaded ----
+19:05:14     2.854  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+19:05:14     2.854  F9   read-only: cycle the armed method and show every gate
+19:05:14     2.854  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+19:05:15     3.930  report appended to BetterInteraction_replay.txt
+19:05:15     3.930  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+19:05:20     8.465  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480882); epoch is now 1
+19:05:44    33.179  report appended to BetterInteraction_replay.txt
+19:05:44    33.179  armed: B  InteractableObject:Interact(pawn)  READY
+19:05:46    35.338  report appended to BetterInteraction_replay.txt
+19:05:46    35.339  armed: C  pay as much as you can afford in ONE press  BLOCKED
+19:05:47    35.644  report appended to BetterInteraction_replay.txt
+19:05:47    35.645  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+19:05:48    37.193  ABOUT TO INVOKE A  PlayerController:Interact_Server(pawn, component) on Chair_01_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.Chair_01_C_2147479867
+19:05:48    37.193  RETURNED from A  PlayerController:Interact_Server(pawn, component)  ok=true
+19:05:48    37.194  report appended to BetterInteraction_replay.txt
+19:05:48    37.194  fire 1: A  PlayerController:Interact_Server(pawn, component) returned; watching for a delta
+19:05:49    38.232  report appended to BetterInteraction_replay.txt
+19:05:49    38.232  fire 1 watch complete
+19:12:08     2.530  ---- BetterInteractionReplay replay-8 loaded ----
+19:12:08     2.530  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+19:12:08     2.530  F9   read-only: cycle the armed method and show every gate
+19:12:08     2.530  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+19:12:09     3.569  report appended to BetterInteraction_replay.txt
+19:12:09     3.569  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+19:12:21    14.973  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480872); epoch is now 1
+19:12:43    37.122  report appended to BetterInteraction_replay.txt
+19:12:43    37.122  armed: B  InteractableObject:Interact(pawn)  READY
+19:12:44    37.951  report appended to BetterInteraction_replay.txt
+19:12:44    37.951  armed: C  pay as much as you can afford in ONE press  BLOCKED
+19:12:44    38.158  report appended to BetterInteraction_replay.txt
+19:12:44    38.158  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+19:12:46    40.413  ABOUT TO INVOKE A  PlayerController:Interact_Server(pawn, component) on Chair_01_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.Chair_01_C_2147479857
+19:12:46    40.413  RETURNED from A  PlayerController:Interact_Server(pawn, component)  ok=true
+19:12:46    40.413  report appended to BetterInteraction_replay.txt
+19:12:46    40.413  fire 1: A  PlayerController:Interact_Server(pawn, component) returned; watching for a delta
+19:12:47    41.437  report appended to BetterInteraction_replay.txt
+19:12:47    41.438  fire 1 watch complete
+19:16:20     2.582  ---- BetterInteractionReplay replay-9 loaded ----
+19:16:20     2.582  loaded. THIS PROBE CAN CHANGE THE GAME. Solo only, 20 fires per session, one call per press.
+19:16:20     2.582  F9   read-only: cycle the armed method and show every gate
+19:16:20     2.582  F10  FIRES ONE REAL INTERACTION. Press F9 first.
+19:16:21     3.593  report appended to BetterInteraction_replay.txt
+19:16:21     3.593  armed: A  PlayerController:Interact_Server(pawn, component)  BLOCKED
+19:16:25     7.400  world changed (HeldenInteractionSubsystem /Game/Maps/Helden_Menu.Helden_Menu:HeldenInteractionSubsystem_2147481477 -> HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480881); epoch is now 1
+19:16:39    21.527  report appended to BetterInteraction_replay.txt
+19:16:39    21.527  armed: B  InteractableObject:Interact(pawn)  READY
+19:16:39    21.736  report appended to BetterInteraction_replay.txt
+19:16:39    21.736  armed: C  pay as much as you can afford in ONE press  BLOCKED
+19:16:40    22.252  report appended to BetterInteraction_replay.txt
+19:16:40    22.252  armed: A  PlayerController:Interact_Server(pawn, component)  READY
+19:16:45    27.966  ABOUT TO INVOKE A  PlayerController:Interact_Server(pawn, component) on Chair_01_C /Game/Maps/Helden_Main.Helden_Main:PersistentLevel.Chair_01_C_2147479866
+19:16:45    27.966  RETURNED from A  PlayerController:Interact_Server(pawn, component)  ok=true
+19:16:45    27.966  report appended to BetterInteraction_replay.txt
+19:16:45    27.966  fire 1: A  PlayerController:Interact_Server(pawn, component) returned; watching for a delta
+19:16:46    29.004  report appended to BetterInteraction_replay.txt
+19:16:46    29.004  fire 1 watch complete

@@ -1,0 +1,131 @@
+
+================================================================
+ BetterInteraction 0.1.0-phase1   2026-08-29 17:40:56
+================================================================
+  config            NOT LOADED -- running on built-in defaults
+  passes            164
+  passes with no world 0
+  world epoch       1
+  values written    1
+  values REFUSED    0
+  values the game put back 0
+  components walked last pass 0
+
+  -- settings, in the order this file lists them --
+  prompt_angle           45
+  prompt_distance        0
+  reach                  0
+  reach_ceiling          250
+  aim_forgiveness        0
+  hold_duration          0
+  hold_duration_floor    0.25
+  apply_interval         1.0
+  log_reverts            1
+  diagnostic_key         1
+
+  -- live readback --
+  subsystem         HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480763
+  settings asset    InteractionSettings /Game/Core/InteractionSettings.InteractionSettings
+  InteractProximityAngle 45.0
+  InteractProximityDistance 300.0
+  RegisteredInteractionEntries 338 entries
+================ end of BetterInteraction state ================
+
+================================================================
+ BetterInteraction 0.2.0-deposit   2026-08-29 19:46:59
+================================================================
+  config            ..\..\Config\BetterInteraction.cfg
+  passes            153
+  passes with no world 0
+  world epoch       1
+  values written    0
+  values REFUSED    0
+  values the game put back 0
+  components walked last pass 0
+  deposits modified right now  0
+
+  -- settings, in the order this file lists them --
+  prompt_angle           0
+  prompt_distance        0
+  reach                  0
+  reach_ceiling          250
+  aim_forgiveness        0
+  hold_duration          0
+  hold_duration_floor    0.25
+  apply_interval         1.0
+  log_reverts            1
+  diagnostic_key         1
+
+  -- live readback --
+  subsystem         HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480863
+  settings asset    InteractionSettings /Game/Core/InteractionSettings.InteractionSettings
+  InteractProximityAngle 20.0
+  InteractProximityDistance 300.0
+  RegisteredInteractionEntries 336 entries
+================ end of BetterInteraction state ================
+
+================================================================
+ BetterInteraction 0.2.2-nohold   2026-08-29 21:02:13
+================================================================
+  config            ..\..\Config\BetterInteraction.cfg
+  passes            659
+  passes with no world 0
+  world epoch       1
+  values written    0
+  values REFUSED    0
+  values the game put back 0
+  components walked last pass 0
+  deposits modified right now  0
+
+  -- settings, in the order this file lists them --
+  prompt_angle           0
+  prompt_distance        0
+  reach                  0
+  reach_ceiling          250
+  aim_forgiveness        0
+  hold_duration          0
+  hold_duration_floor    0.25
+  apply_interval         1.0
+  log_reverts            1
+  diagnostic_key         1
+
+  -- live readback --
+  subsystem         HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480105
+  settings asset    InteractionSettings /Game/Core/InteractionSettings.InteractionSettings
+  InteractProximityAngle 20.0
+  InteractProximityDistance 300.0
+  RegisteredInteractionEntries 336 entries
+================ end of BetterInteraction state ================
+
+================================================================
+ BetterInteraction 0.2.3-proximity   2026-08-29 21:08:34
+================================================================
+  config            ..\..\Config\BetterInteraction.cfg
+  passes            110
+  passes with no world 0
+  world epoch       1
+  values written    0
+  values REFUSED    0
+  values the game put back 0
+  components walked last pass 0
+  deposits modified right now  0
+
+  -- settings, in the order this file lists them --
+  prompt_angle           0
+  prompt_distance        0
+  reach                  0
+  reach_ceiling          250
+  aim_forgiveness        0
+  hold_duration          0
+  hold_duration_floor    0.25
+  apply_interval         1.0
+  log_reverts            1
+  diagnostic_key         1
+
+  -- live readback --
+  subsystem         HeldenInteractionSubsystem /Game/Maps/Helden_Main.Helden_Main:HeldenInteractionSubsystem_2147480857
+  settings asset    InteractionSettings /Game/Core/InteractionSettings.InteractionSettings
+  InteractProximityAngle 20.0
+  InteractProximityDistance 300.0
+  RegisteredInteractionEntries 383 entries
+================ end of BetterInteraction state ================

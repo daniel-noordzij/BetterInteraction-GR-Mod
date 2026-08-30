@@ -1,0 +1,6 @@
+# probe output pasted back from the game lands in data/inventory/ by hand;
+# nothing else from a game session belongs in the repo.
+*.pyc
+__pycache__/
+dist/
+build/

@@ -1,0 +1,204 @@
+
+================================================================
+ BetterInteractionHoldProbe hold-1   RECORDING from 2026-08-29 18:27:21
+================================================================
+ One line per CHANGE. Columns:
+   time      os.clock seconds
+   focus     AHeldenPlayerController.CurrentInteractTarget's owner
+   HOLD/tap  that component's bIsHoldInteraction, and its duration
+   widget    its prompt widget's InteractState -- the second,
+             independent focus signal. If these two ever disagree,
+             that disagreement is the finding.
+   the rest  the interact action's live ETriggerEvent, how long the
+             key has been down, and how long it has been triggered
+
+ WHAT TO DO: hold E, THEN walk into range of a chair or casket --
+ that is the bug. Then release and re-press without moving -- that
+ is the workaround. The two orderings will be side by side.
+
+  79.905  focus=-                                              -            widget=-               IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.003  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.10 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.105  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.20 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.205  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.30 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.307  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.41 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.407  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.51 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.505  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.59 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.609  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.69 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.709  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.81 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.818  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.92 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  83.913  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.01 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.021  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.12 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.128  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.22 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.229  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.33 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.325  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.41 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.427  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.51 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.528  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.63 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.632  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.73 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.736  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.84 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.843  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.94 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  84.949  focus=-                                              -            widget=-               IA_Interact=Ongoing held=2.05 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  85.049  focus=-                                              -            widget=-               IA_Interact=Ongoing held=2.15 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  85.153  focus=-                                              -            widget=-               IA_Interact=Ongoing held=2.25 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  85.257  focus=-                                              -            widget=-               IA_Interact=Ongoing held=2.35 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  85.357  focus=-                                              -            widget=-               IA_Interact=Ongoing held=2.45 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  85.456  focus=-                                              -            widget=-               IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.269  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.06 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.370  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.18 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.476  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.28 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.580  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.39 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.683  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.49 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.788  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.59 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.887  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.70 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  86.993  focus=Chair_01_C Chair_01_C_2147479865               HOLD 0.80s   widget=Focused         IA_Interact=Ongoing held=0.80 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.094  focus=-                                              -            widget=-               IA_Interact=Ongoing held=0.88 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.190  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.295  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.09 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.396  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.19 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.496  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.30 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.601  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.41 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.704  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.51 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.807  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.61 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  87.912  focus=-                                              -            widget=-               IA_Interact=Ongoing held=1.72 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  88.014  focus=-                                              -            widget=-               IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+
+ stopped. 91 samples, 44 changes recorded.
+================================================================
+
+================================================================
+ BetterInteractionHoldProbe hold-2   RECORDING from 2026-08-29 19:05:27
+================================================================
+ One line per CHANGE. Columns:
+   time      os.clock seconds
+   focus     AHeldenPlayerController.CurrentInteractTarget's owner
+   HOLD/tap  that component's bIsHoldInteraction, and its duration
+   widget    its prompt widget's InteractState -- the second,
+             independent focus signal. If these two ever disagree,
+             that disagreement is the finding.
+   the rest  the interact action's live ETriggerEvent, how long the
+             key has been down, and how long it has been triggered
+
+ WHAT TO DO: hold E, THEN walk into range of a chair or casket --
+ that is the bug. Then release and re-press without moving -- that
+ is the workaround. The two orderings will be side by side.
+
+  15.584  focus=-                                        -            widget=-              running=-                          IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.122  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.06 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.223  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.16 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.328  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.27 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.428  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.37 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.528  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.47 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.635  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.57 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.735  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.68 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.835  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.78 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  21.943  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.88 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.043  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.98 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.143  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.08 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.243  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.18 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.346  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.29 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.454  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.39 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.553  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.49 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.662  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.60 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.754  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.70 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.858  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.80 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  22.957  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.90 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.059  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.159  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.10 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.259  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.20 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.364  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.31 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.464  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.39 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.569  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.49 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.676  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.61 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.771  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.72 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.875  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.82 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  23.983  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.92 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.079  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.02 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.181  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.11 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.287  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.23 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.390  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.33 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.488  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.43 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.591  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.52 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  24.698  focus=-                                        -            widget=-              running=-                          IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  25.736  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.12 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  25.829  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.22 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  25.930  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.32 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.030  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.40 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.131  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.51 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.234  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.61 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.338  focus=Chair_01_C Chair_01_C_2147479867         HOLD 0.80s   widget=Focused        running=-                          IA_Interact=Ongoing held=0.71 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.443  focus=-                                        -            widget=-              running=Chair_01_C_2147479867      IA_Interact=Ongoing held=0.82 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.544  focus=-                                        -            widget=-              running=Chair_01_C_2147479867      IA_Interact=Ongoing held=0.94 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.648  focus=-                                        -            widget=-              running=Chair_01_C_2147479867      IA_Interact=Ongoing held=1.04 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  26.756  focus=-                                        -            widget=-              running=Chair_01_C_2147479867      IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.306  focus=-                                        -            widget=-              running=-                          IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+
+ stopped. 249 samples, 49 changes recorded.
+================================================================
+
+================================================================
+ BetterInteractionHoldProbe hold-2   RECORDING from 2026-08-29 19:12:33
+================================================================
+ One line per CHANGE. Columns:
+   time      os.clock seconds
+   focus     AHeldenPlayerController.CurrentInteractTarget's owner
+   HOLD/tap  that component's bIsHoldInteraction, and its duration
+   widget    its prompt widget's InteractState -- the second,
+             independent focus signal. If these two ever disagree,
+             that disagreement is the finding.
+   the rest  the interact action's live ETriggerEvent, how long the
+             key has been down, and how long it has been triggered
+
+ WHAT TO DO: hold E, THEN walk into range of a chair or casket --
+ that is the bug. Then release and re-press without moving -- that
+ is the workaround. The two orderings will be side by side.
+
+  27.580  focus=-                                        -            widget=-              running=-                          IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.134  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.06 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.235  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.18 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.339  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.28 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.443  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.38 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.553  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.49 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.648  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.59 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.745  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.69 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.850  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.79 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  29.956  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=0.90 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.054  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.154  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.08 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.257  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.20 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.364  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.31 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.463  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.39 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.574  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.49 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.672  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.60 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.777  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.70 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.877  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.80 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  30.982  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=1.91 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.084  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.03 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.191  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.11 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.292  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.22 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.391  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.34 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.496  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.42 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.604  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.53 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.702  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.64 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.802  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.75 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  31.902  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.83 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.007  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=2.93 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.108  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.04 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.214  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.14 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.317  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.24 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.420  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.35 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.521  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.45 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.629  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.57 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.726  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.67 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.828  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.77 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  32.927  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.87 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.030  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=3.97 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.133  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.06 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.242  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.17 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.343  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.27 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.444  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.39 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.549  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.49 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.655  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.59 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.756  focus=-                                        -            widget=-              running=-                          IA_Interact=Ongoing held=4.70 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+  33.853  focus=-                                        -            widget=-              running=-                          IA_Interact=None held=0.00 trig=0.00  |  IA_PauseMenu=None held=0.00 trig=0.00
+
+ stopped. 272 samples, 48 changes recorded.
+================================================================

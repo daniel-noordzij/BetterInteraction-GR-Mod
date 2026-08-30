@@ -1,0 +1,1989 @@
+
+================================================================
+ BetterInteractionReplay replay-1   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:00:09
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  BLOCKED -- ALT+F10 would refuse:
+      * nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+
+================================================================
+ BetterInteractionReplay replay-1   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:03:49
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/55G/1A
+  BLOCKED -- ALT+F10 would refuse:
+      * nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+
+================================================================
+ BetterInteractionReplay replay-1   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:04:58
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 24S/68G/1A
+  BLOCKED -- ALT+F10 would refuse:
+      * nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+
+ REFUSED at 16:05:12 -- A  PlayerController:Interact_Server(pawn, component)
+      * nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+
+================================================================
+ BetterInteractionReplay replay-1   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:05:22
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 24S/68G/1A
+  BLOCKED -- ALT+F10 would refuse:
+      * nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+
+ REFUSED at 16:05:27 -- B  InteractableObject:Interact(pawn)
+      * nothing is focused -- CurrentInteraction is empty. Look directly at an interactable and try again.
+
+================================================================
+ BetterInteractionReplay replay-3   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:17:38
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-3   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:20:31
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-3   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:21:19
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 24 interactables --
+     state            owning class                             name
+     no widget        BP_SpikeClub_01_C                        BP_SpikeClub_01_C_2147479314
+     no widget        BP_Broom_01_C                            BP_Broom_01_C_2147479315
+     no widget        BP_SpikeClub_01_C                        BP_SpikeClub_01_C_2147479317
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479319
+     no widget        BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479352
+     no widget        BP_ShopTipJar_C                          BP_ShopTipJar_C_0
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_416
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_571
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_424
+     no widget        BP_HeldenDoor_Base_C                     BP_HeldenDoor_Base_C_1
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_5
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_4
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_0
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_Malet_SpawnSpot_01_C                  BP_Malet_SpawnSpot_01_C_2
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480765
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     Hidden           BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479700
+     no widget        BP_Compass_01_C                          BP_Compass_01_C_2147479708
+     no widget        Bench_01_C                               Bench_01_C_2147479893
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480750
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   B  InteractableObject:Interact(pawn)   2026-08-29 16:21:23
+================================================================
+  target                     BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  CoinsLeftToPay before      n/a
+  RemainingCost before       n/a
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         CoinsLeftToPay n/a -> n/a   RemainingCost n/a -> n/a
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         CoinsLeftToPay n/a -> n/a   RemainingCost n/a -> n/a
+  VERDICT: a non-zero delta above means B  InteractableObject:Interact(pawn)
+  actually performed the interaction. NO CHANGE on both readings
+  means the call was accepted by Lua but did nothing.
+
+================================================================
+ BetterInteractionReplay replay-3   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:21:31
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 1 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 24 interactables --
+     state            owning class                             name
+     no widget        BP_SpikeClub_01_C                        BP_SpikeClub_01_C_2147479314
+     no widget        BP_Broom_01_C                            BP_Broom_01_C_2147479315
+     no widget        BP_SpikeClub_01_C                        BP_SpikeClub_01_C_2147479317
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479319
+     no widget        BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479352
+     no widget        BP_ShopTipJar_C                          BP_ShopTipJar_C_0
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_416
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_571
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_424
+     no widget        BP_HeldenDoor_Base_C                     BP_HeldenDoor_Base_C_1
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_5
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_4
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_0
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_Malet_SpawnSpot_01_C                  BP_Malet_SpawnSpot_01_C_2
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480765
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     Hidden           BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479700
+     no widget        BP_Compass_01_C                          BP_Compass_01_C_2147479708
+     no widget        Bench_01_C                               Bench_01_C_2147479893
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480750
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-3   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:21:33
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 1 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 24 interactables --
+     state            owning class                             name
+     no widget        BP_SpikeClub_01_C                        BP_SpikeClub_01_C_2147479314
+     no widget        BP_Broom_01_C                            BP_Broom_01_C_2147479315
+     no widget        BP_SpikeClub_01_C                        BP_SpikeClub_01_C_2147479317
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479319
+     no widget        BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479352
+     no widget        BP_ShopTipJar_C                          BP_ShopTipJar_C_0
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_416
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_571
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_424
+     no widget        BP_HeldenDoor_Base_C                     BP_HeldenDoor_Base_C_1
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_5
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_4
+     no widget        BP_ItemSpawnSpot_Shop_01_C               BP_ItemSpawnSpot_Shop_01_C_0
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_Malet_SpawnSpot_01_C                  BP_Malet_SpawnSpot_01_C_2
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480765
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     Hidden           BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479700
+     no widget        BP_Compass_01_C                          BP_Compass_01_C_2147479708
+     no widget        Bench_01_C                               Bench_01_C_2147479893
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480750
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 2/20   B  InteractableObject:Interact(pawn)   2026-08-29 16:21:37
+================================================================
+  target                     BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  CoinsLeftToPay before      n/a
+  RemainingCost before       n/a
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         CoinsLeftToPay n/a -> n/a   RemainingCost n/a -> n/a
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         CoinsLeftToPay n/a -> n/a   RemainingCost n/a -> n/a
+  VERDICT: a non-zero delta above means B  InteractableObject:Interact(pawn)
+  actually performed the interaction. NO CHANGE on both readings
+  means the call was accepted by Lua but did nothing.
+
+================================================================
+ BetterInteractionReplay replay-4   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:24:59
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-4   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:26:18
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 13S/36G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480762
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479697
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480747
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-4   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:26:28
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 13S/36G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480762
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479697
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480747
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:26:43
+================================================================
+  target                     BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               13S/36G/1A
+  counters watched           8
+    BP_HeldenElevator_C BP_HeldenElevator_C_1    coins=n/a remaining=n/a
+    BP_HeldenPlayerCharacter_01_C BP_HeldenPlayerCharacter_01_C_2147480762 coins=n/a remaining=n/a
+    BP_ElevatorRoofHatch_01_C BP_ElevatorRoofHatch_01_C_1 coins=n/a remaining=n/a
+    BP_HeldenSymbolCatalog_C BP_HeldenSymbolCatalog_C_1 coins=n/a remaining=n/a
+    BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins=n/a remaining=40
+    BP_HeldenElevator_CoinDeposit_C BP_HeldenElevator_CoinDeposit_C_2 coins=n/a remaining=n/a
+    BP_Malet_01_C BP_Malet_01_C_2147479697       coins=n/a remaining=n/a
+    BP_HeldenSoulPawn_C BP_HeldenSoulPawn_C_2147480747 coins=n/a remaining=n/a
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms                     could not re-read (nothing is focused. CurrentInteraction is empty and none of the 8 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.)
+  +1000ms  money 13S/36G/1A -> 13S/31G/1A   delta +0S/-5G/+0A
+         BP_HeldenElevator_C BP_HeldenElevator_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenPlayerCharacter_01_C BP_HeldenPlayerCharacter_01_C_2147480762 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_ElevatorRoofHatch_01_C BP_ElevatorRoofHatch_01_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenSymbolCatalog_C BP_HeldenSymbolCatalog_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 40 -> 35   <-- MOVED
+         BP_HeldenElevator_CoinDeposit_C BP_HeldenElevator_CoinDeposit_C_2 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_Malet_01_C BP_Malet_01_C_2147479697   coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenSoulPawn_C BP_HeldenSoulPawn_C_2147480747 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+  VERDICT: a non-zero delta above means A  PlayerController:Interact_Server(pawn, component)
+  actually performed the interaction. NO CHANGE on every reading
+  means the call was accepted by Lua but did nothing.
+
+================================================================
+ BetterInteractionReplay replay-4   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:26:49
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 1 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 13S/31G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480762
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479697
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480747
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 2/20   B  InteractableObject:Interact(pawn)   2026-08-29 16:26:51
+================================================================
+  target                     BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               13S/31G/1A
+  counters watched           8
+    BP_HeldenElevator_C BP_HeldenElevator_C_1    coins=n/a remaining=n/a
+    BP_HeldenPlayerCharacter_01_C BP_HeldenPlayerCharacter_01_C_2147480762 coins=n/a remaining=n/a
+    BP_ElevatorRoofHatch_01_C BP_ElevatorRoofHatch_01_C_1 coins=n/a remaining=n/a
+    BP_HeldenSymbolCatalog_C BP_HeldenSymbolCatalog_C_1 coins=n/a remaining=n/a
+    BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins=n/a remaining=35
+    BP_HeldenElevator_CoinDeposit_C BP_HeldenElevator_CoinDeposit_C_2 coins=n/a remaining=n/a
+    BP_Malet_01_C BP_Malet_01_C_2147479697       coins=n/a remaining=n/a
+    BP_HeldenSoulPawn_C BP_HeldenSoulPawn_C_2147480747 coins=n/a remaining=n/a
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 13S/31G/1A -> 13S/26G/1A   delta +0S/-5G/+0A
+         BP_HeldenElevator_C BP_HeldenElevator_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenPlayerCharacter_01_C BP_HeldenPlayerCharacter_01_C_2147480762 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_ElevatorRoofHatch_01_C BP_ElevatorRoofHatch_01_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenSymbolCatalog_C BP_HeldenSymbolCatalog_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 35 -> 30   <-- MOVED
+         BP_HeldenElevator_CoinDeposit_C BP_HeldenElevator_CoinDeposit_C_2 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_Malet_01_C BP_Malet_01_C_2147479697   coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenSoulPawn_C BP_HeldenSoulPawn_C_2147480747 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+  +1000ms  money 13S/31G/1A -> 13S/26G/1A   delta +0S/-5G/+0A
+         BP_HeldenElevator_C BP_HeldenElevator_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenPlayerCharacter_01_C BP_HeldenPlayerCharacter_01_C_2147480762 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_ElevatorRoofHatch_01_C BP_ElevatorRoofHatch_01_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenSymbolCatalog_C BP_HeldenSymbolCatalog_C_1 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 35 -> 30   <-- MOVED
+         BP_HeldenElevator_CoinDeposit_C BP_HeldenElevator_CoinDeposit_C_2 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_Malet_01_C BP_Malet_01_C_2147479697   coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+         BP_HeldenSoulPawn_C BP_HeldenSoulPawn_C_2147480747 coins n/a -> n/a  remaining n/a -> n/a   <-- MOVED
+  VERDICT: a non-zero delta above means B  InteractableObject:Interact(pawn)
+  actually performed the interaction. NO CHANGE on every reading
+  means the call was accepted by Lua but did nothing.
+
+================================================================
+ BetterInteractionReplay replay-6   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:45:43
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-6   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:47:10
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/51G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480768
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479703
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480753
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-6   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 16:47:11
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/51G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+
+  PLAN: none -- nothing in range reports how much is still owed
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480768
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479703
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480753
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+ REFUSED -- C  pay as much as you can afford in ONE press
+      * nothing in range reports how much is still owed
+
+ REFUSED -- C  pay as much as you can afford in ONE press
+      * nothing in range reports how much is still owed
+
+================================================================
+ BetterInteractionReplay replay-6   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 16:56:36
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-6   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 16:58:00
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/33G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480742
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479677
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480727
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-6   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 16:58:00
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/33G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor
+  counter holder             BP_HeldenElevator_CoinDeposit_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              n/a
+  counters watched           8
+
+  PLAN: none -- nothing in range reports how much is still owed
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480742
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479677
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480727
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+ REFUSED -- C  pay as much as you can afford in ONE press
+      * nothing in range reports how much is still owed
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 17:14:16
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 17:16:01
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/20G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor's TargetObject
+  counter holder             BP_HeldenElevatorMachine_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              40
+  counters watched           1
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480766
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     Hidden           BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479701
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480751
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 17:16:02
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/20G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor's TargetObject
+  counter holder             BP_HeldenElevatorMachine_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              40
+  counters watched           1
+
+  PLAN: pay 20 gold in ONE press instead of 5
+        owed 40, you can afford 20, so it takes 20
+        RequiredMoney  0S/5G/0A -> 0S/20G/0A, then restored after 1.5s
+        saves 3 presses
+        INTENDED: the total paid is unchanged, only the chunk
+        size moves. UNVERIFIED until this fire measures it --
+        whether the machine credits what the deposit charges is
+        exactly what the verdict below settles.
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480766
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     Hidden           BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479701
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480751
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   C  pay as much as you can afford in ONE press   2026-08-29 17:16:12
+================================================================
+  target                     BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/20G/1A
+  PLAN                       pay 20 gold in one press instead of 5 (0S/5G/0A -> 0S/20G/0A)
+  EXPECT                     money -20 gold, owed 40 -> 20
+  counters watched           1
+    BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins=n/a remaining=40
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/20G/1A -> 0S/0G/1A   delta +0S/-20G/+0A
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 40 -> 20   <-- MOVED
+  +1000ms  money 0S/20G/1A -> 0S/0G/1A   delta +0S/-20G/+0A
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 40 -> 20   <-- MOVED
+
+  VERDICT: MATCHED the plan -- 20 gold in ONE press.
+  The RequiredMoney write took effect and one press paid what
+  would have taken 4.
+  restored RequiredMoney to 0S/5G/0A   (verified after 1 attempt)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 17:16:19
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 1 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/1A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor's TargetObject
+  counter holder             BP_HeldenElevatorMachine_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              20
+  counters watched           1
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480766
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     Hidden           BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479701
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480751
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 17:22:32
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 17:23:46
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/21G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor's TargetObject
+  counter holder             BP_HeldenElevatorMachine_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              40
+  counters watched           1
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480770
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479705
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480755
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 17:23:46
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/21G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  its InteractComponent      present
+  counter found via          the focused actor's TargetObject
+  counter holder             BP_HeldenElevatorMachine_C_2
+  CoinsLeftToPay             n/a
+  RemainingCost              40
+  counters watched           1
+
+  PLAN: pay 21 gold in ONE press instead of 5
+        owed 40, you can afford 21, so it takes 21
+        RequiredMoney  0S/5G/0A -> 0S/21G/0A, then restored after 1.5s
+        saves 3 presses
+        INTENDED: the total paid is unchanged, only the chunk
+        size moves. UNVERIFIED until this fire measures it --
+        whether the machine credits what the deposit charges is
+        exactly what the verdict below settles.
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+
+  -- what the game says is in range: 8 interactables --
+     state            owning class                             name
+     no widget        BP_HeldenElevator_C                      BP_HeldenElevator_C_1
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480770
+     no widget        BP_ElevatorRoofHatch_01_C                BP_ElevatorRoofHatch_01_C_1
+     no widget        BP_HeldenSymbolCatalog_C                 BP_HeldenSymbolCatalog_C_1
+     ProximityRange   BP_HeldenElevatorMachine_C               BP_HeldenElevatorMachine_C_2
+     Focused          BP_HeldenElevator_CoinDeposit_C          BP_HeldenElevator_CoinDeposit_C_2
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479705
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480755
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   C  pay as much as you can afford in ONE press   2026-08-29 17:23:49
+================================================================
+  target                     BP_HeldenElevator_CoinDeposit_C  BP_HeldenElevator_CoinDeposit_C_2
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/21G/0A
+  PLAN                       pay 21 gold in one press instead of 5 (0S/5G/0A -> 0S/21G/0A)
+  EXPECT                     money -21 gold, owed 40 -> 19
+  counters watched           1
+    BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins=n/a remaining=40
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/21G/0A -> 0S/0G/0A   delta +0S/-21G/+0A
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 40 -> 19   <-- MOVED
+  +1000ms  money 0S/21G/0A -> 0S/0G/0A   delta +0S/-21G/+0A
+         BP_HeldenElevatorMachine_C BP_HeldenElevatorMachine_C_2 coins n/a -> n/a  remaining 40 -> 19   <-- MOVED
+
+  VERDICT: MATCHED the plan -- 21 gold in ONE press.
+  The RequiredMoney write took effect and one press paid what
+  would have taken 4.
+  restored RequiredMoney to 0S/5G/0A   (verified after 1 attempt)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 17:38:07
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 17:44:28
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 18:26:06
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 18:26:22
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479865
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 40 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479394
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480768
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479703
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479710
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479832
+     Focused          Chair_01_C                               Chair_01_C_2147479865
+     no widget        Chair_01_C                               Chair_01_C_2147479866
+     no widget        Bench_01_C                               Bench_01_C_2147479895
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480753
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 18:26:35
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479865
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+
+  PLAN: none -- the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  >>> BLOCKED -- F10 would refuse:
+      * this method needs a plan: the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 40 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479394
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480768
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479703
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479710
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479832
+     Focused          Chair_01_C                               Chair_01_C_2147479865
+     no widget        Chair_01_C                               Chair_01_C_2147479866
+     no widget        Bench_01_C                               Bench_01_C_2147479895
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480753
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 18:26:36
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479865
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 40 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479394
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480768
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479703
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479710
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479832
+     Focused          Chair_01_C                               Chair_01_C_2147479865
+     no widget        Chair_01_C                               Chair_01_C_2147479866
+     no widget        Bench_01_C                               Bench_01_C_2147479895
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480753
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   A  PlayerController:Interact_Server(pawn, component)   2026-08-29 18:26:43
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479865
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  counters watched           0
+  !!! THIS FIRE IS UNINFORMATIVE: no observable can move. Whatever
+      the deltas below say, they say nothing about the call.
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  VERDICT: NONE. This fire had no observable that could move, so
+  it says nothing about A  PlayerController:Interact_Server(pawn, component) either way.
+  Re-run it with coins in hand and a machine in range.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:05:15
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 19:05:44
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479867
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 42 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479396
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480770
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479705
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479712
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479834
+     Focused          Chair_01_C                               Chair_01_C_2147479867
+     no widget        Chair_01_C                               Chair_01_C_2147479868
+     no widget        Bench_01_C                               Bench_01_C_2147479897
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480755
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 19:05:46
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479867
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+
+  PLAN: none -- the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  >>> BLOCKED -- F10 would refuse:
+      * this method needs a plan: the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 42 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479396
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480770
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479705
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479712
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479834
+     Focused          Chair_01_C                               Chair_01_C_2147479867
+     no widget        Chair_01_C                               Chair_01_C_2147479868
+     no widget        Bench_01_C                               Bench_01_C_2147479897
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480755
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:05:47
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479867
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 42 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479396
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480770
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479705
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479712
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479834
+     Focused          Chair_01_C                               Chair_01_C_2147479867
+     no widget        Chair_01_C                               Chair_01_C_2147479868
+     no widget        Bench_01_C                               Bench_01_C_2147479897
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480755
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:05:48
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479867
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  counters watched           0
+  !!! THIS FIRE IS UNINFORMATIVE: no observable can move. Whatever
+      the deltas below say, they say nothing about the call.
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  VERDICT: NONE. This fire had no observable that could move, so
+  it says nothing about A  PlayerController:Interact_Server(pawn, component) either way.
+  Re-run it with coins in hand and a machine in range.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:12:09
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 19:12:43
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479857
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 39 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479386
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480760
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479695
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479702
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479824
+     Focused          Chair_01_C                               Chair_01_C_2147479857
+     no widget        Chair_01_C                               Chair_01_C_2147479858
+     no widget        Bench_01_C                               Bench_01_C_2147479887
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480745
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 19:12:44
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479857
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+
+  PLAN: none -- the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  >>> BLOCKED -- F10 would refuse:
+      * this method needs a plan: the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 39 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479386
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480760
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479695
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479702
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479824
+     Focused          Chair_01_C                               Chair_01_C_2147479857
+     no widget        Chair_01_C                               Chair_01_C_2147479858
+     no widget        Bench_01_C                               Bench_01_C_2147479887
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480745
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-8   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:12:44
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479857
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! WARNING: a fire right now would be UNINFORMATIVE.
+      Your money reads all zero and nothing in range carries a
+      counter, so there is no observable that CAN move. A NO CHANGE
+      result would mean 'nothing was watched', not 'the call
+      failed'. Get some coins first, or aim at a machine.
+
+  -- what the game says is in range: 39 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479386
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_158
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480760
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479695
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479702
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479824
+     Focused          Chair_01_C                               Chair_01_C_2147479857
+     no widget        Chair_01_C                               Chair_01_C_2147479858
+     no widget        Bench_01_C                               Bench_01_C_2147479887
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480745
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:12:46
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479857
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  counters watched           0
+  !!! THIS FIRE IS UNINFORMATIVE: no observable can move. Whatever
+      the deltas below say, they say nothing about the call.
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  VERDICT: NONE. This fire had no observable that could move, so
+  it says nothing about A  PlayerController:Interact_Server(pawn, component) either way.
+  Re-run it with coins in hand and a machine in range.
+
+================================================================
+ BetterInteractionReplay replay-9   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:16:21
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-9   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 19:16:39
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479866
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! NOTE: your money reads all zero, so a deposit would have
+      nothing to spend. The counters below are still watched, so a
+      fire is not wasted -- but money will not move.
+
+  -- what the game says is in range: 40 interactables --
+     state            owning class                             name
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480769
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479704
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479711
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479833
+     Focused          Chair_01_C                               Chair_01_C_2147479866
+     no widget        Chair_01_C                               Chair_01_C_2147479867
+     no widget        Bench_01_C                               Bench_01_C_2147479896
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480754
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-9   ARMED: C  pay as much as you can afford in ONE press   2026-08-29 19:16:39
+================================================================
+  WRITES RequiredMoney, fires Interact_Server, then restores it. CO-OP BUCKET 3 -- unlike A and B this changes a property on a game actor, so it is host/solo only by nature.
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479866
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+
+  PLAN: none -- the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  >>> BLOCKED -- F10 would refuse:
+      * this method needs a plan: the focused actor carries no readable RequiredMoney -- aim at a coin deposit
+  !!! NOTE: your money reads all zero, so a deposit would have
+      nothing to spend. The counters below are still watched, so a
+      fire is not wasted -- but money will not move.
+
+  -- what the game says is in range: 40 interactables --
+     state            owning class                             name
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480769
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479704
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479711
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479833
+     Focused          Chair_01_C                               Chair_01_C_2147479866
+     no widget        Chair_01_C                               Chair_01_C_2147479867
+     no widget        Bench_01_C                               Bench_01_C_2147479896
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480754
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ BetterInteractionReplay replay-9   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:16:40
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479866
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! NOTE: your money reads all zero, so a deposit would have
+      nothing to spend. The counters below are still watched, so a
+      fire is not wasted -- but money will not move.
+
+  -- what the game says is in range: 40 interactables --
+     state            owning class                             name
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480769
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479704
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479711
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479833
+     Focused          Chair_01_C                               Chair_01_C_2147479866
+     no widget        Chair_01_C                               Chair_01_C_2147479867
+     no widget        Bench_01_C                               Bench_01_C_2147479896
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480754
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:16:45
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479866
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  accepted / running before  - / -
+  counters watched           0
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+  VERDICT: a non-zero delta above means A  PlayerController:Interact_Server(pawn, component)
+  actually performed the interaction. NO CHANGE on every reading
+  means the call was accepted by Lua but did nothing.
+
+================================================================
+ BetterInteractionReplay replay-10   ARMED: A  PlayerController:Interact_Server(pawn, component)   2026-08-29 19:21:19
+================================================================
+  the game's own client-to-server interact RPC (Helden.hpp:6700)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  >>> BLOCKED -- F10 would refuse:
+      * nothing is focused. CurrentInteraction is empty and none of the 0 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+      * this method needs the focused InteractComponent
+
+  -- what the game says is in range: 0 interactables --
+     nothing at all. Walk closer to something.
+
+================================================================
+ BetterInteractionReplay replay-10   ARMED: B  InteractableObject:Interact(pawn)   2026-08-29 19:21:37
+================================================================
+  the shared entry point, proven hookable (Helden.hpp:5823)
+  fires used                 0 of 20
+  authority                  true
+  players in lobby           1
+  your pawn                  BP_HeldenPlayerCharacter_01_C
+  your money                 0S/0G/0A
+  focus found via            the prompt widget reporting InteractState=Focused
+  focused target             Chair_01_C  Chair_01_C_2147479868
+  its InteractComponent      present
+  counter holder             none in range carries CoinsLeftToPay
+                             or RemainingCost
+  counters watched           0
+  >>> READY. F10 will fire ONE call and this WILL change the game.
+  !!! NOTE: your money reads all zero, so a deposit would have
+      nothing to spend. The counters below are still watched, so a
+      fire is not wasted -- but money will not move.
+
+  -- what the game says is in range: 41 interactables --
+     state            owning class                             name
+     Hidden           BP_HeldenCharacter_01_C                  BP_HeldenCharacter_01_C_2147479397
+     no widget        BP_OpenGumballObject_C                   BP_OpenGumballObject_C_0
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_19
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_18
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_17
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_16
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_15
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_14
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_13
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_12
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_11
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_10
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_9
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_8
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_7
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_6
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_5
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_4
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_3
+     no widget        BP_ItemRack_Slot_01_C                    BP_ItemRack_Slot_01_C_2
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_170
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_144
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_143
+     no widget        BP_Unlockable_Ceiling_01_C               StaticMeshActor_163
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_271
+     ProximityRange   BP_Unlockable_wall_01_C                  StaticMeshActor_324
+     Hidden           BP_Unlockable_wall_01_C                  StaticMeshActor_273
+     no widget        BP_Unlockable_wall_01_C                  StaticMeshActor_226
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_8
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_7
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_2
+     no widget        BP_InspectRoomView_C                     BP_InspectRoomView_C_0
+     no widget        BP_HeldenPlayerCharacter_01_C            BP_HeldenPlayerCharacter_01_C_2147480771
+     no widget        BP_Gumball_CoinDeposit_C                 BP_Gumball_CoinDeposit_C_1
+     no widget        BP_Malet_01_C                            BP_Malet_01_C_2147479706
+     Hidden           BP_ImageViewer_01_C                      BP_ImageViewer_01_C_2147479713
+     no widget        ScaryPainting_02_C                       ScaryPainting_02_C_2147479835
+     Focused          Chair_01_C                               Chair_01_C_2147479868
+     no widget        Chair_01_C                               Chair_01_C_2147479869
+     no widget        Bench_01_C                               Bench_01_C_2147479898
+     no widget        BP_HeldenSoulPawn_C                      BP_HeldenSoulPawn_C_2147480756
+     (Focused is the one F10 would act on. If nothing is
+      Focused, the game is not offering you a prompt right now.)
+
+================================================================
+ FIRE 1/20   B  InteractableObject:Interact(pawn)   2026-08-29 19:21:40
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479868
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  accepted / running before  - / -
+  counters watched           0
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+         accepted - -> -   running - -> Chair_01_C_2147479868   <-- MOVED
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         accepted - -> -   running - -> Chair_01_C_2147479868   <-- MOVED
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+
+  VERDICT: the call COMPLETED the interaction outright --
+  CurrentInteraction became Chair_01_C_2147479868.
+  For a HOLD that means Interact_Server does not start a hold,
+  it finishes it. Feature 5 would skip the hold entirely,
+  which is a different feature and needs a decision.
+
+================================================================
+ FIRE 2/20   B  InteractableObject:Interact(pawn)   2026-08-29 19:21:46
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479868
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  accepted / running before  - / -
+  counters watched           0
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+         accepted - -> -   running - -> Chair_01_C_2147479868   <-- MOVED
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         accepted - -> -   running - -> Chair_01_C_2147479868   <-- MOVED
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+
+  VERDICT: the call COMPLETED the interaction outright --
+  CurrentInteraction became Chair_01_C_2147479868.
+  For a HOLD that means Interact_Server does not start a hold,
+  it finishes it. Feature 5 would skip the hold entirely,
+  which is a different feature and needs a decision.
+
+ REFUSED at 19:21:50 -- B  InteractableObject:Interact(pawn)
+      * nothing is focused. CurrentInteraction is empty and none of the 40 hot interactables reports InteractState=Focused. Stand closer and look straight at it -- the survey below shows what the game thinks is in range.
+
+================================================================
+ FIRE 3/20   B  InteractableObject:Interact(pawn)   2026-08-29 19:21:50
+================================================================
+  target                     Chair_01_C  Chair_01_C_2147479868
+  focus found via            the prompt widget reporting InteractState=Focused
+  money before               0S/0G/0A
+  accepted / running before  - / -
+  counters watched           1
+    BP_GumballMachine_C BP_GumballMachine_C_1    coins=3 remaining=n/a
+  RESULT                     the call returned without raising
+  (that alone is NOT evidence anything happened -- the deltas below are)
+         accepted - -> -   running - -> Chair_01_C_2147479868   <-- MOVED
+  +300ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+         accepted - -> -   running - -> Chair_01_C_2147479868   <-- MOVED
+  +1000ms  money 0S/0G/0A -> 0S/0G/0A   delta NO CHANGE
+
+  VERDICT: the call COMPLETED the interaction outright --
+  CurrentInteraction became Chair_01_C_2147479868.
+  For a HOLD that means Interact_Server does not start a hold,
+  it finishes it. Feature 5 would skip the hold entirely,
+  which is a different feature and needs a decision.
