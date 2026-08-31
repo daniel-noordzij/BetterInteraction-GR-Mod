@@ -10,10 +10,13 @@ own folder name is NOT repeated inside the package.
 
     manifest.json
     README.md
+    CHANGELOG.md
     icon.png
     mod/Scripts/main.lua
     mod/enabled.txt
-    cfg/BetterInteraction.cfg
+
+The config is NOT in the zip -- see the long note in modpackage.stage() for
+why. The mod writes its own on first run.
 
 Usage:
     py tools/build_thunderstore.py            refuses while release blockers stand
@@ -55,6 +58,10 @@ def main(argv):
 
         shutil.copy2(os.path.join(mp.THUNDERSTORE_DIR, "README.md"),
                      os.path.join(staging, "README.md"))
+        # Thunderstore renders CHANGELOG.md as its own tab on the mod page.
+        mp.check_changelog(mp.SOURCE_CHANGELOG, version)
+        shutil.copy2(mp.SOURCE_CHANGELOG,
+                     os.path.join(staging, "CHANGELOG.md"))
         icon = os.path.join(mp.THUNDERSTORE_DIR, "icon.png")
         if not os.path.isfile(icon):
             raise mp.PackagingError("no icon.png -- run tools/make_icon.py")
@@ -87,7 +94,8 @@ def main(argv):
         bound = mp.check_keybinds(lua)
         mp.check_diagnostic_survives(lua)
         mp.check_no_audience_flag(lua)
-        print("keybinds shipped: %s" % ", ".join(bound))
+        print("keybinds shipped: %s" % (", ".join(bound) or "none, as required"))
+        print("website: %s" % (manifest["website_url"] or "(none)"))
 
         os.makedirs(mp.DIST, exist_ok=True)
         out = os.path.join(mp.DIST, "%s-%s.zip" % (mp.MOD_NAME, version))
@@ -104,7 +112,8 @@ def main(argv):
             print("   " + name)
 
         for required in ("manifest.json", "icon.png", "README.md",
-                         "mod/Scripts/main.lua", "mod/enabled.txt"):
+                         "CHANGELOG.md", "mod/Scripts/main.lua",
+                         "mod/enabled.txt"):
             if required not in names:
                 raise mp.PackagingError("the zip is missing " + required)
         return 0

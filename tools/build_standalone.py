@@ -12,8 +12,11 @@ install:
 
     mod/BetterInteraction/Scripts/main.lua
     mod/BetterInteraction/enabled.txt
-    cfg/BetterInteraction.cfg
     README.md
+    CHANGELOG.md
+
+The config is not in the zip; the mod writes its own on first run and logs
+where it put it.
 
 Usage:
     py tools/build_standalone.py
@@ -44,6 +47,11 @@ def build(staging):
 
     shutil.copy2(os.path.join(mp.STANDALONE_DIR, "README.md"),
                  os.path.join(staging, "README.md"))
+    # The same changelog as the Thunderstore package, and checked the same way.
+    # A hand-installer has no mod page to read it on, so the zip is the only
+    # place they will ever see what changed.
+    mp.check_changelog(mp.SOURCE_CHANGELOG, mp.read_version())
+    shutil.copy2(mp.SOURCE_CHANGELOG, os.path.join(staging, "CHANGELOG.md"))
     return keys
 
 
@@ -61,8 +69,8 @@ def install(staging, target):
     copied = []
     for base, _dirs, files in os.walk(staging):
         for name in files:
-            if name == "README.md" and base == staging:
-                continue                       # the readme is for the zip only
+            if name in ("README.md", "CHANGELOG.md") and base == staging:
+                continue                    # zip paperwork, not profile files
             source = os.path.join(base, name)
             rel = os.path.relpath(source, staging)
             dest = os.path.join(target, rel)

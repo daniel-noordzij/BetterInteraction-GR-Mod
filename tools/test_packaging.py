@@ -107,6 +107,44 @@ expect_pass("rule 5  the shipped config and the mod agree",
             lambda: mp.check_config_matches_lua(
                 GOOD_LUA, mp.check_config_is_a_file(mp.SOURCE_CFG)))
 
+# --- the changelog must name the version being built -------------------------
+expect_refusal("chlog   a changelog that does not mention this build is refused",
+               lambda: mp.check_changelog(mp.SOURCE_CHANGELOG, "99.0.0"))
+
+expect_refusal("chlog   a missing changelog is refused",
+               lambda: mp.check_changelog(
+                   os.path.join(tempfile.mkdtemp(prefix="bi-test-"), "no.md"),
+                   "1.0.0"))
+
+
+def changelog_without_headings():
+    path = os.path.join(tempfile.mkdtemp(prefix="bi-test-"), "CHANGELOG.md")
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write("# Changelog" + os.linesep
+                 + "lots of prose, no version anywhere" + os.linesep)
+    return lambda: mp.check_changelog(path, "1.0.0")
+
+
+expect_refusal("chlog   a changelog with no version headings is refused",
+               changelog_without_headings())
+
+expect_pass("chlog   the real changelog matches the real version",
+            lambda: mp.check_changelog(mp.SOURCE_CHANGELOG, mp.read_version()))
+
+# --- the manifest url --------------------------------------------------------
+def bad_url_manifest():
+    root = tempfile.mkdtemp(prefix="bi-test-")
+    template = os.path.join(root, "manifest.json")
+    data = mp.read_text(os.path.join(mp.THUNDERSTORE_DIR, "manifest.json"))
+    with open(template, "w", encoding="utf-8") as fh:
+        fh.write(data.replace("https://github.com", "github.com"))
+    return lambda: mp.write_manifest(os.path.join(root, "out.json"),
+                                     "1.0.0", template)
+
+
+expect_refusal("manifest a website_url that is not a URL is refused",
+               bad_url_manifest())
+
 # --- the gate that is not a rule but decides every build ---------------------
 expect_pass("gate    lua_check accepts the mod", mp.run_lua_check)
 

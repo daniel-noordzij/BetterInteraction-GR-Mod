@@ -43,6 +43,7 @@ SOURCE_ENABLED = os.path.join(ROOT, "mod", "lua", MOD_NAME, "enabled.txt")
 SOURCE_CFG = os.path.join(ROOT, "mod", "cfg", MOD_NAME + ".cfg")
 THUNDERSTORE_DIR = os.path.join(ROOT, "mod", "thunderstore")
 STANDALONE_DIR = os.path.join(ROOT, "mod", "standalone")
+SOURCE_CHANGELOG = os.path.join(THUNDERSTORE_DIR, "CHANGELOG.md")
 LUA_CHECK = os.path.join(ROOT, "tools", "lua_check.py")
 DIST = os.path.join(ROOT, "dist")
 
@@ -193,6 +194,32 @@ def check_config_matches_lua(lua_source, config_keys):
                                "constants the user cannot see.")
 
 
+def check_changelog(path, version):
+    """The changelog must actually mention the version being built.
+
+    Not a packaging rule from CLAUDE.md -- a guard against the specific way a
+    changelog rots. Nobody notices a stale one, because the build succeeds and
+    the zip looks right; the reader on the mod page is the first to find out,
+    and by then it is published. Since the version already comes from the Lua
+    and nowhere else, this makes the changelog answer to the same source.
+    """
+    if not os.path.isfile(path):
+        raise PackagingError("no CHANGELOG.md at " + path)
+    text = read_text(path)
+    headings = re.findall(r"^##\s+(\d+\.\d+\.\d+)", text, re.M)
+    if not headings:
+        raise PackagingError(
+            "CHANGELOG.md has no version headings. Each release needs a line "
+            "like '## 1.0.0 -- <date>'.")
+    if headings[0] != version:
+        raise PackagingError(
+            "the changelog's newest entry is %s but this build is %s. Add the "
+            "new version at the TOP of CHANGELOG.md -- a changelog that does "
+            "not mention what shipped is worse than none." % (headings[0],
+                                                              version))
+    return headings
+
+
 def stage(staged_root):
     """Rule 1: ONE staging function, no audience parameter.
 
@@ -249,6 +276,13 @@ def write_manifest(path, version, template):
     truth, so a release can never disagree with the mod it contains."""
     data = json.loads(read_text(template))
     data["version_number"] = version
+    # Thunderstore rejects a malformed website_url on upload rather than
+    # ignoring it, so a typo here costs a round trip through the website.
+    url = data.get("website_url", "")
+    if url and not url.startswith(("http://", "https://")):
+        raise PackagingError(
+            "website_url is %r; Thunderstore wants a full URL or an empty "
+            "string" % url)
     with open(path, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(data, handle, indent=4)
         handle.write("\n")
