@@ -9,13 +9,14 @@ The five rules, and where each is enforced:
      question and a build-time flag cannot answer a per-lobby one. Enforced by
      there being exactly one staging function, with no audience parameter --
      check_no_audience_flag() also refuses the shape in the shipped Lua.
-  2. DEV KEYBINDS ARE CUT, NOT DISABLED. A disabled cheat is still a cheat one
-     edited word from live, in a file people unpack and read. check_keybinds()
-     asserts the shipped file registers EXACTLY the allowed keys -- an absence
-     check, not a "no cheats enabled" check.
-  3. THE DIAGNOSTIC KEYBIND SURVIVES, checked separately. "The cheats are gone"
-     and "the instrument is still there" are two claims, so they are two
-     functions.
+  2. THE SHIPPED MOD BINDS NO KEYS AT ALL. Stronger than the original rule,
+     which allowed a named few: a released mod has no business claiming a key
+     on someone else's keyboard, and "no keybinds" is an absence check that
+     cannot be weakened by adding a name to a list.
+  3. THE INSTRUMENT SURVIVES, checked separately. "The keybinds are gone" and
+     "a bug reporter still has something to send" are two claims, so they are
+     two functions. With F3 removed the instrument is the LOG, so that is what
+     is checked.
   4. NO PROBES, EVER. check_no_probes() walks what is actually staged.
   5. THE CONFIG SHIPS AS A FILE the user can read and edit, not as constants
      baked into main.lua.
@@ -45,14 +46,11 @@ STANDALONE_DIR = os.path.join(ROOT, "mod", "standalone")
 LUA_CHECK = os.path.join(ROOT, "tools", "lua_check.py")
 DIST = os.path.join(ROOT, "dist")
 
-# Rule 2 and 3. The complete set of keys the shipped mod may bind, and why each
-# is allowed. Anything else in the file is a build failure, whether or not it is
-# switched on.
-ALLOWED_KEYBINDS = {
-    "KEY_DIAG": "F3, the diagnostic report -- the only instrument a bug reporter has",
-    "KEY_RELOAD": "F4, reload the config file",
-}
-DIAGNOSTIC_KEYBIND = "KEY_DIAG"
+# Rule 2. EMPTY, and that is the rule: the shipped mod binds nothing. F3 and F4
+# were removed at Daniel's request for 1.0.0, and with them the argument that a
+# release may claim keys on a stranger's keyboard. Any RegisterKeyBind in the
+# shipped file is now a build failure.
+ALLOWED_KEYBINDS = {}
 
 # Things that are true of the mod but NOT yet true of a public release. The
 # Thunderstore builder refuses to run while any of these stands, because
@@ -108,20 +106,26 @@ def check_keybinds(lua_source):
     unexpected = sorted(bound - set(ALLOWED_KEYBINDS))
     if unexpected:
         raise PackagingError(
-            "the mod binds keys that are not allowed in a release: "
-            + ", ".join(unexpected)
-            + ". Rule 2: dev keybinds are CUT, not disabled -- delete the block "
-              "rather than switching it off.")
+            "the shipped mod binds keys: " + ", ".join(unexpected)
+            + ". Rule 2: a release binds NOTHING. Dev keybinds are CUT, not "
+              "disabled -- delete the block rather than switching it off.")
     return sorted(bound)
 
 
 def check_diagnostic_survives(lua_source):
-    """Rule 3 -- a PRESENCE check, deliberately separate from rule 2."""
-    if not re.search(r"RegisterKeyBind\(\s*" + DIAGNOSTIC_KEYBIND, lua_source):
+    """Rule 3 -- a PRESENCE check, deliberately separate from rule 2.
+
+    The diagnostic used to be F3. With no keybinds left, the log IS the
+    instrument, so a build that cannot produce one has nothing to send with a
+    bug report and must not ship.
+    """
+    if not re.search(r'^local LOG_FILE\s*=', lua_source, re.M):
         raise PackagingError(
-            "the diagnostic keybind is missing. Rule 3: it is the only "
-            "instrument a bug reporter has, and 'the cheats are gone' and 'the "
-            "instrument is still there' are two separate claims.")
+            "the mod declares no log file. Rule 3: with the keybinds gone the "
+            "log is the only thing a bug reporter can send, and 'the keybinds "
+            "are gone' and 'the instrument is still there' are two claims.")
+    if not re.search(r"^local function log\(", lua_source, re.M):
+        raise PackagingError("the mod has no log() -- see rule 3")
 
 
 def check_no_audience_flag(lua_source):

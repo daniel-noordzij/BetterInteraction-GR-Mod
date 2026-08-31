@@ -36,6 +36,10 @@ def expect_pass(label, run):
 
 
 # --- rule 2: a keybind that is not on the allowed list -----------------------
+expect_refusal("rule 2  ANY keybind is refused, even a harmless one",
+               lambda: mp.check_keybinds(
+                   GOOD_LUA + "\nRegisterKeyBind(KEY_DIAG, function() end)\n"))
+
 expect_refusal("rule 2  a rogue dev keybind is refused",
                lambda: mp.check_keybinds(
                    GOOD_LUA + "\nRegisterKeyBind(KEY_GIVE_MONEY, function() end)\n"))
@@ -48,11 +52,15 @@ expect_pass("rule 2  the real mod passes",
             lambda: mp.check_keybinds(GOOD_LUA))
 
 # --- rule 3: the diagnostic must survive, checked separately -----------------
-expect_refusal("rule 3  removing the diagnostic keybind is refused",
+expect_refusal("rule 3  removing the log file is refused",
                lambda: mp.check_diagnostic_survives(
-                   GOOD_LUA.replace("RegisterKeyBind(KEY_DIAG", "-- gone(")))
+                   GOOD_LUA.replace("local LOG_FILE", "-- local LOG_FILE")))
 
-expect_pass("rule 3  the real mod keeps it",
+expect_refusal("rule 3  removing log() is refused",
+               lambda: mp.check_diagnostic_survives(
+                   GOOD_LUA.replace("local function log(", "local function nolog(")))
+
+expect_pass("rule 3  the real mod keeps its log",
             lambda: mp.check_diagnostic_survives(GOOD_LUA))
 
 # --- rule 1: no build-time audience flag -------------------------------------

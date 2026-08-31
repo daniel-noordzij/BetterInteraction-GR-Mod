@@ -218,10 +218,7 @@ local disabled = {}
 
 local CONFIG_FILE = "BetterInteraction.cfg"
 local LOG_FILE    = "BetterInteraction.log"
-local STATE_FILE  = "BetterInteraction_state.txt"
 
-local KEY_DIAG   = Key.F3
-local KEY_RELOAD = Key.F4
 
 -- THE PUMP ASKS FOR EVERY FRAME. IT CANNOT GET MORE THAN ONE.
 --
@@ -290,7 +287,6 @@ local cfg = {
     hold_duration_floor = 0.25,
     apply_interval      = 1.0,
     log_reverts         = 1,
-    diagnostic_key      = 1,
 }
 
 local cfgPath, cfgLoaded = nil, false
@@ -2346,142 +2342,6 @@ end
 -- bug reporter has (CLAUDE.md, packaging rule 3).
 -- ==========================================================================
 
-local function dumpState()
-    local out = {}
-    local function say(text) out[#out + 1] = text end
-
-    say("")
-    say("================================================================")
-    say(string.format(" %s %s   %s", MOD, VERSION, os.date("%Y-%m-%d %H:%M:%S")))
-    say("================================================================")
-    say(string.format("  config            %s", cfgLoaded and cfgPath
-        or "NOT LOADED -- running on built-in defaults"))
-    say(string.format("  passes            %d", state.passes))
-    say(string.format("  passes with no world %d", state.skipped))
-    if state.lastSkip then say("  last skip         " .. state.lastSkip) end
-    say(string.format("  world epoch       %d", epoch))
-    say(string.format("  values written    %d", applied))
-    say(string.format("  values REFUSED    %d", refused))
-    say(string.format("  values the game put back %d", reapplied))
-    say(string.format("  components walked last pass %d", state.components))
-
-    -- FEATURE 5. What a bug reporter needs is the LIVE input and focus state at
-    -- the moment they hit F3 -- "it did nothing" and "it never saw the key" are
-    -- different reports and only one of them is a bug in this mod.
-    say("")
-    say("  hold rescue")
-    say(string.format("    enabled           %s", cfg.hold_rescue ~= 0))
-    say(string.format("    running one now   %s%s", hold.active,
-        hold.active and string.format(" (%.2fs into %s)",
-            os.clock() - hold.t0, shortName(hold.target or "?")) or ""))
-    say(string.format("    progress bar      %s", hold.barOK == nil
-        and "not exercised yet" or (hold.barOK and "takes writes"
-        or "WILL NOT take writes -- no visible feedback, still completes")))
-    local who = localController()
-    if who == nil then
-        say("    controller        no local controller right now")
-    else
-        local down, heldFor, why = interactDown(who)
-        say(string.format("    interact key      %s", why ~= nil and why
-            or string.format("%s, down %.2fs", down and "DOWN" or "up",
-                heldFor or 0)))
-        -- BOTH signals, labelled, because confusing them is what made 0.6.0 do
-        -- nothing. CurrentInteractTarget fills when the game ACCEPTS a press;
-        -- the widget's InteractState is what is actually on your screen.
-        local accepted = get(who, PROP.focus)
-        say(string.format("    accepted interact %s", real(accepted)
-            and shortName(fullName(accepted)) or "nothing"))
-
-        local subsystem = findFirst(CLASS.subsystem)
-        if subsystem == nil then
-            say("    prompts in range  no subsystem")
-        else
-            local focus, widget = focusedHold(subsystem)
-            if real(focus) and real(widget) then
-                local alpha = nil
-                pcall(function() alpha = widget:GetHoldInteractAlpha() end)
-                say(string.format("    focused HOLD      %s, %.2fs, game alpha %s",
-                    shortName(fullName(focus)),
-                    numberProp(focus, PROP.holdDur) or -1, tostring(alpha)))
-            else
-                say("    focused HOLD      none")
-            end
-
-            -- THE INVENTORY. If InteractState turns out not to be the on-screen
-            -- signal either, this is what says so without another test round:
-            -- every hold component in range and the state its widget reports.
-            local array = get(subsystem, PROP.hot)
-            local shown, holds = 0, 0
-            if array ~= nil then
-                pcall(function()
-                    array:ForEach(function(_i, element)
-                        local component = nil
-                        pcall(function() component = element:get() end)
-                        if not real(component) then return end
-                        if boolProp(component, PROP.holdOn) ~= true then return end
-                        holds = holds + 1
-                        if shown >= 8 then return end
-                        shown = shown + 1
-                        local w = promptWidget(component)
-                        say(string.format("      hold in range   %-34s state %s",
-                            shortName(fullName(component)),
-                            real(w) and tostring(numberProp(w, PROP.state))
-                                or "no widget"))
-                    end)
-                end)
-            end
-            say(string.format("    hold components in range %d (Hidden 0,"
-                .. " ProximityRange 1, Focused 2)", holds))
-        end
-    end
-    say(string.format("  deposit presses sized  %d", sized.count))
-    say(string.format("  last sized             %s", sized.last or "none yet"))
-
-    say("")
-    say("  -- settings, in the order this file lists them --")
-    for _, key in ipairs({ "prompt_angle", "prompt_distance", "reach",
-                           "reach_ceiling", "aim_forgiveness", "hold_duration",
-                           "hold_duration_floor", "apply_interval",
-                           "log_reverts", "diagnostic_key" }) do
-        say(string.format("  %-22s %s", key, tostring(cfg[key])))
-    end
-
-    -- Live readback, straight off the objects, so the file shows the game's
-    -- current truth and not only what the mod believes it did.
-    say("")
-    say("  -- live readback --")
-    local subsystem = findFirst(CLASS.subsystem)
-    if subsystem == nil then
-        say("  no " .. CLASS.subsystem .. " right now (menu, or a transition)")
-    else
-        say("  subsystem         " .. fullName(subsystem))
-        local settings = get(subsystem, PROP.settings)
-        if not real(settings) then
-            say("  settings asset    did not resolve")
-        else
-            say("  settings asset    " .. fullName(settings))
-            say(string.format("  %-22s %s", PROP.angle,
-                tostring(numberProp(settings, PROP.angle))))
-            say(string.format("  %-22s %s", PROP.distance,
-                tostring(numberProp(settings, PROP.distance))))
-        end
-        local array = get(subsystem, PROP.registered)
-        say(string.format("  %-22s %d entries", PROP.registered,
-            array ~= nil and count(array) or -1))
-    end
-
-    say("================ end of " .. MOD .. " state ================")
-
-    local handle, path = openOut(STATE_FILE, "a")
-    if handle == nil then
-        log("could not open " .. STATE_FILE .. "; writing state to the log instead")
-        for _, line in ipairs(out) do print(line .. "\n") end
-        return
-    end
-    handle:write(table.concat(out, "\n") .. "\n")
-    handle:close()
-    log("state written to " .. path)
-end
 
 -- ==========================================================================
 -- The pump (crash rule K). One LoopAsync, one ExecuteInGameThread, no
@@ -2489,7 +2349,6 @@ end
 -- everything, because keybind callbacks are not on the game thread.
 -- ==========================================================================
 
-local pending  = { diag = false, reload = false }
 local inFlight = false
 local ticks    = 0
 local lastScan, lastApply = 0, 0
@@ -2501,17 +2360,6 @@ local pumpStarted = pcall(function()
         ExecuteInGameThread(function()
             ticks = ticks + 1
             defer.drain()
-
-            if pending.reload then
-                pending.reload = false
-                local ok, err = pcall(loadConfig)
-                if not ok then log("config reload failed: " .. tostring(err)) end
-            end
-            if pending.diag then
-                pending.diag = false
-                local ok, err = pcall(dumpState)
-                if not ok then log("diagnostic failed: " .. tostring(err)) end
-            end
 
             -- EVERY TICK, and cheap: no global walk, only a path lookup while
             -- a hold is actually running.
@@ -2550,15 +2398,6 @@ end)
 
 loadConfig()
 
-local boundDiag = false
-if cfg.diagnostic_key ~= 0 then
-    boundDiag = pcall(function()
-        RegisterKeyBind(KEY_DIAG, function() pending.diag = true end)
-    end)
-end
-local boundReload = pcall(function()
-    RegisterKeyBind(KEY_RELOAD, function() pending.reload = true end)
-end)
 
 pcall(installHooks)
 
@@ -2580,7 +2419,3 @@ if cfg.hold_duration > 0 then
     log("NOTE: hold_duration is ON. Whether the host validates it is NOT"
         .. " established, so treat it as untested in a lobby.")
 end
-log(boundDiag and "F3  writes a diagnostic report and changes nothing"
-    or "F3 not bound (diagnostic_key = 0, or registration failed)")
-log(boundReload and "F4  reloads " .. CONFIG_FILE
-    or "F4 could not be registered -- edit the config and restart instead")

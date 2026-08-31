@@ -45,14 +45,11 @@ found no config it writes one for you and says where it put it.
 
 ## Keys
 
-| key | what it does |
-|---|---|
-| **F3** | write a diagnostic report. Changes nothing |
-| **F4** | reload the config file. No restart needed |
+**None.** The mod binds no keys, so it cannot clash with anything you have set.
+Edit the config and restart the game to change a setting.
 
-If something is wrong, press F3 and send `BetterInteraction.log` together with
-`BetterInteraction_state.txt` from that same folder. Between them they say what
-the mod could see and what it did.
+If something is wrong, send `BetterInteraction.log` from that same folder. It
+says what the mod did and why.
 
 ## Uninstall
 

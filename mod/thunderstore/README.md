@@ -37,12 +37,16 @@ hold, the mod stays out of the way.
 ## Settings
 
 The mod writes `BetterInteraction.cfg` itself the first time it runs, and the
-log says where it put it. Edit it and press **F4** in game to reload — no
-restart needed. Every setting is in there at its default, and a fully commented
-copy explaining each one lives with the source.
+log says where it put it. Edit it and restart the game. Every setting is in
+there at its default, and a fully commented copy explaining each one lives with
+the source.
 
-**F3** writes a diagnostic report and changes nothing. If you are reporting a
-problem, press it and include `BetterInteraction.log`.
+**This mod binds no keys.** It will never take a key you have bound to something
+else.
+
+If something looks wrong, `BetterInteraction.log` sits next to the game
+executable in `Helden\Binaries\Win64\` and says what the mod did and why —
+send that with a bug report.
 
 ## Multiplayer
 
