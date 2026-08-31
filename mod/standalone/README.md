@@ -58,4 +58,5 @@ nothing into your save.
 
 ## Multiplayer
 
-Solo and hosting only for now, and untested in a real lobby. See the mod page.
+Only the host needs it. Guests get the same behaviour on a completely unmodified
+game. See the mod page for the detail.

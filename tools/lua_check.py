@@ -444,6 +444,7 @@ def check_rules(tokens, waived):
     problems.extend(_check_undefined_calls(tokens, allowed))
     problems.extend(_check_undeclared_in_scope(tokens, allowed))
     problems.extend(_check_struct_marshalling(tokens, allowed))
+    problems.extend(_check_never_assigned(tokens, allowed))
     return problems
 
 
@@ -832,6 +833,81 @@ def _check_use_before_declaration(tokens, allowed):
                              "line %d. Lua resolves it as a GLOBAL (nil) at this "
                              "point -- move the declaration above this use"
                              % (text, decl_line)))
+    return problems
+
+
+
+def _check_never_assigned(tokens, allowed):
+    """N -- a bare `local x` forward declaration that is never assigned.
+
+    WRITTEN IN BLOOD, 31 Aug 2026. Removing the hold feature took out a span of
+    the file that happened to contain `cachedRoot = function(...)` -- the body of
+    a helper whose forward `local cachedRoot` sat hundreds of lines earlier and
+    survived. Every other rule passed: the name IS declared, so rules L, S and U
+    were all satisfied, and the mod would have loaded and then died the first
+    time any pass called nil.
+
+    That is the exact gap this closes. A forward declaration is a promise that an
+    assignment appears later; nothing checked that the promise was kept.
+
+    Only bare declarations are considered -- `local x` with no `=` and no
+    `function`. A name is treated as assigned if it is ever followed by `=` (or
+    by a comma, which is a multiple-assignment target list), so the check cannot
+    fire on a name that is written anywhere at all.
+    """
+    problems = []
+    declared = {}                       # name -> (index, line)
+
+    index = 0
+    while index < len(tokens):
+        kind, text, line = tokens[index]
+        if kind == "keyword" and text == "local":
+            scan, names = index + 1, []
+            while scan < len(tokens):
+                kind_s, text_s, _ = tokens[scan]
+                if kind_s == "keyword" and text_s == "function" and not names:
+                    names = None            # `local function f` -- an assignment
+                    break
+                if kind_s == "name":
+                    names.append(text_s)
+                elif kind_s == "op" and text_s == ",":
+                    pass
+                else:
+                    break
+                scan += 1
+            # A bare declaration is one whose name list is NOT followed by `=`.
+            if names:
+                after = tokens[scan] if scan < len(tokens) else ("", "", line)
+                if not (after[0] == "op" and after[1] == "="):
+                    for name in names:
+                        declared.setdefault(name, (index, line))
+        index += 1
+
+    if not declared:
+        return problems
+
+    assigned, used = set(), {}
+    for position, (kind, text, _line) in enumerate(tokens):
+        if kind != "name" or text not in declared:
+            continue
+        if position == declared[text][0] + 1:
+            continue                        # the declaration itself
+        used[text] = used.get(text, 0) + 1
+        nxt = tokens[position + 1] if position + 1 < len(tokens) else ("", "", 0)
+        if nxt[0] == "op" and nxt[1] in ("=", ","):
+            assigned.add(text)
+
+    for name, (_index, line) in sorted(declared.items(), key=lambda i: i[1][1]):
+        if name in assigned or not used.get(name):
+            continue
+        if allowed(line, "N"):
+            continue
+        problems.append((line, "N",
+                         "`local %s` is declared and used %d time(s) but never "
+                         "assigned -- a forward declaration whose body is gone. "
+                         "Calling it is a nil call at runtime, and every other "
+                         "rule passes because the NAME exists."
+                         % (name, used[name])))
     return problems
 
 

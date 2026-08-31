@@ -1,78 +1,49 @@
 # BetterInteraction
 
-Quality of life for interacting with things. Fewer button presses for exactly the
-same outcome — nothing here changes what you get, only how much work it is to
-get it.
-
-Every feature can be switched off on its own.
+A Grain Rot mod that takes the spam-clicking out of interacting. Pay a machine in
+one press, and pick up one coin instead of thirty. That's it!
 
 ## What it does
 
-**Pay a machine off in one press.** The elevator wants 5 gold at a time, the
-upgrade machine 20, the gumball machine one artifact at a time. This lets a
-single press pay whatever you can afford toward what is still owed. The total is
-untouched — 100 gold is still 100 gold, it is just one press instead of five. If
-you cannot cover the lot, one press pays what you have and the rest stays owed,
-exactly as it would unmodded.
+Grain Rot takes your money in instalments: 5 gold a press at the elevator, 20 at
+the upgrade machine, one artifact at a time at the gumball machine. This lets one
+press pay as much of what you still owe as you can afford. The price is untouched
+— 100 gold is still 100 gold, it is just one press instead of twenty.
 
-**One coin instead of thirty.** The grinder pays out per item ground and splits
-each payout into coins of at most 5 gold or 1 artifact, so a full load can be
-dozens of separate pickups. This raises the split so each item comes out whole,
-and merges coins that are lying near each other into as few as it safely can.
+The grinder pays out in a shower of small coins, one every 0.4 seconds, and each
+one is a separate pickup. This stops the splitting, and merges coins already
+lying near each other into as few as it safely can. It keeps them under 100 gold
+each rather than putting a whole run on one object that could roll under the
+floor, and the total is never changed.
 
-Coins are merged **into the coin that was already there**, not the one that just
-landed, and a pile is never merged into a single coin — that would put a whole
-run's gold on one object that could roll somewhere you cannot reach. The default
-keeps any one coin under 100 gold. The total is never changed: the merged coin is
-written and read back *first*, and the others are only emptied once that is
-confirmed.
+Every feature switches off on its own in `BetterInteraction.cfg`, which the mod
+writes itself the first time it runs. Edit it and restart the game. The mod binds
+no keys.
 
-**Stop losing a hold you started early.** Holding the interact key before the
-prompt appears normally swallows the input — you have to let go and press again.
-This starts the hold as soon as the prompt shows, so walking up to a chair,
-casket or repair spot with the key already down just works. It only ever acts
-where the game has already dropped the input; if the game is running its own
-hold, the mod stays out of the way.
-
-## Settings
-
-The mod writes `BetterInteraction.cfg` itself the first time it runs, and the
-log says where it put it. Edit it and restart the game. Every setting is in
-there at its default, and a fully commented copy explaining each one lives with
-the source.
-
-**This mod binds no keys.** It will never take a key you have bound to something
-else.
-
-If something looks wrong, `BetterInteraction.log` sits next to the game
-executable in `Helden\Binaries\Win64\` and says what the mod did and why —
-send that with a bug report.
+It never changes what anything costs, never unlocks anything the game locked,
+never touches quest or progression state, and writes nothing into your save.
 
 ## Multiplayer
 
-**It works in co-op, and only the host needs it.** Paying machines and merging
-coins are things only the server can really do, so the mod does them on the
-host — for whoever pressed the button. A guest pays from their own purse, in one
-press, wherever the host happens to be standing.
+Only the host needs it. Everything here is something only the server is allowed
+to do, so the mod does it on the host for whoever pressed the button — a guest
+pays from their own purse, in one press, on a completely unmodified game. A guest
+running it too is harmless; their copy stands down.
 
-If a guest runs it too, nothing conflicts: their copy notices it is not the host
-and leaves that side alone, keeping only the hold fix, which is purely local.
+Tested with two players on two machines.
 
-Tested with two players on two machines. **Three or more is untested**, and so is
-running alongside mod sets other than the one it was developed with.
+## AI usage disclosure and information
 
-## What it deliberately does not do
-
-This is a quality of life mod, not a cheat. It never changes what anything costs,
-never unlocks anything the game locked, and never touches quest or progression
-state. Where it takes an action for you, that action is one you could have taken
-yourself at that moment.
-
-Hold-to-skip dialogue was attempted and dropped: the game gives a mod no way to
-tell a held key from a tapped one, which is the same reason the base game needs
-one press per line.
+- This mod **has been** vibe-coded.
+- This mod does **not** contain AI generated art.
+- The Lua was written with an LLM (Claude), working to a spec I wrote and under
+  my direction.
+- None of the game internals are guessed. Every class and property this mod
+  touches came straight out of the game's own header and object dumps, and both
+  the machines and the grinder were measured in game with a read-only probe
+  before any of the real mod got written.
 
 ## Credits
 
-UE4SS 5.7 signature overrides come from the `GrainRot_UE4SS` package, which this
-mod depends on rather than duplicating.
+Thanks to the RE-UE4SS project, and to the Grain Rot UE4SS overlay for the UE
+5.7.4 signature work that makes any Lua mod possible on this build.

@@ -14,6 +14,25 @@ Three claim strengths are used throughout and are never blurred:
 
 ---
 
+## FEATURE 5 IS GONE — 31 Aug 2026
+
+Daniel: "i've changed my mind on the whole hold feature. remove it entirely from
+the mod and any mention of it while keeping everything else intact."
+
+The hold rescue was built, verified live, and confirmed working in a two-machine
+lobby. It is now removed from `main.lua`, the config and every user-facing
+document. **Everything this file says about it below is kept deliberately**: it
+is measured evidence about this game's Enhanced Input configuration, the
+progress-bar draw path and what `Interact` / `Interact_Server` / `Interact_Local`
+each actually do on a hold — all of which cost real sessions to establish and
+none of which stops being true. It is history, not a plan.
+
+One consequence worth naming: with feature 5 gone the mod has no bucket 2 left,
+so a guest's copy now stands down completely rather than keeping one local
+feature. Host-only is no longer a recommendation, it is the whole architecture.
+
+---
+
 ## 0. Ground truth, re-verified 29 Aug 2026
 
 `CLAUDE.md`'s interaction inventory was re-read against the real dump on disk

@@ -79,7 +79,6 @@ local VERSION = "1.0.0"
 local CLASS = {
     dispenser = "HeldenCoinDispenser",             -- AHeldenCoinDispenser
     subsystem  = "HeldenInteractionSubsystem",
-    controller = "HeldenPlayerController",
     gameState  = "HeldenGameState",
 }
 
@@ -96,30 +95,13 @@ local PROP = {
 
     -- Features 1 and 2, the deposit-all. Every one verified against the dump.
     hot        = "HotInteractions",                -- UHeldenInteractionSubsystem 0x58
-    widgetCmp  = "InteractionWidgetComponent",     -- UInteractionComponent 0x330
-    widget     = "Widget",                         -- UWidgetComponent, UMG.hpp:2376
-    state      = "InteractState",                  -- UInteractionWidget 0x338
     required   = "RequiredMoney",                  -- AHeldenCoinDepositObject 0x4A8
     targetObj  = "TargetObject",                   -- AHeldenCoinDepositObject 0x488
     coinsLeft  = "CoinsLeftToPay",                 -- gumball 0x4A0 / upgrade 0x630
     remaining  = "RemainingCost",                  -- AHeldenElevatorMachine 0x638
     money      = "Money",                          -- AHeldenCharacter 0x1250
-    pawn       = "Pawn",                           -- AController 0x2F0
     players    = "PlayerArray",                    -- AGameStateBase 0x2C8
     stashMoney = "StashMoney",                     -- AHeldenGameState 0x350
-
-    -- Feature 5, the eaten hold input.
-    focus      = "CurrentInteractTarget",          -- AHeldenPlayerController 0xC00
-    playerIn   = "PlayerInput",                    -- APlayerController 0x428
-    actionData = "ActionInstanceData",             -- UEnhancedPlayerInput 0x4E8
-    trigger    = "TriggerEvent",                   -- FInputActionInstance 0x13
-    elapsed    = "ElapsedProcessedTime",           -- FInputActionInstance 0x58
-    holdOn     = "bIsHoldInteraction",             -- UInteractionComponent 0x318
-    holdDur    = "HoldInteractionDuration",        -- UInteractionComponent 0x31C
-    inProgress = "CurrentInteraction",             -- AHeldenCharacter 0xBB0
-    progBar    = "ProgressBarWidget",              -- UInteractionWidget 0x360
-    interpSpd  = "InterpSpeed",                    -- UHeldenProgressBar 0x33C
-    progress   = "Progress",                       -- UHeldenProgressBar 0x338
 
     -- Feature 3, one coin instead of a shower of them.
     dispenser  = "CoinDispenser",                  -- AHeldenPackageSpot 0x4C0
@@ -132,15 +114,6 @@ local PROP = {
     relLoc     = "RelativeLocation",               -- USceneComponent 0x148
 
 }
-
--- ETriggerEvent, EnhancedInput_enums.hpp:116. FLAG values, not a dense
--- sequence. IA_Interact carries exactly one trigger, a UInputTriggerReleased
--- (UE4SS_ObjectDump.txt:126853), so it emits Started on press, Ongoing every
--- frame while the key is down, and Triggered only on RELEASE.
-local TRIG_STARTED, TRIG_ONGOING = 2, 4
-
--- EHeldenInteractState, Helden_enums.hpp:893
-local STATE_FOCUSED = 2
 
 --- WHAT EACH DEPOSIT DOES, ONE ENTRY PER MACHINE. Version-fragile data, so it
 --- lives here and nowhere else.
@@ -243,7 +216,7 @@ local LOG_FILE    = "BetterInteraction.log"
 -- silently make the deposit pass four times slower on a 60fps machine than the
 -- 200ms it was measured and tuned at.
 local PUMP_MS       = 8
-local DEPOSIT_EVERY = 0.20   -- SECONDS between deposit/hold scans
+local DEPOSIT_EVERY = 0.20   -- SECONDS between deposit scans
 local APPLY_MIN     = 0.10   -- floor on the reconciler interval, in seconds
 local WIDE_EVERY  = 1.0    -- seconds between level-wide sweeps
 local MAX_ENTRIES = 6000   -- a length far past the ~400 seen is the RE-UE4SS
@@ -270,11 +243,6 @@ local cfg = {
     coin_merge_max_gold      = 100,
     coin_merge_max_artifacts = 100,
     coin_dispense_delay = 0.05,
-    -- Feature 5. ON by default: it only ever acts where the base game has
-    -- already dropped the input, so with it on nothing that works today
-    -- changes.
-    hold_rescue         = 1,
-    hold_rescue_bar     = 1,
 
     -- Phase 1's knobs. OFF by default -- they work and are verified, but the
     -- interaction angle and distance are fine as the game ships them.
@@ -528,13 +496,51 @@ local function byPath(fullname)
     return found
 end
 
--- FORWARD DECLARED. cachedRoot's body is defined further down, next to the
--- other object helpers, but callers sit between the two. A forward `local` is
--- the honest fix: the name exists from here on, so rules L and S are satisfied
--- and Lua resolves it as an upvalue rather than a nil global -- and the
--- assignment runs at load, long before any pass calls it.
+--- THE ROOT OBJECTS, FOUND ONCE AND THEN REMEMBERED BY NAME.
+---
+--- Daniel asked the obvious question: why look these up on a cadence at all --
+--- why not hardcode them, or find them once per level?
+---
+--- Hardcoding is out. The same subsystem has had at least seventeen different
+--- names across sessions (HeldenInteractionSubsystem_2147479638, _2147480850,
+--- _2147480855 ...) because the instance number changes every run and the
+--- dungeon is regenerated from a seed.
+---
+--- Holding the pointer is worse, and it is crash rule C: there is NO safe way
+--- to ask whether a UObject pointer is still valid. IsValid() reads THROUGH the
+--- pointer, so on freed memory it is the crash rather than a test for it, and
+--- pcall cannot catch an access violation. 0.2.1 cached the subsystem and
+--- controller for one second as exactly this optimisation and crashed 100% of
+--- new-save starts.
+---
+--- So this caches the NAME. A string cannot dangle. StaticFindObject turns it
+--- back into an object with a hash lookup instead of the global object-array
+--- walk that rule E and RE-UE4SS #1328 are about -- and when the world changes
+--- the name simply stops resolving, which is the re-scan trigger, arriving
+--- BEFORE any dereference rather than after one.
+---
+--- This takes the mod from roughly eleven global walks a second to nearly none.
+---
+--- It used to take a third argument, a predicate to re-validate the cached
+--- object. Only one caller ever passed one -- the local-controller resolve,
+--- which existed for the hold feature -- so it went with it. Every surviving
+--- root is identified by its own name and needs no second opinion.
 local rootNames = {}
-local cachedRoot
+
+local function cachedRoot(key, scanner)
+    local found = byPath(rootNames[key])
+    if found ~= nil then return found end
+    rootNames[key] = nil
+    found = scanner()
+    if found ~= nil then
+        rootNames[key] = fullName(found)
+        logOnce("root:" .. key .. ":" .. rootNames[key],
+            "resolved " .. key .. " by scan: " .. shortName(rootNames[key])
+            .. " -- remembered by name, so this should not repeat until the"
+            .. " world changes")
+    end
+    return found
+end
 
 -- World epoch (crash rule D). Deferred work must not outlive its world, and
 -- the revert bookkeeping is per-world by definition.
@@ -994,22 +1000,6 @@ end
 -- Resolution and the pass
 -- ==========================================================================
 
---- One extra global array walk per pass, on the same once-a-second cadence as
---- the subsystem resolve (crash rule E). Never cached across passes (rule C).
-local function localController()
-    local found = nil
-    pcall(function()
-        for _, controller in ipairs(FindAllOf(CLASS.controller) or {}) do
-            if found == nil and real(controller) then
-                local isLocal = nil
-                pcall(function() isLocal = controller:IsLocalController() end)
-                if isLocal == true then found = controller end
-            end
-        end
-    end)
-    return found
-end
-
 local state = { passes = 0, skipped = 0, components = 0, lastSkip = nil }
 
 local function pass()
@@ -1080,528 +1070,6 @@ end
 ---
 --- Both objects are re-resolved EVERY pass. NOTHING IS HELD -- see the note by
 --- the epoch declaration for why 0.2.1's throttle crashed the game.
--- ==========================================================================
--- FEATURE 5 -- THE EATEN HOLD INPUT. The mod runs the hold itself.
--- ==========================================================================
---
--- THE BUG, in Daniel's words: "interacting with an object that requires holding
--- said input requires seeing the input icon. If the input is held even a frame
--- before that icon is shown the input gets eaten and the player needs to
--- release and re-press E."
---
--- WHY IT HAPPENS -- finding, from the dump, not a guess. IA_Interact carries
--- exactly ONE trigger, a UInputTriggerReleased (UE4SS_ObjectDump.txt:126853),
--- and IMC_Default adds no per-mapping triggers. That configuration emits
--- Started on press, Ongoing every frame while held, and Triggered on RELEASE.
--- So while the key stays down NO SECOND Started IS EVER PRODUCED. A tap can
--- still fire on the release edge; a hold, which needs the press edge, cannot.
--- That is the asymmetry, and it predicts release-and-re-press exactly.
---
--- (Which native handler consumes that edge is unreflected C++ and is not in the
--- dump. It stays a HYPOTHESIS and this feature does not depend on it: it does
--- not care why the edge was missed, only that it was.)
---
--- WHAT THIS DOES. When a hold prompt is focused and the key is already down and
--- the game is demonstrably not running a hold, the mod runs the hold itself:
--- its own timer against the component's own HoldInteractionDuration, driving
--- the prompt's own progress bar, and completing through the game's own
--- Interact(pawn) -- which is measured to complete a hold interaction outright.
---
--- CO-OP: bucket 2, local input shaping. Every call is one the unmodded game
--- would have accepted at that moment from that player; the mod only supplies
--- the press edge the input system dropped. NOT verified in a lobby.
---
--- IT CANNOT DOUBLE-FIRE, and this is the property that matters most. The
--- decision to take over is gated on the game's OWN hold alpha reading zero --
--- a measurement, not an inference -- so the mod and the game can never both be
--- running a hold on the same press. Once the mod has taken over it stops
--- consulting that alpha, because by then the alpha it reads is its own.
--- Backstops: it fires at most once per key press (firedFor), it never fires
--- while an interaction is already running (CurrentInteraction), and it drops
--- everything the moment the key goes up.
-
---- Is the interact key down right now. Property walk from the controller:
---- PlayerInput -> ActionInstanceData, a TMap<UInputAction*,
---- FInputActionInstance>. No global scan (rule E), no FKey ever constructed,
---- and it follows a rebind for free because it asks about the ACTION.
---- `wanted` is the lower-cased action asset name, e.g. "ia_interact". Named
---- exactly, never by prefix: SecondaryInteract and TertiaryInteract are separate
---- actions on separate buttons, and IA_UI_Accept is not IA_UI_Puzzl_Accept.
----
---- `roster` is optional; when given, every action currently DOWN is recorded
-local function actionDown(controller, wanted, roster)
-    local input = get(controller, PROP.playerIn)
-    if not real(input) then return nil, nil, "PlayerInput did not resolve" end
-    local map = get(input, PROP.actionData)
-    if map == nil then return nil, nil, PROP.actionData .. " did not read" end
-
-    local down, elapsed, seen = nil, nil, 0
-    local ok = pcall(function()
-        map:ForEach(function(key, value)
-            seen = seen + 1
-            local action = key
-            pcall(function() action = key:get() end)
-            local name = shortName(fullName(action)):lower()
-            local instance = value
-            pcall(function() instance = value:get() end)
-            local trig = numberProp(instance, PROP.trigger)
-            if trig == nil then return end
-            local held = (trig == TRIG_STARTED) or (trig == TRIG_ONGOING)
-            if roster ~= nil and held then roster[#roster + 1] = name end
-            if name == wanted and down == nil then
-                down = held
-                elapsed = numberProp(instance, PROP.elapsed)
-            end
-        end)
-    end)
-    if not ok then return nil, nil, "the " .. PROP.actionData .. " walk raised" end
-    if down == nil then
-        -- Rule H: "that action is not in the map" and "the map is empty" are
-        -- different facts, and only one of them means this name is wrong.
-        return nil, nil, string.format("no %s among %d actions", wanted, seen)
-    end
-    return down, elapsed, nil
-end
-
-local function interactDown(controller)
-    return actionDown(controller, "ia_interact")
-end
-
---- READING SPACE CRASHED THE GAME. Both routes are DELETED, not disabled.
----
---- 0.15.0 asked APlayerController::GetInputKeyTimeDown(FKey) by handing it a
---- Lua table {KeyName = "SpaceBar"}, and failing that walked
---- UEnhancedPlayerInput.KeysPressedThisTick reading KeyName off each FKey. The
---- first conversation of the session took the process down:
----
----   EXCEPTION_ACCESS_VIOLATION reading address 0x0000000000000070
----   SecondsSinceStart 12
----
---- A near-null dereference. An FKey is not just its name -- it carries an
---- internal cached pointer to its key details -- so a struct built from a table
---- has that pointer as garbage, and the engine dereferences it. The same
---- objection applies to reading a field off an FKey taken out of a TMap.
----
---- THE RULE ALREADY SAID SO. "Fields of a struct returned by value across the
---- Lua/native boundary are not safe -- reading one can hard-crash the process,
---- and pcall CANNOT catch it." 0.15.0 carried a comment arguing that passing a
---- struct IN was different from reading one OUT. That argument was mine, it was
---- wrong, and it is exactly the shape of reasoning the rule exists to stop.
----
---- Space cannot be read this way. It is not an input action either (0.15.0's
---- other finding). What is left untried is a UE4SS keybind on the raw key, which
---- touches no game memory at all -- but it is not attempted here, because the
---- next thing this feature does should be chosen deliberately and not while
---- reacting to a crash.
-
---- THE ROOT OBJECTS, FOUND ONCE AND THEN REMEMBERED BY NAME.
----
---- Daniel asked the obvious question: why look these up on a cadence at all --
---- why not hardcode them, or find them once per level?
----
---- Hardcoding is out. The same subsystem has had at least seventeen different
---- names across sessions (HeldenInteractionSubsystem_2147479638, _2147480850,
---- _2147480855 ...) because the instance number changes every run and the
---- dungeon is regenerated from a seed.
----
---- Holding the pointer is worse, and it is crash rule C: there is NO safe way
---- to ask whether a UObject pointer is still valid. IsValid() reads THROUGH the
---- pointer, so on freed memory it is the crash rather than a test for it, and
---- pcall cannot catch an access violation. 0.2.1 cached the subsystem and
---- controller for one second as exactly this optimisation and crashed 100% of
---- new-save starts.
----
---- So this caches the NAME. A string cannot dangle. StaticFindObject turns it
---- back into an object with a hash lookup instead of the global object-array
---- walk that rule E and RE-UE4SS #1328 are about -- and when the world changes
---- the name simply stops resolving, which is the re-scan trigger, arriving
---- BEFORE any dereference rather than after one.
----
---- This takes the mod from roughly eleven global walks a second to nearly none.
-cachedRoot = function(key, scanner, stillValid)
-    local found = byPath(rootNames[key])
-    if found ~= nil then
-        if stillValid == nil or stillValid(found) then return found end
-    end
-    rootNames[key] = nil
-    found = scanner()
-    if found ~= nil then
-        rootNames[key] = fullName(found)
-        logOnce("root:" .. key .. ":" .. rootNames[key],
-            "resolved " .. key .. " by scan: " .. shortName(rootNames[key])
-            .. " -- remembered by name, so this should not repeat until the"
-            .. " world changes")
-    end
-    return found
-end
-
---- The prompt widget for a component: InteractionWidgetComponent -> Widget.
-local function promptWidget(component)
-    local holder = get(component, PROP.widgetCmp)
-    if not real(holder) then return nil end
-    local widget = get(holder, PROP.widget)
-    if not real(widget) then return nil end
-    return widget
-end
-
---- THE FOCUSED HOLD PROMPT, and the correction that this whole feature turned
---- on. 0.6.0 asked AHeldenPlayerController.CurrentInteractTarget and did
---- nothing whatsoever, in complete silence.
----
---- MEASURED 30 Aug 2026, from Daniel's F3 taken while holding the key at a
---- chair for two seconds:
----
----     interact key      DOWN, down 2.00s
----     focused           nothing
----
---- CurrentInteractTarget is not "what you are aiming at". It is the interact
---- the game has ACCEPTED -- it fills on the press edge. So in the eaten-input
---- case, which is the entire point of this feature, it is empty by
---- construction and the takeover condition could never be true. The earlier
---- hold probe showed it populated only because every sample it took was after
---- a press that had landed.
----
---- The real signal is the prompt's own UInteractionWidget.InteractState, which
---- is what is actually on screen. Reaching it needs the components in range,
---- which is HotInteractions on the subsystem -- so this walks the SAME array
---- the deposit pass already walks, off the SAME resolve, and adds no global
---- object-array walk at all (rule E).
-local function focusedHold(subsystem)
-    local array = get(subsystem, PROP.hot)
-    if array == nil then return nil, nil end
-    local total = count(array)
-    if total < 0 or total > MAX_ENTRIES then return nil, nil end
-
-    local found, foundWidget = nil, nil
-    pcall(function()
-        array:ForEach(function(_index, element)
-            if found ~= nil then return end
-            local component = nil
-            pcall(function() component = element:get() end)
-            if not real(component) then return end
-            if boolProp(component, PROP.holdOn) ~= true then return end
-            local widget = promptWidget(component)
-            if not real(widget) then return end
-            if numberProp(widget, PROP.state) ~= STATE_FOCUSED then return end
-            found, foundWidget = component, widget
-        end)
-    end)
-    return found, foundWidget
-end
-
---- DRIVING THE RING SMOOTHLY AT 200ms.
----
---- Daniel, 30 Aug 2026: "the bar filling is very choppy, it basically fills it
---- in ~25% at a time." Correct, and predicted -- four updates across a 0.8s
---- hold is exactly four steps.
----
---- The game does not draw it smoothly by writing it every frame either.
---- UHeldenProgressBar carries `float InterpSpeed` and `SetProgress(float,
---- bool bInterp)`: told to interp, the bar ANIMATES toward the value on its
---- own. So the fix is not a faster pump -- which would have doubled the mod's
---- global-walk rate for cosmetics -- it is to stop snapping the bar and give
---- it somewhere to travel to.
----
---- It is handed the alpha we will have at the NEXT update, one step ahead, so
---- it spends the whole 200ms animating across exactly the gap our sampling
---- leaves and arrives just as the next update lands. Clamped at 1 so it can
---- never show full before the hold actually completes.
-local hold = {
-    active   = false,   -- is the mod running a hold right now
-    t0       = 0,       -- os.clock at which the mod's hold started
-    target   = nil,     -- fullName of the component it started on
-    firedFor = nil,     -- fullName already completed on THIS key press
-    epoch    = -1,
-    barOK    = nil,     -- has SetHoldInteractAlpha ever been seen to take
-    sawFocus = nil,     -- last focused hold announced, to log it only on change
-    dirty    = {},      -- fullName -> true: rings we wrote and have not cleared
-    pawnName = nil,     -- the pawn's path, so the fast tick can complete without
-                        -- a controller resolve
-    frames   = 0,       -- ring updates drawn in the current hold
-    tracked  = false,   -- has this hold reported its achieved rate yet
-}
-
---- ANSWERED 30 Aug 2026, so there is nothing here any more:
---- AHeldenInteractableObject::Interact_Local(pawn) DOES NOTHING on a hold, the
---- same as Interact_Server. All three members of the family are now measured --
---- Interact completes outright, Interact_Server does nothing, Interact_Local
---- does nothing -- and the component carries no hold-start-time field either
---- (its whole reflected surface is bIsHoldInteraction, HoldInteractionDuration,
---- bAutoEndHoldInteract and GetHoldInteractAlpha). The game's hold lives in
---- unreflected C++ and cannot be started, so the mod draws the ring itself and
---- the only lever left is how often it can do that.
----
---- The probe that established this is DELETED rather than left switched off: it
---- also suppressed the ring for the whole of the hold it ran on, so shipping it
---- would have broken the first hold of every session.
-
---- DRAW THE RING THE WAY THE GAME DOES: write the alpha, every update.
----
---- 0.7.1 raised the bar's InterpSpeed and led the target, on the theory that the
---- bar would animate between updates. It does not -- SetProgress performs ONE
---- step and stores no target, measured -- so all that machinery bought nothing
---- and left a game property to put back. It is gone, and with it the
---- hold_ring_interp knob.
----
---- SetProgress IS THE DRAW. SetHoldInteractAlpha is not, or not on its own:
---- 0.7.1 called it exactly once per hold and the ring still animated for the
---- whole hold, which can only have been the per-frame SetProgress calls. It is
---- still made on the first update, because that combination is the one actually
---- observed to put a ring on screen, and it costs nothing.
----
---- bInterp is FALSE. Interpolation existed to hide a low update rate; at frame
---- rate it would only add lag, and the game's own ring is linear.
-local function driveBar(widget, alpha, first)
-    if first then pcall(function() widget:SetHoldInteractAlpha(alpha) end) end
-    local bar = get(widget, PROP.progBar)
-    if not real(bar) then return false end
-    pcall(function() bar:SetProgress(alpha, false) end)
-    return true
-end
-
-local function clearBar(component)
-    local widget = promptWidget(component)
-    if not real(widget) then return false end
-    pcall(function() widget:SetHoldInteractAlpha(0) end)
-    local bar = get(widget, PROP.progBar)
-    if real(bar) then pcall(function() bar:SetProgress(0, false) end) end
-    return true
-end
-
-
-local function resetHold(why)
-    if hold.active and why ~= nil then
-        diag(string.format("hold: abandoned after %.2fs (%s)",
-            os.clock() - hold.t0, why))
-    end
-    hold.active, hold.target = false, nil
-end
-
---- END A HOLD THE MOD HAS SERVED IN FULL.
----
---- Interact(pawn) on the owning actor is measured to perform a hold interaction
---- outright, which is exactly what is wanted at the END of a hold that has
---- already run its whole duration.
----
---- Reachable from BOTH cadences on purpose. The 30Hz ring tick finds its
---- component by path and is the one that normally fires, on time; the 200ms
---- scan already has the component in hand and fires as a fallback if the path
---- lookup ever fails, so a component whose path will not resolve costs the ring
---- and not the feature. hold.firedFor makes the two safe to have at once: the
---- first to arrive latches it and the other returns.
-local function finishHold(component, pawn, duration)
-    if pawn == nil then return resetHold("the pawn could not be found again") end
-
-    -- Never while something is already running.
-    local running = get(pawn, PROP.inProgress)
-    if running ~= nil and real(running) then
-        return resetHold("an interaction is already running")
-    end
-
-    local owner = nil
-    pcall(function() owner = component:GetOwner() end)
-    if not real(owner) then return resetHold("no owner") end
-
-    local name = hold.target
-    local fired = pcall(function() owner:Interact(pawn) end)
-    hold.firedFor = name              -- once per key press, whatever happened
-    resetHold(nil)
-    -- Immediately, while the component is still in hand. The prompt is about to
-    -- hide anyway; what must not survive is the VALUE, which is what was still
-    -- sitting on the fixed spot after its interaction had gone.
-    if clearBar(component) then hold.dirty[name] = nil end
-    diag(string.format("hold: completed %s after %.2fs and called Interact -- %s",
-        shortName(name), duration, fired and "call returned" or "the call RAISED"))
-end
-
---- Everything this feature remembers between passes is a SCALAR or a STRING.
---- No UObject is held (crash rule C): the focus target is remembered by NAME
---- and re-resolved from the controller every pass.
-
---- Put back every ring this mod has written and not yet cleared.
----
---- Most ends have the widget in hand and clear on the spot. The ones that do
---- not -- the key released, focus lost, the object finished and stopped being a
---- focusable hold at all -- reach it here, by NAME, from the same
---- HotInteractions walk, matching whatever state the component is in now. That
---- last case is the fixed spot: it is still in range, it is simply no longer
---- something focusedHold() would ever return, so nothing else would ever find
---- it again.
-local function clearDirty(subsystem, keep)
-    if next(hold.dirty) == nil then return end
-    local array = get(subsystem, PROP.hot)
-    if array == nil then return end
-    local total = count(array)
-    if total < 0 or total > MAX_ENTRIES then return end
-
-    pcall(function()
-        array:ForEach(function(_index, element)
-            local component = nil
-            pcall(function() component = element:get() end)
-            if not real(component) then return end
-            local name = fullName(component)
-            if hold.dirty[name] == nil or name == keep then return end
-            if clearBar(component) then
-                hold.dirty[name] = nil
-                diag("hold: cleared the ring on " .. shortName(name))
-            end
-        end)
-    end)
-end
-
---- Runs on the deposit cadence, off the deposit's own subsystem resolve, so it
---- costs no extra global walk. 200ms to notice a prompt against a 0.75s hold is
---- about 13% longer than pressing normally would be -- which is a far better
---- trade than doubling the mod's largest crash exposure for it.
-local function holdScan(subsystem, controller)
-    if cfg.hold_rescue == 0 then return end
-    if hold.epoch ~= epoch then
-        hold.epoch, hold.active, hold.target, hold.firedFor = epoch, false, nil, nil
-        -- The old world's widgets are gone with it; carrying their names would
-        -- be a list this mod could never satisfy.
-        hold.sawFocus, hold.dirty = nil, {}
-    end
-    if controller == nil then return end
-
-    clearDirty(subsystem, hold.active and hold.target or nil)
-
-    local down, heldFor, why = interactDown(controller)
-    if why ~= nil then
-        logOnce("holdinput:" .. why,
-            "the hold feature cannot read the interact key (" .. why
-            .. "), so it is doing nothing at all")
-        return
-    end
-
-    -- KEY UP CLEARS EVERYTHING, including the once-per-press latch. This is
-    -- also what leaves release-and-re-press working exactly as it does today.
-    if down ~= true then
-        -- Clear on THIS pass, not the next one: the top-of-pass sweep spared
-        -- the ring we were still driving, and releasing the key is exactly when
-        -- it has to go.
-        if hold.active then clearDirty(subsystem, nil) end
-        resetHold(nil)
-        hold.firedFor = nil
-        return
-    end
-
-    local focus, widget = focusedHold(subsystem)
-    if not real(focus) or not real(widget) then
-        return resetHold("no hold prompt focused")
-    end
-
-    local name = fullName(focus)
-    if hold.sawFocus ~= name then
-        hold.sawFocus = name
-        diag(string.format("hold: a hold prompt is focused -- %s (%.2fs)",
-            shortName(name), numberProp(focus, PROP.holdDur) or -1))
-    end
-    if hold.firedFor == name then return end      -- done; waiting for release
-    if hold.active and hold.target ~= name then
-        resetHold("looked at something else")
-    end
-
-    if not hold.active then
-        -- THE DECISION, and the only place the game's own alpha is consulted.
-        -- Non-zero means the game IS running its hold -- the key went down
-        -- while this was already focused, the press edge landed, and there is
-        -- nothing wrong to fix. Stand down and let it run.
-        local gameAlpha = nil
-        pcall(function() gameAlpha = widget:GetHoldInteractAlpha() end)
-        if type(gameAlpha) == "number" and gameAlpha > 0.001 then
-            -- Worth one line, once: this is the reading the whole no-double-fire
-            -- property rests on, and it had never been observed NON-zero.
-            logOnce("gamehold", string.format("hold: the game's own hold reads"
-                .. " alpha %.3f while running, so standing down on a live hold"
-                .. " works as designed.", gameAlpha))
-            return
-        end
-
-        -- Key down, hold prompt focused, and the game is not holding: the press
-        -- edge was eaten. Take it over -- starting NOW, not from when the key
-        -- went down, so it feels exactly like pressing at this moment.
-        hold.active, hold.t0, hold.target = true, os.clock(), name
-        hold.pawnName = fullName(get(controller, PROP.pawn))
-        hold.frames, hold.tracked = 0, false
-
-        -- Reported HERE, not on some later pass. 0.6.2 put this behind "the
-        -- first update where alpha is already moving" and it never printed
-        -- once, so the ring's real InterpSpeed went unmeasured for a whole run.
-        local bar = get(promptWidget(focus) or focus, PROP.progBar)
-        diag(string.format("hold: TAKING OVER %s (key already down %.2fs,"
-            .. " game alpha %s) -- running %.2fs myself, ring InterpSpeed %s",
-            shortName(name), heldFor or -1, tostring(gameAlpha),
-            numberProp(focus, PROP.holdDur) or -1,
-            real(bar) and tostring(numberProp(bar, PROP.interpSpd)) or "no ring"))
-    end
-
-    -- THE FALLBACK, and the only reason this is here rather than only in the
-    -- 30Hz tick: if StaticFindObject cannot resolve the component's path, the
-    -- fast tick can neither draw nor finish. Firing from here means that costs
-    -- the smooth ring and NOT the feature. Normally the fast tick has already
-    -- latched firedFor by now and this never runs.
-    local duration = numberProp(focus, PROP.holdDur)
-    if duration == nil or duration <= 0 then return resetHold("no duration") end
-    if (os.clock() - hold.t0) / duration < 1 then return end
-    if byPath(hold.target) == nil then
-        logOnce("holdpath:" .. shortName(name), string.format(
-            "hold: %s could not be found again by path, so the ring cannot be"
-            .. " drawn at 30Hz for it. Completing from the 200ms pass instead --"
-            .. " the hold still works, it just will not animate smoothly.",
-            shortName(name)))
-    end
-    finishHold(focus, get(controller, PROP.pawn), duration)
-end
-
---- THE RING, AND THE COMPLETION, at pump rate.
----
---- Split out of holdScan because both are time-critical and holdScan is not:
---- deciding whether to take over needs the subsystem and the controller, which
---- are global walks and stay on the 200ms cadence. Drawing the ring and firing
---- at the right moment need neither -- the component and the pawn are found
---- again BY PATH, which is a hash lookup.
----
---- 0.6.2 did both at 200ms and Daniel got two defects for it: "the filling
---- animation goes too quickly but also still isn't really smooth ... a very
---- fast ease-out to every 25% spot". Four samples cannot be smoothed into a
---- sweep, and leading the bar by a whole 200ms step made it read FULL up to a
---- fifth of a second before the hold actually fired. At 30Hz the lead is one
---- frame and both go away.
-local function holdFast()
-    if not hold.active or cfg.hold_rescue == 0 then return end
-
-    local component = byPath(hold.target)
-    if component == nil then return end        -- the 200ms scan will notice
-
-    local duration = numberProp(component, PROP.holdDur)
-    if duration == nil or duration <= 0 then return end
-    local alpha = (os.clock() - hold.t0) / duration
-    if alpha > 1 then alpha = 1 end
-
-    if cfg.hold_rescue_bar ~= 0 then
-        local widget = promptWidget(component)
-        if real(widget) then
-            hold.frames = hold.frames + 1
-            driveBar(widget, alpha, hold.frames == 1)
-            hold.dirty[hold.target] = true
-
-            -- Rule J: the ACHIEVED update rate, which is the only number that
-            -- decides whether this ring can look like the game's. Reported once
-            -- per hold, at the midpoint.
-            if not hold.tracked and alpha > 0.5 then
-                hold.tracked = true
-                diag(string.format("hold: ring is updating at %.0f Hz (%d"
-                    .. " updates in %.2fs of a %.2fs hold)",
-                    hold.frames / (os.clock() - hold.t0), hold.frames,
-                    os.clock() - hold.t0, duration))
-            end
-        end
-    end
-
-    if alpha < 1 then return end
-    finishHold(component, byPath(hold.pawnName), duration)
-end
-
 -- ==========================================================================
 -- FEATURE 3 -- ONE COIN, NOT A SHOWER OF THEM.
 -- ==========================================================================
@@ -2071,7 +1539,7 @@ end
 --- global object-array walk and the mod's largest crash exposure (rule E,
 --- RE-UE4SS #1328), so it is resolved once here rather than once per feature.
 local function interactionTick()
-    if cfg.deposit_all == 0 and cfg.hold_rescue == 0
+    if cfg.deposit_all == 0
             and cfg.coin_max_gold == 0 and cfg.coin_max_artifacts == 0 then
         return
     end
@@ -2081,17 +1549,8 @@ local function interactionTick()
     if subsystem == nil then return end
     noteWorld(subsystem)
 
-    -- Re-validated as well as re-resolved: a name could in principle come back
-    -- as a controller that is no longer the local one, and acting on someone
-    -- else's controller would be a real bug rather than a slow one.
-    local controller = cachedRoot("controller", localController, function(found)
-        local isLocal = nil
-        pcall(function() isLocal = found:IsLocalController() end)
-        return isLocal == true
-    end)
-
     -- ============================================================
-    -- BUCKET 2 RUNS EVERYWHERE. BUCKET 3 RUNS ONLY ON THE AUTHORITY.
+    -- EVERY FEATURE IS BUCKET 3, SO ALL OF IT RUNS ONLY ON THE AUTHORITY.
     -- ============================================================
     --
     -- Measured in the first real lobby, 30 Aug 2026. A guest running the deposit
@@ -2103,13 +1562,11 @@ local function interactionTick()
     -- The brief already called these bucket 3, host and solo only. This is what
     -- makes that true rather than merely written down.
     --
-    -- A guest KEEPS feature 5, which is bucket 2: it re-sends an input the player
-    -- could have sent themselves, changes no shared state, and is confirmed
-    -- working in a lobby.
-    --
-    -- A guest loses nothing that ever worked. When the HOST runs the mod and is
-    -- near the machine, the guest still gets the benefit, because the host's
-    -- write is the authoritative one.
+    -- NOTHING IS LEFT FOR A GUEST TO RUN. Every feature the mod still has is
+    -- bucket 3, so a guest's copy stands down completely -- and loses nothing,
+    -- because the host's writes are the authoritative ones and the guest gets
+    -- the benefit of them either way. This is what makes the mod host-only
+    -- rather than merely host-recommended.
     --
     -- UNKNOWN DEFAULTS TO ACTING. A failed read answers nil, not false, and nil
     -- must not disable the mod in single player -- that would trade a cosmetic
@@ -2126,11 +1583,6 @@ local function interactionTick()
         .. " features are %s", tostring(authority),
         authority == false and "STANDING DOWN (they are the host's to make)"
             or "active"))
-
-    local okH, errH = pcall(function() holdScan(subsystem, controller) end)
-    if not okH then
-        logOnce("holdscan:" .. tostring(errH), "hold pass failed: " .. tostring(errH))
-    end
 
     -- Bucket 3 from here down: nothing below this line may run on a guest.
     if authority == false then return end
@@ -2361,15 +1813,7 @@ local pumpStarted = pcall(function()
             ticks = ticks + 1
             defer.drain()
 
-            -- EVERY TICK, and cheap: no global walk, only a path lookup while
-            -- a hold is actually running.
-            local okF, errF = pcall(holdFast)
-            if not okF then
-                logOnce("holdfast:" .. tostring(errF),
-                    "hold ring tick failed: " .. tostring(errF))
-            end
-
-            -- Both features, one subsystem resolve, one controller resolve.
+            -- Both features, one subsystem resolve.
             -- ELAPSED TIME, not a tick count: ticks are frames now.
             local now = os.clock()
             local ok2, err2 = true, nil

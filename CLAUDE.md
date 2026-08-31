@@ -580,7 +580,17 @@ context for delivering these five things.
 | **4** | Skipping NPC dialogue: **one space press per line** | hold space to keep skipping |
 | **5** | **The eaten hold input.** Interacting with a hold object requires seeing the icon first. Hold the key even one frame early and the input is swallowed — you must release and re-press. (Fixing a spot, opening a casket, sitting on a chair.) | if the key is already held when the prompt appears, start the hold |
 
-(5) is a different shape from the rest: it is a **timing bug**, not a repetition
+**FEATURE 5 WAS REMOVED FROM THE MOD ON 31 AUG 2026 AT DANIEL'S REQUEST**, after
+being built, shipped and confirmed working in a two-machine lobby: "i've changed
+my mind on the whole hold feature. remove it entirely." The code, its config
+keys and every user-facing mention are gone as of 1.0.0. The record below and in
+`docs/DESIGN.md` is kept because it is measured evidence about this game's input
+system, not because the feature is coming back. **Do not rebuild it unasked.**
+
+Removing it made the mod entirely bucket 3, which is why it is now host-only
+with nothing left for a guest's copy to do.
+
+(5) was a different shape from the rest: it is a **timing bug**, not a repetition
 count, and it is the only one that bites on every hold interaction in the game
 rather than at specific machines. **It is being built first.**
 
@@ -602,7 +612,8 @@ several of this file's original assumptions were retired.
 defaulted to off because they are harmless and someone may want them. They are
 not the mod.
 
-**Phase 2 — feature 5, the eaten hold input.** In progress.
+**Phase 2 — feature 5, the eaten hold input.** Built, shipped, confirmed in a
+lobby, then REMOVED on 31 Aug 2026 at Daniel's request. See above.
 
 **Phase 3 — features 1 and 2**, the deposit-all mechanism, generalised across
 all three coin-deposit machines.
