@@ -394,45 +394,54 @@ Crash dumps live in `%LOCALAPPDATA%\Helden\Saved\Crashes\UECC-*` —
 `CrashContext.runtime-xml` carries the stack without needing the minidump, and
 `PCallStackHash` identifies the family in one line.
 
-**K. NEVER schedule through UE4SS. All delayed work goes through one queue.
-This rule is load-bearing for every session that touches `main.lua`, forever.**
+**K. NEVER schedule through UE4SS, and NEVER run Lua off the game thread.
+The heartbeat is a HOOK the engine's own timer drives. This rule is
+load-bearing for every session that touches `main.lua`, forever.**
 
-Upstream RE-UE4SS **#1180**, unfixed on any build that boots 5.7:
-`process_simple_actions` drains the engine-tick action vector with `erase_if`, its
-mutex is RECURSIVE, and an `ExecuteWithDelay` / `ExecuteInGameThread` call made
-from inside any drained callback appends mid-iteration and corrupts the stored Lua
-registry refs. The process then dies with "Abort signal received" or
-`Ref was not function`. **Seven of one tester's fifteen crashes in a single session
-were this.** These look random, strike hardest on slow machines and unfocused
-windows, and come back the moment someone reintroduces the pattern — because it
-works fine on a fast machine.
+Two upstream defects on the build that boots 5.7, both unfixed:
+
+- RE-UE4SS **#1180**: `process_simple_actions` drains the engine-tick action
+  vector with `erase_if` under a RECURSIVE mutex, so an `ExecuteWithDelay` /
+  `ExecuteInGameThread` issued from inside a drained callback corrupts the
+  stored Lua registry refs.
+- **The LoopAsync registry race** (established 4-5 Sep 2026, four aborts with
+  one stack hash, one of them with UE4SS's log naming our hook's slot as
+  overwritten): the LoopAsync thread runs its Lua with no lock and
+  `ExecuteInGameThread` does `luaL_ref` from that thread while the game
+  thread is allocating refs for every hook call. A settle gap narrows it; it
+  cannot close it. "Ref was not function" / "Abort signal received".
+
+So the mod runs NO Lua on any thread but the game thread, ever:
 
 ```lua
-LoopAsync(TICK_MS, function()
-    if inFlight then return false end       -- never queue faster than the game drains
-    inFlight = true
-    ExecuteInGameThread(function()          -- the ONLY steady append we make
-        inFlight = false
-        defer.drain()                       -- our own table, swapped before it runs
-        pass()
-    end)
-    return false
-end)
+-- the pump: the engine's timer calls a harmless native controller function
+-- by name, 40 times a second, and our hook on it is the heartbeat.
+RegisterHook("/Script/Engine.PlayerController:ResetControllerLightColor",
+    function() pcall(heartbeat) end)          -- heartbeat() drains defer, then passes
+-- armed per world, on the game thread, from PlayerController:ClientRestart
+statics:K2_SetTimer(controller, "ResetControllerLightColor", 0.025, true, false, 0, 0)
 ```
 
+- **No `LoopAsync`, no `ExecuteInGameThread`, no `ExecuteWithDelay`,
+  anywhere.** `tools/modpackage.py` refuses a package containing any of the
+  three (`check_no_second_thread`), and `test_packaging.py` proves it refuses.
 - **Every delay is `defer.at`, every retry ladder is one `defer.poll`, every
-  "next frame" is `defer.at(0, ...)`.** The queue drains once per pass on the game
-  thread; scheduling from inside a drained entry is safe by construction, because
-  it appends to our live table and never the one being walked.
-- **`defer` captures the world epoch centrally** (rule D) and drops stale entries
-  with a diag line (rule H). Do not hand-roll a second epoch guard — one site's
-  hand-rolled guard compared against an epoch that was never captured, which made
-  that feature silently dead for weeks.
-- **All UObject work runs on the game thread. Keybind callbacks are NOT on it** —
-  route their bodies through `defer.at(0, ...)`. Any new callback source gets the
-  same treatment unless proven otherwise.
-- The pump — the single `ExecuteInGameThread` in the `LoopAsync` body — is the
-  only steady append the mod makes. There is never a reason for a second one.
+  "next frame" is `defer.at(0, ...)`.** The queue drains once per beat on the
+  game thread; scheduling from inside a drained entry is safe by construction,
+  because it appends to our live table and never the one being walked.
+- **`defer` captures the world epoch centrally** (rule D) and drops stale
+  entries with a diag line (rule H). Do not hand-roll a second epoch guard.
+- **The beat function must be a `/Script/` NATIVE with no parameters and no
+  effect on a PC.** An empty Blueprint event never reaches the hook (measured),
+  and a hook on any `/Game/` Blueprint function crashed the game at the first
+  world change (measured, 5 Sep 2026). LetMeLook uses a different native
+  (`ResetControllerDeadZones`) so the two mods never drive each other.
+- **Arming is per world and logged.** A timer dies with its world.
+  `PlayerController:ClientRestart` on the local controller is the proven
+  arming point; `RegisterInitGameStatePostHook` clears the mark; the feature
+  hooks arm as a fallback. The beat count is logged once a minute.
+- Keybind callbacks are not on the game thread. There are none in the shipped
+  mod; a probe's keybind sets a flag and nothing else.
 
 ---
 

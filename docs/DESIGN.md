@@ -4088,3 +4088,247 @@ state (a metatable or `__index` failure) is strong evidence for the
 hypothesis; a recurrence with a clean owner check and a normal log is
 evidence against, and the next step is then to read `process_simple_actions`
 with symbols.
+
+#### 5 Sep 2026 -- two machines: the guest's repeats hit but do not animate
+
+Daniel, both copies modded, one joining the other: "it does make the
+swinging work for the guest however it makes it so the animation doesnt
+play. if i aim at something i still see it doing the damage though."
+
+Logs: the F: copy was the GUEST this time (`HasAuthority = false` at
+181.857) and repeated up to 20 swings a chain; Copy B hosted. So route B's
+core claim holds on a guest against a host: `Attack_Server` from Lua
+reaches the server and the server swings. **Established: the guest's own
+animation does not play for a mod-made call.**
+
+**Best candidate, not established:** the game's click path plays the swing
+montage on the owning client itself, and the server's `Attack_Multicast`
+skips the owner (the headers carry a `PlayMontageIgnoreLocal_*` family, the
+same idea). A call that came from the mod never ran that owner-side half.
+
+**Fix, presentation only (bucket 1 on the guest):** after each repeat call
+on an instance where the weapon reports `HasAuthority() == false`, play the
+swing montage on the local mesh: `AttackAnimChain.Attacks[(combo % n) + 1]`
+through `Mesh:GetAnimInstance():Montage_Play(...)`, then
+`Montage_JumpToSection` if the entry names a section. The server still
+decides the hit; nothing authoritative moves. Whether `(combo % n) + 1` is
+the game's own mapping is **not established** -- so every real swing also
+logs `LastAttackMontage` for its combo, once per class, beside the guest's
+pick. A mismatch will be in the file, not on the screen only.
+
+Host-side is untouched: `Attack_Server` executes locally there and runs the
+whole path, which is why solo never showed this.
+
+### 5 Sep 2026 -- the 13:22 abort: the hook's registry slot held a RemoteUnrealParam. ATTRIBUTED.
+
+**Game, two machines.** F: hosting, Copy B the guest, both modded, the guest
+hitting things with a mallet. F: crashed at 13:22:50. Dump
+`UECC-Windows-DDB95E86…`, `PCallStackHash C812BDA7…`, "Abort signal
+received" -- **the same hash as the 4 Sep abort** (`BB759C15…`) and as a 30
+Aug access violation (`5CD1F3E5…`). One family.
+
+**Established, and it is the piece the 4 Sep entry lacked.** The last line
+UE4SS wrote before dying, 13:22:50.522:
+
+```
+Error executing hook pre-callback /Script/Helden.HeldenWeapon:Attack_Multicast:
+[Lua::call_function] lua_pcall returned LUA_ERRRUN => attempt to call a RemoteUnrealParam value
+stack traceback:
+```
+
+with **no traceback frames**. That error is not one our code can raise: the
+whole hook body is inside `pcall`, the probe's hook body is inside `pcall`,
+LetMeLook hooks nothing on that function, and nothing in any of them calls a
+parameter as a function. An error with no frames and that message means
+UE4SS fetched the hook callback by registry ref, got a `RemoteUnrealParam`
+userdata instead of the function, and tried to call it. **The hook's
+registry slot had been overwritten.** That is registry corruption with the
+victim named, and it fits the 4 Sep dump's `Ref was not function` exactly:
+same corruption, different slot, and this time in ours.
+
+**Why now, and why the host.** This session had two players swinging, so
+`Attack_Multicast` fired on the host for both, ~5 hook calls a second, each
+creating parameter userdata and refs on the game thread -- while the
+LoopAsync thread took a `luaL_ref` every 8 ms (`PUMP_MS = 8`, ~125 a
+second) for `ExecuteInGameThread`. The settle gap shipped on 5 Sep narrows
+the window against the drain's `unref`; it cannot help against a hook that
+is allocating refs at the same moment, which is the collision this needed.
+**Best candidate, not established at the instruction level:** the LoopAsync
+thread's `luaL_ref` and the game thread's ref allocation interleaved on the
+registry free list, and the slot the hook function lived in was handed out
+again.
+
+**What this rules in and out.** Not the guest-side montage play (host
+crashed; the host never runs it). Not the swing hook's logic (it is the
+victim, not the cause: a corrupted slot is found by whoever reads it most,
+and this hook reads it five times a second). Not LetMeLook alone: its pump
+has the same shape and cannot be excluded, but the evidence is in our slot.
+
+**The fix is structural: no Lua on a second thread, ever.** The only reason
+the pump exists is a game-thread heartbeat, and LoopAsync is the wrong way
+to get one on this build. The right way is a `RegisterHook` on something
+the game calls every frame, which runs on the game thread with no registry
+writes but UE4SS's own, single-threaded. The object dump has seven
+Blueprint `Tick` / `ReceiveTick` functions; none is on the player pawn or
+controller, so which of them fires, how often, and whether it keeps firing
+across outpost, dungeon and menus has to be measured. `attack-12` hooks all
+seven and writes a count every five seconds from the game thread. CLAUDE.md
+records widget `OnInitalize*` hooks never firing, so a widget `Tick` is
+NOT assumed to work until the census says so.
+
+**Interim, shipped now, and it is a mitigation:** `PUMP_MS` 8 -> 25. The 8
+was for feature 5's ring, which is gone; nothing left needs more. Three
+times fewer cross-thread refs per second is fewer chances, not zero.
+LetMeLook runs the same pump at 100 ms and gets the same replacement once
+the census names a source.
+
+**What would confirm the fix:** the census names a source that ticks every
+frame in play; the pump moves to it; no LoopAsync and no
+`ExecuteInGameThread` remain in either mod; and no abort of hash
+`C812BDA7…` across the next several two-player sessions. The victim line
+is now known, so a recurrence will be recognisable in the log.
+
+### 5 Sep 2026 -- the tick census: what fires, what does not, and a NEW crash family
+
+`attack-12` could hook none of the seven Blueprint tick functions at load:
+a `/Game/` function does not exist until its class is loaded. `attack-13`
+retried from the pump and all attached on the second attempt (~6 s in).
+`attack-14` added the player animation blueprint and an engine timer.
+
+**Established, one solo session, outpost then the dungeon button:**
+
+| source | rate |
+|---|---|
+| `ABP_HeldenPlayer_C:BlueprintUpdateAnimation` | 270-405 /s -- every frame, several instances |
+| the seven widget / actor Blueprint ticks | 0-1 /s |
+| `K2_SetTimer` -> `AActor:K2_OnReset` (empty event), hooked | **0** -- the timer was armed twice and the hook never fired |
+
+**And the game crashed at the world change**: `EXCEPTION_ACCESS_VIOLATION
+reading 0xa`, hash `FA4D668E…`, a hash never seen before. GameThread, the
+game calling into ue4ss.dll, nine ue4ss frames, a C++ throw. Not the abort
+family. **Best candidate, not established:** a `RegisterHook` on a Blueprint
+UFunction does not survive that class being unloaded and rebuilt at a level
+change. It is the first session that ever hooked a `/Game/` function, the
+animation one was firing 400/s, and it died at the first transition; every
+`/Script/` native hook this project has used has crossed hundreds of
+transitions. Consequence: **the heartbeat cannot come from a Blueprint
+hook**, even though the animation update is exactly the rate wanted.
+
+**Why the timer route likely misfired, and the retry:** an empty
+BlueprintImplementableEvent has no `Func` and no bytecode, and UE4SS's hook
+lives on the `Func` pointer, so a timer that calls it may never touch the
+hook. `attack-15` aims the timer at three NATIVE parameterless
+`APlayerController` functions that do nothing useful on a PC
+(`ResetControllerLightColor`, `ResetControllerDeadZones`,
+`ResetControllerTriggerReleaseThresholds`, Engine.hpp:11180-11182) and hooks
+those. Re-arm per world comes from `RegisterInitGameStatePostHook`, UE4SS's
+own game-thread callback, so the heartbeat needs no pump at all.
+
+If one of the three counts ~40/s across outpost, dungeon and pause, the
+pump moves onto it in both mods and LoopAsync is gone.
+
+### 5 Sep 2026 -- the game is our clock: LoopAsync removed from both mods
+
+**`attack-15` census, solo, outpost -> dungeon, 128 s:** the engine timer
+aimed at three NATIVE parameterless controller functions fired every one
+of them at **exactly 40/s** (0.025 s), through the world change (re-armed
+from `RegisterInitGameStatePostHook`, which fired), for the whole session.
+The empty Blueprint event in `attack-14` fired nothing; the native ones do,
+because a native goes through its `Func` pointer and that is where UE4SS's
+hook lives.
+
+**And the abort came back**, 14:53, hash `C812BDA7…` -- the fourth of the
+family, and the second today. This session had MORE game-thread Lua than
+any before it (three hooks at 40/s, the swing hook, the repeater) and three
+LoopAsync pumps (BetterInteraction 25 ms, LetMeLook 100 ms, the probe 100
+ms) still writing refs from their own threads. The race hypothesis predicts
+exactly that: more collisions with more traffic. Consistent, not a proof;
+the proof is the absence of the hash once the second thread is gone.
+
+**Shipped, both mods:**
+
+- **No `LoopAsync`, no `ExecuteInGameThread`, no `ExecuteWithDelay`.** The
+  packaging rule `check_no_second_thread` refuses any of the three in the
+  shipped Lua, and `test_packaging.py` proves it refuses (22 checks).
+- The pump is `RegisterHook` on a native controller function the engine's
+  timer calls by name: BetterInteraction on
+  `PlayerController:ResetControllerLightColor` at 25 ms, LetMeLook on
+  `ResetControllerDeadZones` at 100 ms -- different functions so neither
+  drives the other. Both are gamepad-only resets that do nothing on a PC.
+- Armed per world from `PlayerController:ClientRestart` on the local
+  controller. That hook is PROVEN on this build: `CheatManagerEnablerMod`
+  in the test profile hooks it and its UE4SS.log lines show it firing once
+  per world. `RegisterInitGameStatePostHook` clears the mark.
+  BetterInteraction also arms from its first Interact or swing hook, so a
+  world in which ClientRestart somehow did not fire still gets a beat the
+  first time the player does anything. Arming is logged; the beat count is
+  logged once a minute (rule H).
+- `defer.at` still converts delays with `PUMP_MS`; the beat is 25 ms so a
+  "tick" is now a beat, and every existing delay is unchanged in seconds.
+
+**What changed in the brief.** Crash rule K said "never schedule through
+UE4SS; all delayed work goes through one queue drained by one LoopAsync
+pump" and called that shape load-bearing forever. The first half stands
+and is stronger now; the second half was the bug. Rule K is rewritten in
+CLAUDE.md to say so.
+
+**What would confirm it:** several long sessions, solo and two-player, with
+no `C812BDA7…` abort and the minute-line showing ~2400 beats. A recurrence
+now means the hypothesis is wrong, because the thread it blames no longer
+exists -- which is why removing it entirely, rather than narrowing it, is
+the only version of this fix that can be falsified.
+
+**The attack probe is disabled in the profile** (`enabled.txt.off`): it
+still has its own LoopAsync pump, and a clean test needs none running.
+
+#### 5 Sep 2026 -- bare hands: a punch is a character montage multicast, and Lua can throw one
+
+`attack-16/17`, solo. **Established:** with empty hands every left click is
+`AHeldenCharacter:PlayMontage_Multicast(AM_PunchAttacks, section)` on the
+local player character, section alternating 0, 1, 0, 1; nothing on any
+weapon. Fast clicking: 0.507-0.717 s between punches. No `_Server` form
+appears on the host (the host's punch is native, the multicast is what is
+reflected -- same shape as weapon swings).
+
+**Established, F1:** `PlayMontageIgnoreLocal_Server(AM_PunchAttacks, 1)`
+from Lua on the host produced the server call and an `IgnoreLocal`
+multicast and, per Daniel, "nothing" -- correct, it ignores the local
+player by name. `PlayMontage_Multicast(AM_PunchAttacks, 1)` from Lua
+"punched like it would normally". (attack-16's first attempt failed on a
+probe bug: `fullName()` carries the class prefix and `StaticFindObject`
+wants the bare path.)
+
+**Shipped in `main.lua`:** a second chain kind. The `PlayMontage_Multicast`
+hook opens an "unarmed" chain when the local pawn plays a montage in the
+`UNARMED` table (`AM_PunchAttacks` -> 0.51 s); each repeat re-resolves the
+montage by path and, on the authority, calls the same multicast with the
+other section; on a guest it calls the server form (everyone else) and
+plays the montage on its own mesh, as weapons do. A weapon swing closes an
+unarmed chain. The "no swing followed our call" refusal rule does not apply
+to punches (our own multicast is the swing). Compass and other unlisted
+things are still never repeated.
+
+**Not measured:** whether a GUEST's repeated punch hits (the damage may live
+in a notify that only the authority runs). The two-machine test says.
+
+#### 5 Sep 2026 -- switching mid-hold kept the old chain
+
+Daniel: switching from bare hands to a hammer mid-hold "makes you keep the
+punching animation and cadence while having a hammer in your hand"; hammer
+to rust bonk kept "the hammer's cadence and animation but works as if it
+were a rust bonk: dealing bigger damage to enemies at a much faster cadence".
+
+**Established from the design, not the log:** the chain is keyed to the
+item that started it; the game starts a chain only on a real press, so a
+switch with the key held never opens a new one; and the weapon check asked
+only "is that class still carried" -- a holstered hammer is. So the mod kept
+calling `Attack_Server` on the holstered hammer (its montage, its cadence)
+while the game charged the swing to the item actually drawn. For bare
+hands the punch chain had no drawn-item check at all.
+
+**Fix:** `weaponInHand` now reports what reads `HolsterState == Equipped`
+and refuses when the chain's item is holstered (2) or something else is
+drawn; the punch chain closes the moment anything is drawn. The new item
+then waits for a fresh press, which is the rule agreed on 2 Sep ("resumes
+only on a fresh press"). Cheat-equipped probe items read `None` and cannot
+be told apart; real pickups read `Equipped` and can.

@@ -133,8 +133,15 @@
     held, only ever continuing a chain the game's own press started. Do NOT
     press F5 for this test: the game's flag must stay false.
 
+    attack-16: BARE HANDS. Punching with no item swings no weapon actor, so
+    the mod has nothing to repeat. The five AHeldenCharacter montage RPCs are
+    hooked log-only; F1 replays the last one seen on the local player, by
+    name, alternating the Server and Multicast forms. And the probe now runs
+    on the same engine-timer heartbeat as the mods: no LoopAsync anywhere.
+
     KEYS
     ----
+      F1    replay the last local montage RPC (does a Lua call punch?)
       F2    call Attack_Multicast(0) on the weapon in hand (one swing?)
       F3    call Attack_Server(0) on the weapon in hand (one swing?)
       F4    toggle the runaway guard: off <-> D (starve the rate)
@@ -147,7 +154,7 @@
 ]]
 
 local MOD     = "BetterInteractionAttackProbe"
-local VERSION = "attack-11"
+local VERSION = "attack-17"
 
 -- ==========================================================================
 -- Version-fragile names, all verified against the 5.7.4 dump on 2 Sep 2026.
@@ -466,7 +473,6 @@ local ticksSeen = 0
 local guard   -- the runaway guard, assigned below once meleeInHand exists
 
 local function sample()
-    ticksSeen = ticksSeen + 1
     if ticksSeen % SAMPLE_EVERY ~= 0 then return end
     local controller = localController()
     if controller == nil then
@@ -1140,7 +1146,128 @@ local function logAttack(which, self, combo)
     end
 end
 
+-- ==========================================================================
+-- BARE HANDS (5 Sep 2026). With no item in hand a left click punches, and
+-- no weapon actor swings, so the mod's swing hook sees nothing. What a punch
+-- actually calls is not established. AHeldenCharacter carries five montage
+-- RPCs (Helden.hpp:4247-4251) and UHeldenAnimSet.PlayerUnarmedAttacks holds
+-- the unarmed chain; the likeliest path is one of those RPCs carrying a
+-- montage from that chain. All five are hooked, log-only: who, which
+-- montage, which section, the gap. The last one seen on the LOCAL player is
+-- remembered BY NAME (a string, never the object) so F1 can replay it.
+-- ==========================================================================
+
+local MONTAGE_RPCS = {
+    "/Script/Helden.HeldenCharacter:PlayMontageIgnoreLocal_Server",
+    "/Script/Helden.HeldenCharacter:PlayMontageIgnoreLocal_Multicast",
+    "/Script/Helden.HeldenCharacter:PlayMontageIgnoreLocal_Unreliable_Multicast",
+    "/Script/Helden.HeldenCharacter:PlayMontage_Multicast",
+    "/Script/Helden.HeldenCharacter:PlayMontage_Unreliable_Multicast",
+}
+local lastMontageAt = {}
+local lastUnarmed = { path = nil, section = nil, rpc = nil }
+
+local function registerUnarmed()
+    for _, path in ipairs(MONTAGE_RPCS) do
+        local short = shortName(path)
+        local ok = pcall(function()
+            RegisterHook(path, function(self, montage, section)
+                pcall(function()
+                    local who = deref(self)
+                    local mont = deref(montage)
+                    local sect = deref(section)
+                    if type(sect) ~= "number" then sect = tonumber(tostring(sect)) end
+                    local isLocal = nil
+                    pcall(function() isLocal = who:IsLocallyControlled() end)
+                    local now = os.clock()
+                    local gap = lastMontageAt[short] and (now - lastMontageAt[short]) or nil
+                    lastMontageAt[short] = now
+                    local montPath = real(mont) and fullName(mont) or "-"
+                    emit(string.format("%8.3f  %-40s %-28s local=%s montage=%s section=%s gap=%s",
+                        now, short, className(who), tostring(isLocal),
+                        shortName(montPath), tostring(sect),
+                        gap and string.format("%.3fs", gap) or "first"))
+                    if isLocal == true and real(mont) then
+                        lastUnarmed.path, lastUnarmed.section, lastUnarmed.rpc = montPath, sect or 0, short
+                    end
+                end)
+            end)
+        end)
+        emit("  " .. (ok and "hooked " or "COULD NOT HOOK ") .. path)
+    end
+end
+
+--- F1: replay the last local montage RPC by calling it ourselves, so the
+--- next file says whether a Lua-made call punches (with damage) or only
+--- animates. Alternates between the Server and the Multicast form.
+local punchForm = 0
+local PUNCH_FORMS = { "PlayMontageIgnoreLocal_Server", "PlayMontage_Multicast" }
+
+local function callPunch()
+    emit("")
+    punchForm = punchForm % #PUNCH_FORMS + 1
+    local form = PUNCH_FORMS[punchForm]
+    emit(string.format("%8.3f  F1: %s with the last local montage", os.clock(), form))
+    if lastUnarmed.path == nil then emit("  no local montage seen yet -- punch once by hand first") return end
+    local controller = localController()
+    if controller == nil then emit("  no local controller") return end
+    local pawn = get(controller, PROP.pawn)
+    if not real(pawn) then emit("  no pawn") return end
+    -- fullName() is "Class /Path.Name"; the finder wants only the path.
+    local path = lastUnarmed.path:gsub("^%S+%s+", "")
+    local montage = nil
+    pcall(function() montage = StaticFindObject(path) end)
+    if not real(montage) then pcall(function() montage = LoadAsset(path) end) end
+    if not real(montage) then emit("  montage did not resolve: " .. path) return end
+    local ok, err = pcall(function() pawn[form](pawn, montage, lastUnarmed.section) end)
+    emit(string.format("  %s(%s, %s) %s -- did it punch, and did it hurt?", form,
+        shortName(lastUnarmed.path), tostring(lastUnarmed.section),
+        ok and "returned" or ("THREW " .. tostring(err))))
+end
+
+-- ==========================================================================
+-- THE HEARTBEAT (5 Sep 2026): the probe runs on the same clock as the mods
+-- now -- K2_SetTimer on a harmless native controller function, hooked --
+-- and its own LoopAsync is gone, so a probe session no longer brings the
+-- second thread back. Its function is the third of the three the census
+-- measured at 40/s, distinct from both mods'.
+-- ==========================================================================
+
+local BEAT_HOOK = "/Script/Engine.PlayerController:ResetControllerTriggerReleaseThresholds"
+local BEAT_FUNC = "ResetControllerTriggerReleaseThresholds"
+local beatArmedFor = nil
+
+local function armBeat(controller)
+    if not real(controller) then return end
+    local name = fullName(controller)
+    if name == beatArmedFor then return end
+    local statics = nil
+    pcall(function() statics = StaticFindObject("/Script/Engine.Default__KismetSystemLibrary") end)
+    if not real(statics) then emit("  heartbeat: no KismetSystemLibrary CDO") return end
+    local ok, err = pcall(function()
+        statics:K2_SetTimer(controller, BEAT_FUNC, PUMP_MS / 1000, true, false, 0.0, 0.0)
+    end)
+    beatArmedFor = name
+    emit(string.format("%8.3f  heartbeat armed on %s: %s every %d ms%s", os.clock(),
+        shortName(name), BEAT_FUNC, PUMP_MS, ok and "" or ("  (THREW " .. tostring(err) .. ")")))
+end
+
+pcall(function()
+    RegisterInitGameStatePostHook(function() beatArmedFor = nil end)
+end)
+pcall(function()
+    RegisterHook("/Script/Engine.PlayerController:ClientRestart", function(self)
+        pcall(function()
+            local controller = self:get()
+            local isLocal = nil
+            pcall(function() isLocal = controller:IsLocalController() end)
+            if isLocal == true then armBeat(controller) end
+        end)
+    end)
+end)
+
 local function registerHooks()
+    registerUnarmed()
     local results = {}
     results[#results + 1] = (pcall(function()
         RegisterHook(HOOK.attackServer, function(self, combo)
@@ -1205,8 +1332,8 @@ local function toggle()
 end
 
 -- ==========================================================================
--- The pump (crash rule K). One LoopAsync, one ExecuteInGameThread. The
--- keybind sets a flag and nothing else.
+-- The heartbeat drives everything below (see THE HEARTBEAT above). The
+-- keybinds set a flag and nothing else; the beat does the work.
 -- ==========================================================================
 
 local pendingToggle = false
@@ -1217,80 +1344,74 @@ local pendingAll = false
 local pendingGuard = false
 local pendingServer = false
 local pendingMulti = false
-local inFlight = false
 
-local pumpStarted = pcall(function()
-    LoopAsync(PUMP_MS, function()
-        if inFlight then return false end
-        inFlight = true
-        ExecuteInGameThread(function()
-            if pendingToggle then
-                pendingToggle = false
-                local ok, err = pcall(toggle)
-                if not ok then log("toggle error: " .. tostring(err)) end
-            end
-            if pendingEquip then
-                pendingEquip = false
-                local ok, err = pcall(equipNext)
-                if not ok then
-                    log("equip error: " .. tostring(err))
-                    emit("  equip error: " .. tostring(err))
-                end
-            end
-            if pendingFlip then
-                pendingFlip = false
-                local ok, err = pcall(flipAutoFire)
-                if not ok then
-                    log("flip error: " .. tostring(err))
-                    emit("  flip error: " .. tostring(err))
-                end
-            end
-            if pendingRate then
-                pendingRate = false
-                local ok, err = pcall(cycleRate)
-                if not ok then
-                    log("rate error: " .. tostring(err))
-                    emit("  rate error: " .. tostring(err))
-                end
-            end
-            if pendingAll then
-                pendingAll = false
-                local ok, err = pcall(flagAll)
-                if not ok then
-                    log("flag-all error: " .. tostring(err))
-                    emit("  flag-all error: " .. tostring(err))
-                end
-            end
-            if pendingGuard then
-                pendingGuard = false
-                local ok, err = pcall(cycleGuard)
-                if not ok then log("guard cycle error: " .. tostring(err)) end
-            end
-            if pendingServer then
-                pendingServer = false
-                local ok, err = pcall(callAttack, "Attack_Server")
-                if not ok then log("attack call error: " .. tostring(err)) end
-            end
-            if pendingMulti then
-                pendingMulti = false
-                local ok, err = pcall(callAttack, "Attack_Multicast")
-                if not ok then log("attack call error: " .. tostring(err)) end
-            end
-            do
-                local ok, err = pcall(verifyEquip)
-                if not ok then log("verify error: " .. tostring(err)) end
-            end
-            do
-                local ok, err = pcall(repeaterTick)
-                if not ok then log("repeater error: " .. tostring(err)) end
-            end
-            if recording then
-                local ok, err = pcall(sample)
-                if not ok then log("sample error: " .. tostring(err)) end
-            end
-            inFlight = false
-        end)
-        return false
+local pendingPunch = false
+
+local function heartbeat()
+    if pendingToggle then
+        pendingToggle = false
+        local ok, err = pcall(toggle)
+        if not ok then log("toggle error: " .. tostring(err)) end
+    end
+    if pendingEquip then
+        pendingEquip = false
+        local ok, err = pcall(equipNext)
+        if not ok then log("equip error: " .. tostring(err)); emit("  equip error: " .. tostring(err)) end
+    end
+    if pendingFlip then
+        pendingFlip = false
+        local ok, err = pcall(flipAutoFire)
+        if not ok then log("flip error: " .. tostring(err)); emit("  flip error: " .. tostring(err)) end
+    end
+    if pendingRate then
+        pendingRate = false
+        local ok, err = pcall(cycleRate)
+        if not ok then log("rate error: " .. tostring(err)); emit("  rate error: " .. tostring(err)) end
+    end
+    if pendingAll then
+        pendingAll = false
+        local ok, err = pcall(flagAll)
+        if not ok then log("flag-all error: " .. tostring(err)); emit("  flag-all error: " .. tostring(err)) end
+    end
+    if pendingGuard then
+        pendingGuard = false
+        local ok, err = pcall(cycleGuard)
+        if not ok then log("guard cycle error: " .. tostring(err)) end
+    end
+    if pendingServer then
+        pendingServer = false
+        local ok, err = pcall(callAttack, "Attack_Server")
+        if not ok then log("attack call error: " .. tostring(err)) end
+    end
+    if pendingMulti then
+        pendingMulti = false
+        local ok, err = pcall(callAttack, "Attack_Multicast")
+        if not ok then log("attack call error: " .. tostring(err)) end
+    end
+    if pendingPunch then
+        pendingPunch = false
+        local ok, err = pcall(callPunch)
+        if not ok then log("punch error: " .. tostring(err)) end
+    end
+    do
+        local ok, err = pcall(verifyEquip)
+        if not ok then log("verify error: " .. tostring(err)) end
+    end
+    do
+        local ok, err = pcall(repeaterTick)
+        if not ok then log("repeater error: " .. tostring(err)) end
+    end
+    ticksSeen = ticksSeen + 1
+    if recording then
+        local ok, err = pcall(sample)
+        if not ok then log("sample error: " .. tostring(err)) end
+    end
+end
+
+local beatHooked = pcall(function()
+    RegisterHook(BEAT_HOOK, function()
+        local ok, err = pcall(heartbeat)
+        if not ok then log("heartbeat error: " .. tostring(err)) end
     end)
 end)
 
@@ -1318,15 +1439,20 @@ end)
 local boundMulti = pcall(function()
     RegisterKeyBind(KEY_MULTI, function() pendingMulti = true end)
 end)
+local boundPunch = pcall(function()
+    RegisterKeyBind(Key.F1, function() pendingPunch = true end)
+end)
 
 emit("")
 emit(string.format("---- %s %s loaded %s", MOD, VERSION, os.date("%Y-%m-%d %H:%M:%S")))
 registerHooks()
 
 log("loaded " .. VERSION .. ". F11 is read-only; F10 puts weapons in the world.")
-if not pumpStarted then
-    log("FATAL: LoopAsync did not start -- nothing will ever run.")
+if not beatHooked then
+    log("FATAL: the heartbeat hook did not register -- nothing will ever run.")
 end
+log(boundPunch and "F1   replay the last local montage RPC (bare-hands test)"
+    or "F1 could not be registered")
 log(bound and "F11  start / stop recording -> " .. OUT_FILE
     or "F11 could not be registered")
 log(boundEquip and string.format("F10  equip / spawn the next of %d weapons (solo only)", #ITEMS)

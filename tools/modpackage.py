@@ -130,6 +130,21 @@ def check_diagnostic_survives(lua_source):
         raise PackagingError("the mod has no log() -- see rule 3")
 
 
+def check_no_second_thread(lua_source):
+    """5 Sep 2026: the shipped mod must never run Lua off the game thread.
+
+    Three aborts with one stack hash came from LoopAsync's registry writes
+    racing the game thread's. The heartbeat is a hooked native function driven
+    by the engine's own timer; any of these three calls reintroduces the race.
+    """
+    for name in ("LoopAsync", "ExecuteInGameThread", "ExecuteWithDelay"):
+        if re.search(r"\b%s\s*\(" % name, lua_source):
+            raise PackagingError(
+                "the shipped mod calls %s. The heartbeat is a game-thread hook; "
+                "nothing may schedule Lua from another thread (DESIGN.md, 5 Sep "
+                "2026)." % name)
+
+
 def check_no_audience_flag(lua_source):
     """Rule 1 -- one build. A host/guest switch cannot exist at build time."""
     for pattern in (r"\bIS_HOST\b", r"\bHOST_BUILD\b", r"\bGUEST_BUILD\b",
@@ -230,6 +245,7 @@ def stage(staged_root):
     """
     lua = read_text(SOURCE_LUA)
     check_no_audience_flag(lua)
+    check_no_second_thread(lua)
     check_keybinds(lua)
     check_diagnostic_survives(lua)
 

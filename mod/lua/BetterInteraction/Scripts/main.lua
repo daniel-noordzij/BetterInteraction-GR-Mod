@@ -48,13 +48,13 @@
     property off the subsystem. One global object-array walk per pass to find
     the subsystem; everything below it is a property walk (crash rule E).
 
-    SCHEDULING (crash rule K, RE-UE4SS #1180)
-    -----------------------------------------
-    Exactly one LoopAsync, exactly one ExecuteInGameThread, and no
-    ExecuteWithDelay anywhere. Every delayed step goes through the `defer` queue
-    below, which the pump drains on the game thread -- scheduling from inside a
-    drained entry is safe by construction because it appends to our live table,
-    never to the one being walked.
+    SCHEDULING (the heartbeat -- see the pump section)
+    --------------------------------------------------
+    NO LoopAsync, NO ExecuteInGameThread, NO ExecuteWithDelay anywhere. The
+    game's own timer manager calls a harmless native controller function 40
+    times a second and our hook on it is the pump, so every line of this file
+    runs on the game thread. Every delayed step goes through the `defer`
+    queue, drained once per beat.
 
     CONFIG
     ------
@@ -86,13 +86,25 @@ local CLASS = {
 --- Functions called by name, so a rename is one edit here.
 local FUNC = {
     attack     = "Attack_Server",                  -- AHeldenWeapon(int32 InCombo), Helden.hpp:7490
+    animInst   = "GetAnimInstance",                -- USkeletalMeshComponent, Engine.hpp:24686
+    playMont   = "Montage_Play",                   -- UAnimInstance, Engine.hpp:12542
+    jumpSect   = "Montage_JumpToSection",          -- UAnimInstance, Engine.hpp:12545
+    setTimer   = "K2_SetTimer",                    -- UKismetSystemLibrary, Engine.hpp:17811
+    punchMulti = "PlayMontage_Multicast",          -- AHeldenCharacter(UAnimMontage*, uint8), Helden.hpp:4251
+    punchServer= "PlayMontageIgnoreLocal_Server",  -- AHeldenCharacter, Helden.hpp:4248 (guest: everyone else)
+    sectionName= "GetSectionName",                 -- UAnimMontage(int32) -> FName
 }
 
 --- Hooked function paths (rule H: registration is logged either way).
 local HOOK = {
     interact   = "/Script/Helden.HeldenInteractableObject:Interact",
     swing      = "/Script/Helden.HeldenWeapon:Attack_Multicast",
+    punch      = "/Script/Helden.HeldenCharacter:PlayMontage_Multicast",         -- bare hands
+    beat       = "/Script/Engine.PlayerController:ResetControllerLightColor",  -- the heartbeat
+    restart    = "/Script/Engine.PlayerController:ClientRestart",              -- arms it, per world
 }
+local BEAT_FUNC    = "ResetControllerLightColor"     -- what K2_SetTimer calls by name
+local STATICS_PATH = "/Script/Engine.Default__KismetSystemLibrary"
 
 --- The attack input action's own name, lower-cased; a rebind does not change it.
 local ATTACK_ACTION = "ia_attack"
@@ -108,6 +120,16 @@ local ATTACK_ACTION = "ia_attack"
 --- accepting calls at 0.40 s that clicking could only make at 0.68 s. A
 --- repeat faster than the click is the cheat this mod promises not to be.
 ---
+--- BARE HANDS. A punch swings no weapon actor: the game multicasts a punch
+--- montage on the character instead (probe attack-16/17: every punch is
+--- HeldenCharacter:PlayMontage_Multicast(AM_PunchAttacks, section 0 or 1,
+--- alternating). Calling that same multicast from Lua on the host punches
+--- "like it would normally" (attack-17, F1). Keyed on the montage's name;
+--- the value is the fastest measured click, 0.507-0.717 s.
+local UNARMED = {
+    AM_PunchAttacks = 0.51,
+}
+
 --- A class not in this table is NOT repeated, and the log says so once.
 --- The saw is absent on purpose: it ships with the game's own auto-fire on,
 --- and a repeat on top of it double-swings (attack-10 log, 21:46).
@@ -165,6 +187,13 @@ local PROP = {
     actionData = "ActionInstanceData",             -- UEnhancedPlayerInput 0x4E8
     trigger    = "TriggerEvent",                   -- FInputActionInstance 0x13
     canAuto    = "bCanAutoFire",                   -- AHeldenMeleeWeapon 0xC72: the game's own loop
+    -- the guest's local swing animation (see playSwingLocally)
+    mesh       = "Mesh",                           -- ACharacter 0x330, USkeletalMeshComponent*
+    animChain  = "AttackAnimChain",                -- AHeldenWeapon 0xC18, FHeldenAttackAnimChain
+    attacks    = "Attacks",                        -- FHeldenAttackAnimChain: TArray<FHeldenMontage>
+    montage    = "Montage",                        -- FHeldenMontage: UAnimMontage*
+    sections   = "Sections",                       -- FHeldenMontage: TArray<FName>
+    lastMont   = "LastAttackMontage",              -- AHeldenWeapon 0xC40, FHeldenMontage
 }
 
 --- WHAT EACH DEPOSIT DOES, ONE ENTRY PER MACHINE. Version-fragile data, so it
@@ -289,7 +318,11 @@ local LOG_FILE    = "BetterInteraction.log"
 -- rather than a tick count, because a tick count now means "frames" and would
 -- silently make the deposit pass four times slower on a 60fps machine than the
 -- 200ms it was measured and tuned at.
-local PUMP_MS       = 8
+-- The beat length, in ms: what K2_SetTimer is asked for, and what defer.at
+-- converts delays with. 25 ms = 40 beats a second, measured exact. Nothing
+-- in the mod needs more (the attack repeat tolerates it; the deposit hooks
+-- do not use the beat at all).
+local PUMP_MS       = 25
 local DEPOSIT_EVERY = 0.20   -- SECONDS between deposit scans
 local APPLY_MIN     = 0.10   -- floor on the reconciler interval, in seconds
 local WIDE_EVERY  = 1.0    -- seconds between level-wide sweeps
@@ -1890,6 +1923,17 @@ local hooksOn = false
 -- The controller is re-found at every step (crash rule C) -- a FindAllOf at
 -- most 1/attack_rate times a second, only while the key is held, against the
 -- 5 Hz the removed feature 5 ran in a lobby without incident.
+--
+-- ON A GUEST THE SWING IS SILENT WITHOUT ONE MORE STEP. Measured 5 Sep 2026,
+-- two machines: a guest's repeats did damage but played no animation. The
+-- game's click path plays the montage on the owning client itself and the
+-- server's Attack_Multicast skips the owner; a call that came from the mod
+-- never ran that client-side half. So on an instance where the weapon
+-- reports HasAuthority() == false, each repeat also plays the swing montage
+-- on the local mesh: bucket 1, presentation only, the server still decides
+-- the hit. The montage is picked from the weapon's AttackAnimChain by combo
+-- index, and the game's own choice (LastAttackMontage after a real swing) is
+-- logged beside it once per class so a wrong mapping shows in the file.
 -- ==========================================================================
 
 --- The live chain: plain values only, never a UObject (rule C).
@@ -1941,23 +1985,42 @@ end
 --- the game's own equip path can read None until it is holstered and redrawn
 --- (attack-10 / first shipped run: "carried but not drawn" on every fresh
 --- weapon), and a swung weapon that is still carried is still the one in hand.
+--- Returns the item, a reason, and the class of whatever reads Equipped
+--- (HolsterState 1) right now -- nil when nothing does. SWITCHING MID-HOLD
+--- (5 Sep 2026): a chain is keyed to the item that started it, and the game
+--- never starts a new chain while the key stays down, so a chain that only
+--- checks "still carried" keeps driving the OLD item after a switch -- the
+--- old animation and cadence with the new item's damage. The caller closes
+--- the chain when the drawn item is no longer the chain's.
 local function weaponInHand(controller, wantedClass)
     local pawn = get(controller, PROP.pawn)
-    if not real(pawn) then return nil, "no pawn" end
+    if not real(pawn) then return nil, "no pawn", nil end
     local items = get(pawn, PROP.equipped)
-    if items == nil then return nil, PROP.equipped .. " did not read" end
-    local match = nil
+    if items == nil then return nil, PROP.equipped .. " did not read", nil end
+    local match, matchHolster, drawnClass = nil, nil, nil
     pcall(function()
         items:ForEach(function(_, element)
             local item = element
             pcall(function() item = element:get() end)
-            if match == nil and real(item) and className(item) == wantedClass then
-                match = item
-            end
+            if not real(item) then return end
+            local holster = numberProp(item, PROP.holster)
+            local cls = className(item)
+            if holster == 1 and drawnClass == nil then drawnClass = cls end
+            if match == nil and cls == wantedClass then match, matchHolster = item, holster end
         end)
     end)
-    if match ~= nil then return match, "carried" end
-    return nil, "not carried"
+    if match == nil then return nil, "not carried", drawnClass end
+    if matchHolster == 2 then return nil, "holstered", drawnClass end
+    if drawnClass ~= nil and drawnClass ~= wantedClass then
+        return nil, "no longer in hand (" .. drawnClass .. " is)", drawnClass
+    end
+    return match, "carried", drawnClass
+end
+
+--- The class of the item drawn right now, or nil for empty hands.
+local function drawnItem(controller)
+    local _, _, drawn = weaponInHand(controller, "")
+    return drawn
 end
 
 --- Seconds between repeats for this weapon class, or nil for "do not repeat".
@@ -2011,9 +2074,23 @@ local function noteSwing(weapon, combo)
             .. " with the weapon's name and it can be added.")
         return
     end
+    -- Rule J: which montage did the GAME use for this combo? Read in place off
+    -- the weapon, logged once per class and index, so the guest-side pick can
+    -- be checked against it in the file.
+    if chain == nil or chain.calledAt == nil then
+        local last = get(get(weapon, PROP.lastMont), PROP.montage)
+        pcall(function() last = last:get() end)
+        if real(last) then
+            logOnce("attack:game:" .. class .. ":" .. tostring(combo),
+                string.format("hold-to-attack: the game played %s for combo %d on %s",
+                    shortName(fullName(last)), combo, class))
+        end
+    end
+
     local now = os.clock()
+    if chain ~= nil and chain.kind == "unarmed" then chain = nil end
     if chain == nil then
-        chain = { class = class, combo = combo, rate = rate, nextAt = now + rate,
+        chain = { kind = "weapon", class = class, combo = combo, rate = rate, nextAt = now + rate,
                   calledAt = nil, calls = 0, epoch = epoch }
         attackStats.chains = attackStats.chains + 1
     else
@@ -2023,6 +2100,131 @@ local function noteSwing(weapon, combo)
     chain.lastSwing = now
 end
 
+--- The weapon's swing montages, in chain order, as { montage, section }.
+local function swingMontages(weapon)
+    local list = {}
+    local attacks = get(get(weapon, PROP.animChain), PROP.attacks)
+    pcall(function()
+        attacks:ForEach(function(_, element)
+            local entry = element
+            pcall(function() entry = element:get() end)
+            local montage = get(entry, PROP.montage)
+            pcall(function() montage = montage:get() end)
+            local section = nil
+            local sections = get(entry, PROP.sections)
+            pcall(function()
+                sections:ForEach(function(_, name)
+                    if section ~= nil then return end
+                    local inner = name
+                    pcall(function() inner = name:get() end)
+                    pcall(function() section = inner:ToString() end)
+                end)
+            end)
+            if real(montage) then list[#list + 1] = { montage = montage, section = section } end
+        end)
+    end)
+    return list
+end
+
+--- GUEST ONLY. Play the swing the server is about to confirm, on our own mesh,
+--- because the game's owner-side animation only runs from its own input path.
+local function playSwingLocally(controller, weapon, combo)
+    local list = swingMontages(weapon)
+    if #list == 0 then
+        logOnce("attack:nomontage:" .. className(weapon), "hold-to-attack: "
+            .. className(weapon) .. " has no readable swing montage; guest repeats"
+            .. " will hit without an animation. REPORT THIS.")
+        return
+    end
+    local pick = list[(combo % #list) + 1]
+    local pawn = get(controller, PROP.pawn)
+    local mesh = get(pawn, PROP.mesh)
+    local anim = nil
+    pcall(function() anim = mesh[FUNC.animInst](mesh) end)
+    if not real(anim) then
+        logOnce("attack:noanim", "hold-to-attack: the pawn's mesh has no AnimInstance;"
+            .. " guest repeats will hit without an animation. REPORT THIS.")
+        return
+    end
+    local played = nil
+    local ok = pcall(function()
+        played = anim[FUNC.playMont](anim, pick.montage, 1.0, 0, 0.0, true)
+    end)
+    if ok and pick.section ~= nil and pick.section ~= "" and pick.section ~= "None" then
+        pcall(function() anim[FUNC.jumpSect](anim, FName(pick.section), pick.montage) end)
+    end
+    logOnce("attack:played:" .. className(weapon) .. ":" .. ((combo % #list) + 1),
+        string.format("hold-to-attack (guest): combo %d plays %s%s locally -> %s",
+            combo, shortName(fullName(pick.montage)),
+            pick.section and (" [" .. pick.section .. "]") or "",
+            ok and (type(played) == "number" and string.format("%.2f", played) or "returned")
+               or "THREW"))
+end
+
+--- Fed by the PlayMontage_Multicast hook: the local character played a
+--- montage. Only a punch montage on the LOCAL pawn opens a chain, and never
+--- while a weapon chain is live.
+local function notePunch(pawn, montage, section)
+    if cfg.attack_hold == 0 then return end
+    if not real(montage) then return end
+    local montPath = fullName(montage)
+    local short = shortName(montPath)
+    local rate = UNARMED[short]
+    if rate == nil then return end
+    local isLocal = nil
+    pcall(function() isLocal = pawn:IsLocallyControlled() end)
+    if isLocal ~= true then return end
+    if cfg.attack_rate > 0 then rate = math.max(cfg.attack_rate, rate) end
+    local now = os.clock()
+    if chain ~= nil and chain.kind ~= "unarmed" then return end
+    if chain == nil then
+        chain = { kind = "unarmed", class = short, rate = rate, nextAt = now + rate,
+                  montage = (montPath:gsub("^%S+%s+", "")), section = section,
+                  calledAt = nil, calls = 0, epoch = epoch }
+        attackStats.chains = attackStats.chains + 1
+    else
+        chain.section = section
+        chain.nextAt = now + chain.rate
+    end
+    chain.lastSwing = now
+end
+
+--- One repeat of a punch. Host: the multicast itself IS the punch (measured).
+--- Guest: the server form reaches everyone else, and the montage is played
+--- on our own mesh, as for weapons. Whether a guest's punch also HITS is not
+--- yet measured.
+local function repeatPunch(controller)
+    local pawn = get(controller, PROP.pawn)
+    if not real(pawn) then return false, "no pawn" end
+    local montage = nil
+    pcall(function() montage = StaticFindObject(chain.montage) end)
+    if not real(montage) then pcall(function() montage = LoadAsset(chain.montage) end) end
+    if not real(montage) then return false, "punch montage did not resolve" end
+    local section = 1 - (chain.section or 0)   -- the game alternates 0, 1, 0, 1
+    local authority = nil
+    pcall(function() authority = pawn:HasAuthority() end)
+    local ok, err
+    if authority == false then
+        ok, err = pcall(function() pawn[FUNC.punchServer](pawn, montage, section) end)
+        pcall(function()
+            local mesh = get(pawn, PROP.mesh)
+            local anim = mesh[FUNC.animInst](mesh)
+            anim[FUNC.playMont](anim, montage, 1.0, 0, 0.0, true)
+            local name = montage[FUNC.sectionName](montage, section)
+            local text = nil
+            pcall(function() text = name:ToString() end)
+            if type(text) == "string" and text ~= "" and text ~= "None" then
+                anim[FUNC.jumpSect](anim, FName(text), montage)
+            end
+        end)
+    else
+        ok, err = pcall(function() pawn[FUNC.punchMulti](pawn, montage, section) end)
+    end
+    if not ok then return false, "punch call threw: " .. tostring(err) end
+    chain.section = section
+    return true
+end
+
 --- Every pump tick. Returns immediately unless a chain is live and due.
 local function attackTick()
     if chain == nil then return end
@@ -2030,7 +2232,7 @@ local function attackTick()
     if now < chain.nextAt then return end
     if chain.epoch ~= epoch then chain = nil return end
 
-    if chain.calledAt ~= nil and chain.lastSwing < chain.calledAt then
+    if chain.kind ~= "unarmed" and chain.calledAt ~= nil and chain.lastSwing < chain.calledAt then
         attackStats.refused = attackStats.refused + 1
         diag(string.format("hold-to-attack: no swing followed Attack_Server(%d) on %s"
             .. " -- refused by the game; chain closed after %d call(s)",
@@ -2056,6 +2258,27 @@ local function attackTick()
         chain = nil
         return
     end
+    if chain.kind == "unarmed" then
+        local drawn = drawnItem(controller)
+        if drawn ~= nil then
+            diag("hold-to-attack (bare hands): " .. drawn .. " was drawn; punch chain closed")
+            chain = nil
+            return
+        end
+        local okP, whyP = repeatPunch(controller)
+        if not okP then
+            logOnce("punch:" .. tostring(whyP), "hold-to-attack (bare hands): " .. tostring(whyP)
+                .. "; chain closed. REPORT THIS.")
+            chain = nil
+            return
+        end
+        chain.calls = chain.calls + 1
+        chain.calledAt = now
+        chain.nextAt = now + chain.rate
+        attackStats.calls = attackStats.calls + 1
+        return
+    end
+
     local weapon, why = weaponInHand(controller, chain.class)
     if weapon == nil then
         diag("hold-to-attack: " .. chain.class .. " " .. why .. "; chain closed")
@@ -2075,12 +2298,22 @@ local function attackTick()
     chain.calledAt = now
     chain.nextAt = now + chain.rate
     attackStats.calls = attackStats.calls + 1
+
+    -- Guest: the server will confirm the hit; the animation is ours to play.
+    local authority = nil
+    pcall(function() authority = weapon:HasAuthority() end)
+    if authority == false then
+        pcall(playSwingLocally, controller, weapon, combo)
+    end
 end
+
+local armIfNeeded   -- the heartbeat's fallback arming; defined with the pump below
 
 local function installHooks()
     if cfg.attack_hold ~= 0 then
         local swingOn = pcall(function()
             RegisterHook(HOOK.swing, function(self, combo)
+                pcall(armIfNeeded)
                 pcall(function()
                     local index = combo
                     pcall(function() index = combo:get() end)
@@ -2089,6 +2322,22 @@ local function installHooks()
                 end)
             end)
         end)
+        local punchOn = pcall(function()
+            RegisterHook(HOOK.punch, function(self, montage, section)
+                pcall(armIfNeeded)
+                pcall(function()
+                    local index = section
+                    pcall(function() index = section:get() end)
+                    if type(index) ~= "number" then index = tonumber(tostring(index)) or 0 end
+                    local mont = montage
+                    pcall(function() mont = montage:get() end)
+                    notePunch(self:get(), mont, index)
+                end)
+            end)
+        end)
+        log(punchOn
+            and ("hold-to-attack (bare hands) hook registered on " .. HOOK.punch)
+            or "THE PUNCH HOOK WOULD NOT REGISTER -- holding with empty hands will punch once.")
         log(swingOn
             and ("hold-to-attack hook registered on " .. HOOK.swing
                 .. (cfg.attack_rate > 0
@@ -2102,6 +2351,7 @@ local function installHooks()
     hooksOn = pcall(function()
         RegisterHook(HOOK.interact,
             function(self, pawn)
+                pcall(armIfNeeded)
                 pcall(function() sizeDeposit(self:get(), pawn:get()) end)
             end,
             function() pcall(settleDeposit) end)
@@ -2117,57 +2367,145 @@ local function installHooks()
 end
 
 -- ==========================================================================
--- The pump (crash rule K). One LoopAsync, one ExecuteInGameThread, no
--- ExecuteWithDelay. Everything that touches a UObject runs from here, on the
--- game thread.
+-- THE HEARTBEAT. The game is our clock; there is no second thread.
+--
+-- Until 5 Sep 2026 this was a LoopAsync thread appending one
+-- ExecuteInGameThread per pass -- rule K's shape. Three "Abort signal
+-- received" crashes with one stack hash (4 Sep, 5 Sep 13:22, 5 Sep 14:53),
+-- the second of them with UE4SS's own log naming OUR hook's registry slot as
+-- the thing that had been overwritten, established what rule K missed: on
+-- this build the LoopAsync thread writes the Lua registry (luaL_ref, for the
+-- hand-off) with no lock while the game thread is writing it too (every hook
+-- call allocates refs). A settle gap only narrows that; it cannot close it.
+-- docs/DESIGN.md, 5 Sep 2026, all three entries.
+--
+-- So the beat comes from the game. UKismetSystemLibrary:K2_SetTimer asks the
+-- world's timer manager to call, by name and looping, a NATIVE parameterless
+-- APlayerController function that does nothing useful on a PC --
+-- ResetControllerLightColor (Engine.hpp:11181, a gamepad light) -- and our
+-- RegisterHook on that function IS the pump. Measured (probe attack-15):
+-- exactly 40/s at 0.025, across a world change, for the whole session.
+--
+-- No LoopAsync, no ExecuteInGameThread, no ExecuteWithDelay anywhere in this
+-- file, and packaging asserts it. Every callback in the file runs on the game
+-- thread. Keybinds do not exist. `defer` still drains here, once per beat.
+--
+-- ARMING. A timer dies with its world, so it is armed per world, on the game
+-- thread, from callbacks the game gives us: PlayerController:ClientRestart on
+-- the local controller (fires when it takes a pawn, every world; proven on
+-- this build), a new GameState (RegisterInitGameStatePostHook clears the
+-- mark), and -- the fallback that cannot fail to happen in play -- the first
+-- Interact or swing hook. Arming is logged and the beat count once a minute.
 -- ==========================================================================
 
-local inFlight = false
-local settled  = 0        -- LoopAsync passes seen with nothing in flight
 local ticks    = 0
 local lastScan, lastApply = 0, 0
+local beatArmedFor = nil          -- fullName of the controller the timer is on
+local beatsThisMinute, beatMinuteAt = 0, 0
+local lastBeatAt = nil
 
-local pumpStarted = pcall(function()
-    LoopAsync(PUMP_MS, function()
-        if inFlight then settled = 0 return false end
-        settled = settled + 1
-        if settled < 2 then return false end   -- the settle gap, see PUMP_MS
-        inFlight = true
-        ExecuteInGameThread(function()
-            ticks = ticks + 1
-            defer.drain()
+local function heartbeat()
+    ticks = ticks + 1
+    local now = os.clock()
+    lastBeatAt = now
+    beatsThisMinute = beatsThisMinute + 1
+    if now - beatMinuteAt >= 60 then
+        if beatMinuteAt > 0 then
+            diag(string.format("heartbeat: %d beats in the last %.0f s", beatsThisMinute, now - beatMinuteAt))
+        end
+        beatMinuteAt, beatsThisMinute = now, 0
+    end
 
-            do
-                local okA, errA = pcall(attackTick)
-                if not okA then
-                    logOnce("attack:" .. tostring(errA), "hold-to-attack tick failed: " .. tostring(errA))
-                end
-            end
+    defer.drain()
 
-            -- Both features, one subsystem resolve.
-            -- ELAPSED TIME, not a tick count: ticks are frames now.
-            local now = os.clock()
-            local ok2, err2 = true, nil
-            if now - lastScan >= DEPOSIT_EVERY then
-                lastScan = now
-                ok2, err2 = pcall(interactionTick)
-            end
-            if not ok2 then
-                logOnce("tick:" .. tostring(err2),
-                    "interaction tick failed: " .. tostring(err2))
-            end
+    do
+        local okA, errA = pcall(attackTick)
+        if not okA then
+            logOnce("attack:" .. tostring(errA), "hold-to-attack tick failed: " .. tostring(errA))
+        end
+    end
 
-            if now - lastApply >= math.max(APPLY_MIN, cfg.apply_interval) then
-                lastApply = now
-                local ok, err = pcall(pass)
-                if not ok then
-                    logOnce("pass:" .. tostring(err), "apply pass failed: " .. tostring(err))
-                end
-            end
+    -- Both features, one subsystem resolve, gated on ELAPSED TIME.
+    local ok2, err2 = true, nil
+    if now - lastScan >= DEPOSIT_EVERY then
+        lastScan = now
+        ok2, err2 = pcall(interactionTick)
+    end
+    if not ok2 then
+        logOnce("tick:" .. tostring(err2), "interaction tick failed: " .. tostring(err2))
+    end
 
-            inFlight = false
-        end)
+    if now - lastApply >= math.max(APPLY_MIN, cfg.apply_interval) then
+        lastApply = now
+        local ok, err = pcall(pass)
+        if not ok then
+            logOnce("pass:" .. tostring(err), "apply pass failed: " .. tostring(err))
+        end
+    end
+end
+
+--- Arm the beat on this controller, once per controller. Game thread only.
+local function armHeartbeat(controller)
+    if not real(controller) then return false end
+    local name = fullName(controller)
+    if name == beatArmedFor then return true end
+    local statics = nil
+    pcall(function() statics = StaticFindObject(STATICS_PATH) end)
+    if not real(statics) then
+        logOnce("beat:nostatics", "HEARTBEAT: KismetSystemLibrary did not resolve; the mod"
+            .. " cannot tick. REPORT THIS.")
         return false
+    end
+    local ok, err = pcall(function()
+        statics[FUNC.setTimer](statics, controller, BEAT_FUNC, PUMP_MS / 1000, true, false, 0.0, 0.0)
+    end)
+    if not ok then
+        logOnce("beat:settimer:" .. tostring(err), "HEARTBEAT: K2_SetTimer threw: "
+            .. tostring(err) .. " -- the mod cannot tick. REPORT THIS.")
+        return false
+    end
+    beatArmedFor = name
+    lastBeatAt = nil
+    diag(string.format("heartbeat armed on %s: %s every %d ms", shortName(name), BEAT_FUNC, PUMP_MS))
+    return true
+end
+
+--- Fallback arming from any game-thread callback: find the local controller
+--- (one scan, and only while unarmed) and arm it.
+armIfNeeded = function()
+    if beatArmedFor ~= nil then return end
+    local controller = localController()
+    if controller ~= nil then armHeartbeat(controller) end
+end
+
+local beatHooked = pcall(function()
+    RegisterHook(HOOK.beat, function()
+        local ok, err = pcall(heartbeat)
+        if not ok then logOnce("beat:" .. tostring(err), "heartbeat failed: " .. tostring(err)) end
+    end)
+end)
+
+pcall(function()
+    RegisterInitGameStatePostHook(function()
+        -- A new world: the old timer died with it. Clear the mark so the next
+        -- game-thread callback re-arms; say so if nothing beats within 10 s.
+        beatArmedFor = nil
+        lastBeatAt = nil
+        diag("heartbeat: new GameState; will re-arm on the local controller")
+    end)
+end)
+
+-- PlayerController:ClientRestart fires on the local controller each time it
+-- takes a pawn -- every world, early. Proven on this build: the profile's
+-- CheatManagerEnablerMod hooks exactly this and logs once per world.
+local restartHooked = pcall(function()
+    RegisterHook(HOOK.restart, function(self)
+        pcall(function()
+            local controller = self:get()
+            local isLocal = nil
+            pcall(function() isLocal = controller:IsLocalController() end)
+            if isLocal == true then armHeartbeat(controller) end
+        end)
     end)
 end)
 
@@ -2178,10 +2516,10 @@ pcall(installHooks)
 
 diag("---- " .. MOD .. " " .. VERSION .. " loaded ----")
 log("loaded.")
-if not pumpStarted then
-    log("FATAL: LoopAsync did not start. NOTHING WILL EVER RUN -- report this")
-    log("rather than waiting for the mod to take effect.")
-end
+log(beatHooked
+    and ("heartbeat hook registered on " .. HOOK.beat .. "; armed per world from "
+        .. (restartHooked and "ClientRestart" or "the feature hooks only (ClientRestart would not hook)"))
+    or "FATAL: the heartbeat hook would not register. NOTHING WILL EVER RUN -- report this")
 log(string.format("prompt_angle=%s  prompt_distance=%s  reach=%s"
     .. "  aim_forgiveness=%s  hold_duration=%s", tostring(cfg.prompt_angle),
     tostring(cfg.prompt_distance), tostring(cfg.reach),

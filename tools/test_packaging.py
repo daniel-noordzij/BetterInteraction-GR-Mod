@@ -63,6 +63,16 @@ expect_refusal("rule 3  removing log() is refused",
 expect_pass("rule 3  the real mod keeps its log",
             lambda: mp.check_diagnostic_survives(GOOD_LUA))
 
+# --- the heartbeat: no Lua off the game thread (5 Sep 2026) -----------------
+expect_refusal("beat    a LoopAsync in the shipped mod is refused",
+               lambda: mp.check_no_second_thread(
+                   GOOD_LUA + "\nLoopAsync(100, function() return false end)\n"))
+expect_refusal("beat    an ExecuteInGameThread in the shipped mod is refused",
+               lambda: mp.check_no_second_thread(
+                   GOOD_LUA + "\nExecuteInGameThread(function() end)\n"))
+expect_pass("beat    the real mod runs no second thread",
+            lambda: mp.check_no_second_thread(GOOD_LUA))
+
 # --- rule 1: no build-time audience flag -------------------------------------
 expect_refusal("rule 1  a host/guest build flag is refused",
                lambda: mp.check_no_audience_flag(
