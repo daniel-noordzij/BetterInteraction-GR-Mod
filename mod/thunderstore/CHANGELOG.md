@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2
+
+- The mod page: feature names in bold only; Thunderstore does not render underline.
+
 ## 1.0.1
 
 - The mod page: feature names formatted, no wording changed.
