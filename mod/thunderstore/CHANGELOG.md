@@ -6,11 +6,12 @@ First release.
 
 - Pays the elevator, the upgrade machine and the gumball machine off in one
   press instead of one instalment at a time. The total charged is unchanged.
+  These features require you to be host, and are disabled if you're not.
+- Holding the attack button continuously attacks. This works for any offensive
+  item as well as bare-handed. This feature works on client side, meaning
+  all who want this need this mod.
 - Stops the grinder splitting a payout into small coins, and merges coins lying
   near each other, kept under 100 gold each so a whole run is never sitting on a
-  single object.
-- Only the host needs the mod. Guests get all of it on a completely unmodified
-  game, because the work happens on the machine that is allowed to do it, for
-  whoever pressed the button. A guest running it stands down entirely.
+  single object. Also makes the grinder spit out coins much faster.
 - Every feature is switchable in `BetterInteraction.cfg`, which
   the mod writes itself on first run.

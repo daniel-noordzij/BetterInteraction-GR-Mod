@@ -4332,3 +4332,98 @@ drawn; the punch chain closes the moment anything is drawn. The new item
 then waits for a fresh press, which is the rule agreed on 2 Sep ("resumes
 only on a fresh press"). Cheat-equipped probe items read `None` and cannot
 be told apart; real pickups read `Equipped` and can.
+
+#### 5 Sep 2026 -- a guest's punch never opened a chain
+
+Copy B as guest (17:13, same file hash as the repo): weapon chains worked,
+the bare-hands hook registered, and no punch line ever appeared. The mod
+keyed only on `PlayMontage_Multicast`, which is what the HOST's own punch
+produces; a guest's own punch is presumably sent through
+`PlayMontageIgnoreLocal_Server` (so everyone else sees it) and the plain
+multicast never occurs on the guest. **Best candidate, not established** --
+the probe's montage census only ever ran on a host. The mod now hooks both
+forms and logs once which RPC carried the local punch, so the guest's next
+log says. The repeat on a guest already used the server form plus a local
+`Montage_Play`.
+
+#### 5 Sep 2026 -- a guest's punch is invisible to every reflected RPC; look at the anim instance instead
+
+Copy B as guest, with both punch hooks registered: weapons repeated, and
+neither `PlayMontage_Multicast` nor `PlayMontageIgnoreLocal_Server` fired
+for the guest's own punch (no "seen via" line in a session with dozens of
+punches). Hosting, the multicast fired as before. **Established: on a
+guest, the punch is not carried by either of those.** Whether any other
+reflected call carries it is not established -- the probe did not load in
+the lobby sessions, so the host-side census of the guest's punch is missing.
+
+**Shipped instead of another guess:** detection by observation. Every 100 ms
+while the attack key is down, no chain is live and nothing is drawn, the
+mod asks the local mesh's `UAnimInstance:GetCurrentActiveMontage()`; a
+montage in `UNARMED` opens the chain, with the section read back through
+`Montage_GetCurrentSection` + `GetSectionIndex`. This needs the local
+controller ten times a second -- and the heartbeat hook already HAS it,
+because the timer fires the hooked function on the controller it was armed
+on, so `self` in the beat hook is our controller and no scan is made. The
+attack tick uses that controller for everything now.
+
+A guest's repeat is now a plain local `Montage_Play` (the server form is
+dropped: it never carried a real punch either). The engine replicates a
+real punch's montage natively; whether a Lua-started one is credited with
+the hit on the server is **unmeasured** and logged as such.
+
+#### 5 Sep 2026 -- the host census: a guest's punch IS PlayMontageIgnoreLocal_Server
+
+`attack-18` on F: hosting, Copy B joining VANILLA and punching. **Established:**
+each guest punch arrives on the host as
+`HeldenCharacter:PlayMontageIgnoreLocal_Server(AM_PunchAttacks, section)`
+on the guest's pawn (`local=false`), immediately followed by the server's
+`PlayMontageIgnoreLocal_Multicast` of the same; sections alternate 0/1;
+fast punching 0.58-0.78 s apart. No other `_Server` RPC on the character or
+controller fires for a punch (the census hooked twenty; only
+`RemoveCharacterFlags_Server` and `InventoryAction_Server` appeared, for
+other things). The guest's weapon swings arrived as `Attack_Server`, as
+expected.
+
+So the earlier guest-side finding stands and is now explained: the SENDING
+side of that RPC is not hookable on the guest (both punch hooks were silent
+on Copy B as guest), but the RPC is exactly what a guest must send. And
+Daniel's observation that "only the first attack actually lands server-side"
+with the local-only repeat is the same fact from the other side: a local
+`Montage_Play` is the animation half; the server half is the RPC.
+
+**Shipped:** the guest repeat is the RPC plus the local montage, the chain
+still opened by the anim-instance look. Whether the server credits a
+Lua-sent RPC the way it credits the game's own is the next lobby's question.
+
+### 5 Sep 2026 -- Phase 1 removed; the config rewritten; guest punches confirmed
+
+**Copy B as guest, F: host:** "the local punch was seen on the anim instance",
+"repeating by PlayMontageIgnoreLocal_Server plus a local Montage_Play",
+"released; 8 repeat(s) on AM_PunchAttacks". Daniel: "everything seemed to be
+working well." So a guest's repeated punch now takes the same two halves a
+real one does, and the server credits it. Hold-to-attack is complete on both
+sides of a lobby.
+
+**Phase 1 is gone.** Daniel: "there are a lot of things still in there that
+aren't used anymore. update that config to be completely up to date." Every
+key was still read by code -- `check_config_matches_lua` sees to that -- so
+"not used" meant the knobs he said on 29 Aug he did not want: the prompt
+cone, prompt distance, reach and its ceiling, aim forgiveness, hold duration
+and its floor, and `apply_interval`, which only paced the pass that applied
+them. Cut with them: `applySettings`, `applyComponent`, `needComponentWalk`,
+`pass()`, the `state` table, seven `PROP` entries and the load-time lines.
+`log_reverts` stays: `setNumber` still serves the coin dispenser. The config
+file is rewritten from scratch around the four things the mod does, with the
+hold-to-attack section carrying the measured cadences and the bare-hands and
+switch-mid-hold behaviour.
+
+#### 5 Sep 2026 -- coin caps floored at the game's own coin size
+
+Daniel: the merged-coin cap should be "customizable up to a point with a
+minimum of the game's default". Both cap families (`coin_max_*`, the
+dispenser's per-coin size, and `coin_merge_max_*`, the merged pile's) are now
+floored at what the game itself puts in one coin -- learned from the first
+grinder seen this session (`MaxGoldPerCoins` / `MaxArtifactsPerCoin` before
+the mod writes them, plain numbers), 5 gold and 1 artifact as measured on 30
+Aug (Daniel remembered 10; the log says 5). 0 still means "leave alone" /
+"no limit". No ceiling: above the floor the number is the player's.

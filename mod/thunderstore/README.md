@@ -1,18 +1,26 @@
 # BetterInteraction
 
 A Grain Rot mod that takes the spam-clicking out of interacting. Pay a machine in
-one press, and pick up a couple coins instead of a whole pile!
+one press, pick up a couple coins instead of a whole pile and hold-to-attack!
 
 ## What it does
 
+-- Single Click Deposits
 Grain Rot takes your money in instalments: 5 gold a press at the elevator, 20 at
 the upgrade machine, one artifact at a time at the gumball machine. This lets one
 press pay as much of what you still owe as you can afford.
 
+-- Quicker Grinder & Bigger Coins
 Normally the grinder is limited to dispensing one coin with a max value of 10
 every 0.4 seconds. Now it not only spits them out faster but it also does so with
 more value per coin, making less total coins required. On top of that, coins
-will get merged together if they're close to eachother up to a value of 100.
+will get merged together if they're close to eachother up to a customizable value
+(default of 100).
+
+-- Hold-to-Attack
+As it says on the tin. Allows for holding the attack button to attack with
+offensive items as well as bare-handed.
+
 
 Every feature is switchable off/on in `BetterInteraction.cfg`, which the mod
 writes itself the first time it runs. Edit it and restart the game.
@@ -22,17 +30,12 @@ never touches quest or progression state, and writes nothing into your save.
 
 ## Multiplayer
 
-Only the host needs this. Everything here is something only the server is allowed
-to do, so the mod does it on the host for whoever pressed the button. A guest
+All the money-related features are something only the server is allowed to
+do, so the mod does it on the host for whoever pressed the button. A guest
 running it too is harmless; some features will simply be disabled for them.
 
 The only thing that's client-side only is the `Hold-to-Attack` feature.
 If a guest wants it, they'll need this mod too.
-
-## Upcoming features
-
-These are features that will be added in a later update to the mod:
-- Holding space to skip dialogue instead of having to spam click space.
 
 ## AI usage disclosure and information
 

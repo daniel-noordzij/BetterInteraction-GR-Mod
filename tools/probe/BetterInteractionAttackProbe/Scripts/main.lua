@@ -154,7 +154,7 @@
 ]]
 
 local MOD     = "BetterInteractionAttackProbe"
-local VERSION = "attack-17"
+local VERSION = "attack-18"
 
 -- ==========================================================================
 -- Version-fragile names, all verified against the 5.7.4 dump on 2 Sep 2026.
@@ -1266,8 +1266,79 @@ pcall(function()
     end)
 end)
 
+-- ==========================================================================
+-- SERVER RPC CENSUS (5 Sep 2026). A guest's punch reaches the server somehow:
+-- a Lua Montage_Play on the guest animates but only the guest's REAL first
+-- punch is credited. Neither character montage RPC carries it. So every
+-- _Server RPC on the character and the controller (Helden.hpp, the two
+-- class blocks) is hooked log-only, and the file, taken ON THE HOST while a
+-- guest punches, names the one that fires. Args are summarised only when
+-- they are plain (number / bool / FName / object class); struct params are
+-- never read (the memory-safety rule).
+-- ==========================================================================
+
+local SERVER_RPCS = {
+    "/Script/Helden.HeldenCharacter:TriggerScriptEvent_Server",
+    "/Script/Helden.HeldenCharacter:SetPendingJumpAttackEnd_Server",
+    "/Script/Helden.HeldenCharacter:SetEmoteAnimation_Server",
+    "/Script/Helden.HeldenCharacter:RemoveCharacterFlags_Server",
+    "/Script/Helden.HeldenCharacter:ReleaseObject_Server",
+    "/Script/Helden.HeldenCharacter:PlayerEndDialogue_Server",
+    "/Script/Helden.HeldenCharacter:LaunchPredictive_Server",
+    "/Script/Helden.HeldenCharacter:InteractObjectEvent_Server",
+    "/Script/Helden.HeldenCharacter:HolsterItems_Server",
+    "/Script/Helden.HeldenCharacter:GrabObject_Server",
+    "/Script/Helden.HeldenCharacter:AddCharacterFlags_Server",
+    "/Script/Helden.HeldenCharacter:AbortCurrrentInteraction_Server",
+    "/Script/Helden.HeldenPlayerController:SetItemDropChargeing_Server",
+    "/Script/Helden.HeldenPlayerController:InventoryAction_Server",
+    "/Script/Helden.HeldenPlayerController:Interact_Server",
+    "/Script/Helden.HeldenPlayerController:EndInteract_Server",
+    "/Script/Helden.HeldenPlayerController:EndHoldInteract_Server",
+    "/Script/Helden.HeldenPlayerController:DropItem_Server",
+    "/Script/Helden.HeldenPlayerController:CrouchHold_Server",
+    "/Script/Helden.HeldenPlayerController:Crouch_Server",
+}
+local rpcLastAt = {}
+
+local function argText(value)
+    local inner = deref(value)
+    local t = type(inner)
+    if t == "number" or t == "boolean" or t == "string" then return tostring(inner) end
+    local text = nil
+    pcall(function() text = inner:ToString() end)          -- FName / FString
+    if type(text) == "string" then return text end
+    if real(inner) then return className(inner) end
+    return "?"
+end
+
+local function registerServerCensus()
+    for _, path in ipairs(SERVER_RPCS) do
+        local short = shortName(path)
+        local ok = pcall(function()
+            RegisterHook(path, function(self, a, b, c)
+                pcall(function()
+                    local who = deref(self)
+                    local isLocal = nil
+                    pcall(function() isLocal = who:IsLocallyControlled() end)
+                    if isLocal == nil then pcall(function() isLocal = who:IsLocalController() end) end
+                    local now = os.clock()
+                    local gap = rpcLastAt[short] and (now - rpcLastAt[short]) or nil
+                    rpcLastAt[short] = now
+                    emit(string.format("%8.3f  RPC %-34s %-28s local=%-5s args=%s,%s,%s gap=%s",
+                        now, short, className(who), tostring(isLocal),
+                        argText(a), argText(b), argText(c),
+                        gap and string.format("%.3fs", gap) or "first"))
+                end)
+            end)
+        end)
+        emit("  " .. (ok and "census hooked " or "census COULD NOT HOOK ") .. path)
+    end
+end
+
 local function registerHooks()
     registerUnarmed()
+    registerServerCensus()
     local results = {}
     results[#results + 1] = (pcall(function()
         RegisterHook(HOOK.attackServer, function(self, combo)

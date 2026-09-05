@@ -1,32 +1,30 @@
 --[[
     BetterInteraction -- interaction quality of life for Grain Rot.
 
-    PHASE 1. This file changes only LOCAL PRESENTATION: how far off-centre you
-    may look before a prompt appears, how close you must be, and how long a hold
-    takes. It writes no authoritative state, sends no RPC, touches no save, and
-    registers no hook.
+    WHAT IT DOES, and the co-op bucket of each, per CLAUDE.md:
 
-    CO-OP BUCKET, declared per feature at the site, per CLAUDE.md:
+      deposit_all / deposit_counter   bucket 3  pay a whole deposit in one
+                                                press; sized at the press, on
+                                                the host, for whoever pressed.
+      coin_*                          bucket 3  the grinder pays out in one
+                                                coin; piles merge; host/solo.
+      attack_hold / attack_rate       bucket 2  hold to keep swinging or
+                                                punching, at each weapon's own
+                                                measured click cadence; runs on
+                                                the machine whose key is down.
 
-      prompt_angle      bucket 1  local presentation. One float on one shared
-                                  asset. Nothing is replicated, nothing agreed.
-      prompt_distance   bucket 1  same asset.
-      reach             bucket 1  MaxInteractDistance, per component. Governs
-                                  what YOUR machine offers you.
-      aim_forgiveness   bucket 1  LineTraceDiscardRadius, per component.
-      hold_duration     bucket 3  HoldInteractionDuration MAY be validated by
-                                  the host. Not established. OFF by default and
-                                  the config says so.
+    The prompt-cone / reach / aim / hold-duration knobs that this file carried
+    from Phase 1 were removed on 5 Sep 2026 at Daniel's request: built,
+    verified, never wanted (CLAUDE.md, "What we are actually building").
 
-    WHY IT IS A RECONCILER AND NOT A PATCHER
-    ----------------------------------------
+    WHY EVERY WRITE IS READ BACK AND RE-ASSERTED
+    ---------------------------------------------
     The game puts its own values back -- measured on this build, a written
-    property reset twice inside a fourteen-minute session. This mod assumes the
-    same for everything it writes: a one-shot apply would work until
-    the first reset and then quietly stop, which is the worst failure mode
-    available. So every value is re-asserted on a timer, every write is read
-    back, and a value the game has put back is reported once per object per
-    world rather than silently rewritten forever.
+    property reset twice inside a fourteen-minute session. So the coin caps
+    are re-asserted on every interaction tick, every write is read back, and
+    a value the game has put back is reported once per object per world
+    rather than silently rewritten forever. The deposit writes are the other
+    way round on purpose: made at the press and put back straight after.
 
     WHAT THE GAME ACTUALLY SHIPS  (measured 29 Aug 2026, 739 components,
     two worlds -- see docs/DESIGN.md)
@@ -93,13 +91,17 @@ local FUNC = {
     punchMulti = "PlayMontage_Multicast",          -- AHeldenCharacter(UAnimMontage*, uint8), Helden.hpp:4251
     punchServer= "PlayMontageIgnoreLocal_Server",  -- AHeldenCharacter, Helden.hpp:4248 (guest: everyone else)
     sectionName= "GetSectionName",                 -- UAnimMontage(int32) -> FName
+    sectionIdx = "GetSectionIndex",                -- UAnimMontage(FName) -> int32, Engine.hpp:12646
+    activeMont = "GetCurrentActiveMontage",        -- UAnimInstance() -> UAnimMontage*, Engine.hpp:12596
+    curSection = "Montage_GetCurrentSection",      -- UAnimInstance(UAnimMontage*) -> FName, Engine.hpp:12552
 }
 
 --- Hooked function paths (rule H: registration is logged either way).
 local HOOK = {
     interact   = "/Script/Helden.HeldenInteractableObject:Interact",
     swing      = "/Script/Helden.HeldenWeapon:Attack_Multicast",
-    punch      = "/Script/Helden.HeldenCharacter:PlayMontage_Multicast",         -- bare hands
+    punch      = "/Script/Helden.HeldenCharacter:PlayMontage_Multicast",         -- bare hands, the host's own punch
+    punchGuest = "/Script/Helden.HeldenCharacter:PlayMontageIgnoreLocal_Server",  -- bare hands, a guest's own punch (best candidate)
     beat       = "/Script/Engine.PlayerController:ResetControllerLightColor",  -- the heartbeat
     restart    = "/Script/Engine.PlayerController:ClientRestart",              -- arms it, per world
 }
@@ -151,13 +153,6 @@ local CADENCE = {
 local PROP = {
     registered = "RegisteredInteractionEntries",  -- TArray<FHeldenInteractionEntry>
     entryComp  = "Component",                     -- its only field
-    settings   = "InteractSettings",              -- on the subsystem
-    angle      = "InteractProximityAngle",        -- UInteractionSettings 0x3C
-    distance   = "InteractProximityDistance",     -- UInteractionSettings 0x38
-    reach      = "MaxInteractDistance",           -- UInteractionComponent 0x2D8
-    discard    = "LineTraceDiscardRadius",        -- UInteractionComponent 0x2E0
-    holdOn     = "bIsHoldInteraction",            -- UInteractionComponent 0x318
-    holdDur    = "HoldInteractionDuration",       -- UInteractionComponent 0x31C
 
     -- Features 1 and 2, the deposit-all. Every one verified against the dump.
     hot        = "HotInteractions",                -- UHeldenInteractionSubsystem 0x58
@@ -324,7 +319,6 @@ local LOG_FILE    = "BetterInteraction.log"
 -- do not use the beat at all).
 local PUMP_MS       = 25
 local DEPOSIT_EVERY = 0.20   -- SECONDS between deposit scans
-local APPLY_MIN     = 0.10   -- floor on the reconciler interval, in seconds
 local WIDE_EVERY  = 1.0    -- seconds between level-wide sweeps
 local MAX_ENTRIES = 6000   -- a length far past the ~400 seen is the RE-UE4SS
                            -- #1328 failure mode, not a big level
@@ -351,16 +345,8 @@ local cfg = {
     coin_merge_max_artifacts = 100,
     coin_dispense_delay = 0.05,
 
-    -- Phase 1's knobs. OFF by default -- they work and are verified, but the
-    -- interaction angle and distance are fine as the game ships them.
-    prompt_angle        = 0,
-    prompt_distance     = 0,
-    reach               = 0,
-    reach_ceiling       = 250,
-    aim_forgiveness     = 0,
-    hold_duration       = 0,
-    hold_duration_floor = 0.25,
-    apply_interval      = 1.0,
+    -- Housekeeping. Write a line whenever the game reverts a value the mod
+    -- set, once per object per world.
     log_reverts         = 1,
 
     -- Hold to attack. ON by default. attack_rate 0 = each weapon's own
@@ -934,64 +920,6 @@ end
 -- The features. Each declares its co-op bucket at the site.
 -- ==========================================================================
 
---- BUCKET 1 -- local presentation. One shared asset, one write, whole game.
---- Established 29 Aug 2026: every one of 739 components in two worlds points at
---- /Game/Core/InteractionSettings.InteractionSettings, so this really is one
---- write for everything.
-local function applySettings(subsystem)
-    local settings = get(subsystem, PROP.settings)
-    if not real(settings) then
-        logOnce("nosettings", "the shared " .. PROP.settings .. " asset did not"
-            .. " resolve; the prompt-cone features are doing nothing this world")
-        return
-    end
-    if cfg.prompt_angle > 0 then
-        setNumber(settings, PROP.angle, cfg.prompt_angle, "settings")
-    end
-    if cfg.prompt_distance > 0 then
-        setNumber(settings, PROP.distance, cfg.prompt_distance, "settings")
-    end
-end
-
---- BUCKET 1 for reach and forgiveness -- they change what YOUR machine offers.
---- BUCKET 3 for hold duration: whether the host validates HoldInteractionDuration
---- is NOT established, so it is off by default and the config says why.
-local function applyComponent(component)
-    local label = shortName(fullName(component))
-
-    if cfg.reach > 0 then
-        -- The ceiling is where CLAUDE.md's scope line is enforced: "you are
-        -- standing at it" is in scope, "you are across the room" is not. The
-        -- game's own upper value is 250, so that is the default ceiling.
-        local want = math.min(cfg.reach, cfg.reach_ceiling)
-        local current = numberProp(component, PROP.reach)
-        -- Only ever raise a short reach toward the ceiling. Never shorten
-        -- something the game deliberately made long.
-        if current ~= nil and current < want then
-            setNumber(component, PROP.reach, want, label)
-        end
-    end
-
-    if cfg.aim_forgiveness > 0 then
-        local current = numberProp(component, PROP.discard)
-        if current ~= nil and current < cfg.aim_forgiveness then
-            setNumber(component, PROP.discard, cfg.aim_forgiveness, label)
-        end
-    end
-
-    if cfg.hold_duration > 0 then
-        -- Only touch components that ARE holds. Setting a duration on a tap
-        -- would be meaningless at best.
-        if boolProp(component, PROP.holdOn) == true then
-            local want = math.max(cfg.hold_duration, cfg.hold_duration_floor)
-            local current = numberProp(component, PROP.holdDur)
-            if current ~= nil and current > want then
-                setNumber(component, PROP.holdDur, want, label)
-            end
-        end
-    end
-end
-
 local function findFirst(class)
     local found = nil
     pcall(function() found = FindFirstOf(class) end)
@@ -1104,76 +1032,7 @@ end
 --- True when any per-component feature is on. When they are all off -- which is
 --- the shipped default -- the walk is skipped entirely and a pass costs one
 --- object-array scan plus one property write.
-local function needComponentWalk()
-    return cfg.reach > 0 or cfg.aim_forgiveness > 0 or cfg.hold_duration > 0
-end
-
--- ==========================================================================
--- Resolution and the pass
--- ==========================================================================
-
-local state = { passes = 0, skipped = 0, components = 0, lastSkip = nil }
-
-local function pass()
-    -- Rule F: gate on a FACT -- is there a playable world -- not on a timer.
-    local subsystem = cachedRoot("subsystem",
-        function() return findFirst(CLASS.subsystem) end)
-    if subsystem == nil then
-        state.skipped = state.skipped + 1
-        state.lastSkip = "no " .. CLASS.subsystem .. " (menu, or a level transition)"
-        logOnce("noworld", "waiting: " .. state.lastSkip)
-        return
-    end
-    said["noworld"] = nil     -- so the next transition says it again
-    noteWorld(subsystem)
-    state.passes = state.passes + 1
-
-    applySettings(subsystem)
-
-
-
-    if not needComponentWalk() then
-        state.components = 0
-        return
-    end
-
-    local array = get(subsystem, PROP.registered)
-    if array == nil then
-        logOnce("noarray", PROP.registered .. " did not read; per-component"
-            .. " features are doing nothing")
-        return
-    end
-    local total = count(array)
-    if total < 0 then
-        logOnce("nolength", PROP.registered .. " has no readable length")
-        return
-    end
-    if total > MAX_ENTRIES then
-        logOnce("bogus", string.format("%s reports %d entries, past the %d cap"
-            .. " -- refusing to walk it (RE-UE4SS #1328 returns garbage lengths"
-            .. " off a raced array)", PROP.registered, total, MAX_ENTRIES))
-        return
-    end
-
-    local seen = 0
-    pcall(function()
-        array:ForEach(function(_index, element)
-            local entry = nil
-            pcall(function() entry = element:get() end)
-            local component = nil
-            if entry ~= nil then
-                pcall(function() component = entry[PROP.entryComp] end)
-            end
-            if real(component) then
-                seen = seen + 1
-                applyComponent(component)
-            end
-        end)
-    end)
-    state.components = seen
-end
-
---- Runs EVERY PUMP TICK, unlike the 1-second reconciler.
+--- Runs every DEPOSIT_EVERY seconds from the heartbeat.
 ---
 --- Measured 29 Aug 2026: at 1 Hz the write and the restore alternate as focus
 --- flickers on approach, and the player's press lands on whichever the last
@@ -1337,14 +1196,26 @@ end
 --- somehow clips through the environment then everything is lost at once" -- so
 --- a pile becomes ceil(total / cap) coins, split evenly so there is no
 --- near-worthless straggler. A cap of 0 puts it all in one.
+--- The game's own per-coin split, learned from the first grinder seen this
+--- session; until then the measured shipped values. Plain numbers.
+local GAME_COIN_MEASURED = { gold = 5, artifacts = 1 }   -- measured 30 Aug 2026
+local gameCoin = { gold = GAME_COIN_MEASURED.gold, artifacts = GAME_COIN_MEASURED.artifacts }
+
+--- A configured cap, never below what the game itself puts in one coin.
+local function mergeCap(kind)
+    local want = (kind == "gold") and cfg.coin_merge_max_gold or cfg.coin_merge_max_artifacts
+    if want <= 0 then return 0 end
+    return math.max(want, gameCoin[kind] or 1)
+end
+
 local function chunksFor(sum, available)
     local wanted = 1
-    if cfg.coin_merge_max_gold > 0 and sum.gold > 0 then
-        wanted = math.max(wanted, math.ceil(sum.gold / cfg.coin_merge_max_gold))
+    local capGold, capArt = mergeCap("gold"), mergeCap("artifacts")
+    if capGold > 0 and sum.gold > 0 then
+        wanted = math.max(wanted, math.ceil(sum.gold / capGold))
     end
-    if cfg.coin_merge_max_artifacts > 0 and sum.artifacts > 0 then
-        wanted = math.max(wanted,
-            math.ceil(sum.artifacts / cfg.coin_merge_max_artifacts))
+    if capArt > 0 and sum.artifacts > 0 then
+        wanted = math.max(wanted, math.ceil(sum.artifacts / capArt))
     end
     if wanted > available then wanted = available end
     return wanted
@@ -1479,6 +1350,12 @@ local function tuneDispenser(unit)
         end
         entry = { gold = wasGold, artifacts = wasArt }
         dispensers[name] = entry
+        -- The game's own coin size is the FLOOR for every cap in the config
+        -- (5 Sep 2026, Daniel): a cap below it would split payouts finer
+        -- than the game does, which nobody wants. Plain numbers, never the
+        -- object (rule C).
+        if wasGold > 0 then gameCoin.gold = wasGold end
+        if wasArt > 0 then gameCoin.artifacts = wasArt end
         log(string.format("grinder %s: the game splits payouts into coins of at"
             .. " most %d gold and %d artifacts", shortName(name), wasGold, wasArt))
     end
@@ -1486,8 +1363,8 @@ local function tuneDispenser(unit)
     -- DRIVE TO TARGET, never decline and leave -- the same discipline the
     -- deposits use. A config of 0 drives the game's own value back, so switching
     -- the feature off actually undoes it rather than merely ceasing to re-apply.
-    local wantGold = cfg.coin_max_gold > 0 and cfg.coin_max_gold or entry.gold
-    local wantArt = cfg.coin_max_artifacts > 0 and cfg.coin_max_artifacts
+    local wantGold = cfg.coin_max_gold > 0 and math.max(cfg.coin_max_gold, entry.gold) or entry.gold
+    local wantArt = cfg.coin_max_artifacts > 0 and math.max(cfg.coin_max_artifacts, entry.artifacts)
         or entry.artifacts
     setNumber(unit, PROP.maxGold, wantGold, shortName(name))
     setNumber(unit, PROP.maxArt, wantArt, shortName(name))
@@ -2164,7 +2041,7 @@ end
 --- Fed by the PlayMontage_Multicast hook: the local character played a
 --- montage. Only a punch montage on the LOCAL pawn opens a chain, and never
 --- while a weapon chain is live.
-local function notePunch(pawn, montage, section)
+local function notePunch(pawn, montage, section, via)
     if cfg.attack_hold == 0 then return end
     if not real(montage) then return end
     local montPath = fullName(montage)
@@ -2174,6 +2051,11 @@ local function notePunch(pawn, montage, section)
     local isLocal = nil
     pcall(function() isLocal = pawn:IsLocallyControlled() end)
     if isLocal ~= true then return end
+    -- Rule J: a guest's own punch never showed on PlayMontage_Multicast (5 Sep,
+    -- Copy B as guest: weapons repeated, punches never opened a chain). Which
+    -- RPC carries it is measured here, once per session.
+    logOnce("punch:via:" .. tostring(via), "hold-to-attack (bare hands): the local punch"
+        .. " was seen via " .. tostring(via))
     if cfg.attack_rate > 0 then rate = math.max(cfg.attack_rate, rate) end
     local now = os.clock()
     if chain ~= nil and chain.kind ~= "unarmed" then return end
@@ -2205,6 +2087,17 @@ local function repeatPunch(controller)
     pcall(function() authority = pawn:HasAuthority() end)
     local ok, err
     if authority == false then
+        -- MEASURED ON THE HOST, 5 Sep 2026 (probe attack-18, vanilla guest):
+        -- every guest punch arrives as PlayMontageIgnoreLocal_Server(
+        -- AM_PunchAttacks, section) and the server multicasts it on. That is
+        -- what credits the hit -- a local Montage_Play alone animated and
+        -- landed nothing (Daniel, same day). The guest's sending side is not
+        -- hookable (both hooks silent on Copy B), which is why the chain is
+        -- opened by looking at the anim instance instead. So the repeat is
+        -- both halves of a real guest punch: the server RPC, and the montage
+        -- on our own mesh, which the RPC by name skips.
+        logOnce("punch:guest", "hold-to-attack (bare hands, guest): repeating by"
+            .. " PlayMontageIgnoreLocal_Server plus a local Montage_Play")
         ok, err = pcall(function() pawn[FUNC.punchServer](pawn, montage, section) end)
         pcall(function()
             local mesh = get(pawn, PROP.mesh)
@@ -2225,10 +2118,52 @@ local function repeatPunch(controller)
     return true
 end
 
---- Every pump tick. Returns immediately unless a chain is live and due.
-local function attackTick()
-    if chain == nil then return end
+--- BARE HANDS ON A GUEST. Neither montage RPC fires on a guest for its own
+--- punch (5 Sep, Copy B as guest: weapons repeated, both punch hooks silent).
+--- The engine replicates the guest's montage natively, with nothing
+--- reflected in between. So the guest's punch is detected by LOOKING: while
+--- the attack key is down and no chain is live, ask the local mesh's anim
+--- instance which montage is active; a punch montage opens the chain. Ten
+--- times a second, off the controller the heartbeat already holds -- no scan.
+local lastPunchLook = 0
+local PUNCH_LOOK_EVERY = 0.10
+
+local function lookForPunch(controller, now)
+    if now - lastPunchLook < PUNCH_LOOK_EVERY then return end
+    lastPunchLook = now
+    if attackHeld(controller) ~= true then return end
+    local pawn = get(controller, PROP.pawn)
+    if not real(pawn) then return end
+    if drawnItem(controller) ~= nil then return end
+    local mesh = get(pawn, PROP.mesh)
+    local anim, montage = nil, nil
+    pcall(function() anim = mesh[FUNC.animInst](mesh) end)
+    if not real(anim) then return end
+    pcall(function() montage = anim[FUNC.activeMont](anim) end)
+    if not real(montage) then return end
+    local short = shortName(fullName(montage))
+    if UNARMED[short] == nil then return end
+    local section = 0
+    pcall(function()
+        local name = anim[FUNC.curSection](anim, montage)
+        local index = montage[FUNC.sectionIdx](montage, name)
+        if type(index) == "number" and index >= 0 then section = index end
+    end)
+    logOnce("punch:via:anim", "hold-to-attack (bare hands): the local punch was seen"
+        .. " on the anim instance (" .. short .. ")")
+    notePunch(pawn, montage, section, "anim instance")
+end
+
+--- Every pump tick, with the controller the heartbeat was called on.
+--- Returns immediately unless a chain is live and due.
+local function attackTick(beatController)
     local now = os.clock()
+    if chain == nil then
+        if cfg.attack_hold ~= 0 and real(beatController) then
+            pcall(lookForPunch, beatController, now)
+        end
+        return
+    end
     if now < chain.nextAt then return end
     if chain.epoch ~= epoch then chain = nil return end
 
@@ -2241,7 +2176,7 @@ local function attackTick()
         return
     end
 
-    local controller = localController()
+    local controller = real(beatController) and beatController or localController()
     if controller == nil then chain = nil return end
     local held = attackHeld(controller)
     if held == nil then
@@ -2322,22 +2257,27 @@ local function installHooks()
                 end)
             end)
         end)
-        local punchOn = pcall(function()
-            RegisterHook(HOOK.punch, function(self, montage, section)
-                pcall(armIfNeeded)
-                pcall(function()
-                    local index = section
-                    pcall(function() index = section:get() end)
-                    if type(index) ~= "number" then index = tonumber(tostring(index)) or 0 end
-                    local mont = montage
-                    pcall(function() mont = montage:get() end)
-                    notePunch(self:get(), mont, index)
+        local function punchHook(path, via)
+            return pcall(function()
+                RegisterHook(path, function(self, montage, section)
+                    pcall(armIfNeeded)
+                    pcall(function()
+                        local index = section
+                        pcall(function() index = section:get() end)
+                        if type(index) ~= "number" then index = tonumber(tostring(index)) or 0 end
+                        local mont = montage
+                        pcall(function() mont = montage:get() end)
+                        notePunch(self:get(), mont, index, via)
+                    end)
                 end)
             end)
-        end)
-        log(punchOn
-            and ("hold-to-attack (bare hands) hook registered on " .. HOOK.punch)
-            or "THE PUNCH HOOK WOULD NOT REGISTER -- holding with empty hands will punch once.")
+        end
+        local punchOn = punchHook(HOOK.punch, "PlayMontage_Multicast")
+        local punchGuestOn = punchHook(HOOK.punchGuest, "PlayMontageIgnoreLocal_Server")
+        log((punchOn and punchGuestOn)
+            and ("hold-to-attack (bare hands) hooks registered on " .. HOOK.punch .. " and " .. HOOK.punchGuest)
+            or ("A PUNCH HOOK WOULD NOT REGISTER (multicast " .. tostring(punchOn) .. ", server "
+                .. tostring(punchGuestOn) .. ") -- holding with empty hands may punch once."))
         log(swingOn
             and ("hold-to-attack hook registered on " .. HOOK.swing
                 .. (cfg.attack_rate > 0
@@ -2399,12 +2339,12 @@ end
 -- ==========================================================================
 
 local ticks    = 0
-local lastScan, lastApply = 0, 0
+local lastScan = 0
 local beatArmedFor = nil          -- fullName of the controller the timer is on
 local beatsThisMinute, beatMinuteAt = 0, 0
 local lastBeatAt = nil
 
-local function heartbeat()
+local function heartbeat(beatController)
     ticks = ticks + 1
     local now = os.clock()
     lastBeatAt = now
@@ -2419,7 +2359,7 @@ local function heartbeat()
     defer.drain()
 
     do
-        local okA, errA = pcall(attackTick)
+        local okA, errA = pcall(attackTick, beatController)
         if not okA then
             logOnce("attack:" .. tostring(errA), "hold-to-attack tick failed: " .. tostring(errA))
         end
@@ -2435,13 +2375,6 @@ local function heartbeat()
         logOnce("tick:" .. tostring(err2), "interaction tick failed: " .. tostring(err2))
     end
 
-    if now - lastApply >= math.max(APPLY_MIN, cfg.apply_interval) then
-        lastApply = now
-        local ok, err = pcall(pass)
-        if not ok then
-            logOnce("pass:" .. tostring(err), "apply pass failed: " .. tostring(err))
-        end
-    end
 end
 
 --- Arm the beat on this controller, once per controller. Game thread only.
@@ -2479,8 +2412,12 @@ armIfNeeded = function()
 end
 
 local beatHooked = pcall(function()
-    RegisterHook(HOOK.beat, function()
-        local ok, err = pcall(heartbeat)
+    RegisterHook(HOOK.beat, function(self)
+        -- `self` is the controller the timer fired on: our own, the one the
+        -- timer was armed on. Handed down so the attack tick needs no scan.
+        local controller = nil
+        pcall(function() controller = self:get() end)
+        local ok, err = pcall(heartbeat, controller)
         if not ok then logOnce("beat:" .. tostring(err), "heartbeat failed: " .. tostring(err)) end
     end)
 end)
@@ -2520,15 +2457,3 @@ log(beatHooked
     and ("heartbeat hook registered on " .. HOOK.beat .. "; armed per world from "
         .. (restartHooked and "ClientRestart" or "the feature hooks only (ClientRestart would not hook)"))
     or "FATAL: the heartbeat hook would not register. NOTHING WILL EVER RUN -- report this")
-log(string.format("prompt_angle=%s  prompt_distance=%s  reach=%s"
-    .. "  aim_forgiveness=%s  hold_duration=%s", tostring(cfg.prompt_angle),
-    tostring(cfg.prompt_distance), tostring(cfg.reach),
-    tostring(cfg.aim_forgiveness), tostring(cfg.hold_duration)))
-if cfg.aim_forgiveness > 0 then
-    log("NOTE: aim_forgiveness is ON. What LineTraceDiscardRadius actually does"
-        .. " is NOT established -- you are experimenting. Please report what you see.")
-end
-if cfg.hold_duration > 0 then
-    log("NOTE: hold_duration is ON. Whether the host validates it is NOT"
-        .. " established, so treat it as untested in a lobby.")
-end

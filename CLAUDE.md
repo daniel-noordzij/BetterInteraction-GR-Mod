@@ -616,10 +616,12 @@ destroys resources on the third. See `docs/DESIGN.md`, 30 Aug 2026.
 in two worlds. The numbers are in `docs/DESIGN.md` §1.5 and are the reason
 several of this file's original assumptions were retired.
 
-**Phase 1 — the global knobs. Built, works, NOT WANTED.** `prompt_angle` and
-`prompt_distance` apply correctly and are verified live; they stay in the config
-defaulted to off because they are harmless and someone may want them. They are
-not the mod.
+**Phase 1 — the global knobs. Built, worked, NOT WANTED, and REMOVED on
+5 Sep 2026** at Daniel's request ("a lot of things still in there that aren't
+used anymore"): `prompt_angle`, `prompt_distance`, `reach`, `reach_ceiling`,
+`aim_forgiveness`, `hold_duration`, `hold_duration_floor` and the reconciler
+pass that applied them are gone from `main.lua` and the config. The
+measurements behind them stay in `docs/DESIGN.md` §1.5.
 
 **Phase 2 — feature 5, the eaten hold input.** Built, shipped, confirmed in a
 lobby, then REMOVED on 31 Aug 2026 at Daniel's request. See above.
