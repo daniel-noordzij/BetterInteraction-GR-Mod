@@ -2,7 +2,7 @@
     "name": "BetterInteraction",
     "version_number": "1.0.0",
     "website_url": "https://github.com/daniel-noordzij/BetterInteraction-GR-Mod",
-    "description": "Quality of life for interacting. No spam clicking the elevator, gumball- and upgrade machine, and the grinder pays out in one coin instead of thirty. Only the host needs it.",
+    "description": "Quality of life for interacting. No spam clicking for repeating interactions and changes to coins.",
     "dependencies": [
         "Thunderstore-GrainRot_UE4SS-1.0.1",
         "Thunderstore-unreal_shimloader-1.1.7"

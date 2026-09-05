@@ -3565,3 +3565,526 @@ BP_Gumball_CoinDeposit_C:        charged 2 artifacts,  credited 2   -- balanced
 two Steam accounts, identical mod sets. The bucket model in CLAUDE.md predicted
 which features would need authority, which would not, and which machine would
 fail and why -- and every prediction held.
+
+### 2 Sep 2026 -- hold-to-attack: the design tree, and the read-only probe
+
+Daniel's next feature, grilled to a shared understanding before any code:
+**holding the attack key should keep swinging at the game's own cadence.**
+Nothing is on Thunderstore yet, so it ships inside 1.0.0. The page copy
+(README, manifest description, changelog) is Daniel's and is not touched here.
+
+**What the dump says, read 2 Sep 2026.** The game already has the mechanism.
+`AHeldenMeleeWeapon` (`Helden.hpp:6188`) carries `bCanAutoFire` (0xC72),
+`AutoFireRate` (0xC74), `bUseAutoFireLoop` (0xC78), `AutoFireLoop`,
+`bAutoFireEffect` (0xC88), plus `SetAutoFireEffect_Server`,
+`OnToggleAutoFireEffect` and an `OnRep_`. `AHeldenRangedWeapon` has
+`bCanAutoFire` and `FireRate`. `BP_HandSaw_01` is the only shipped weapon
+Blueprint that overrides `OnToggleAutoFireEffect`, so the path is live.
+Nothing else in the 954 headers holds a player-side attack rate or cooldown:
+no `CanAttack`, no `bIsAttacking`. The attack itself is
+`AHeldenWeapon:Attack_Server(int32 InCombo)` and its `_Multicast`. The
+character carries `EquipedItems` [sic] (`Helden.hpp:4187`, 0x1270) and each
+item has `HolsterState` (None 0, Equipped 1, Holsterd 2). `IA_Attack` carries
+BOTH a Pressed and a Released trigger (`UE4SS_ObjectDump.txt:122380-122381`),
+unlike `IA_Interact`, and `ia_attack` was seen held during the dialogue work.
+
+**Not established, and the probe's first job:** whether `bCanAutoFire` is
+true on any weapon other than the saw. CDO values are in neither dump.
+
+**The decisions, all Daniel's:**
+
+- Route A first: set `bCanAutoFire` true on the melee weapon in hand, each
+  pass; leave `AutoFireRate` alone (rate is result, the flag is effort). Flip
+  only false, leave true alone, log each flip once per object per world.
+  Route B, the `ActionInstanceData` walk from removed feature 5, only if A does
+  nothing or the server refuses.
+- `Attack` only, never `AltAttack`. Config key `attack_hold`, on by default.
+- Exclusion list in the data section of `main.lua`: shield (an item that is
+  not in the game as released) and radar (unknown) until tested. Ranged
+  weapons excluded.
+- Stops wherever the game itself refuses a swing; resumes only on a fresh
+  press. No stamina guard: the game's refusal is the guard.
+- Expected bucket 2 per machine, but route A's bucket is measured, not
+  assumed: the weapon is a replicated actor and nothing says whether the
+  client or the server reads the flag. Ship only after a two-machine test BOTH
+  ways -- guest modded / host unmodded, and host modded / guest unmodded. The
+  result decides the README's guest sentence, which Daniel writes.
+- The probe gets a second version with a bare F-key that flips the flag on
+  the weapon in hand and one that equips the next attack item from a fixed
+  list (shield included, for testing). Equip via
+  `UHeldenCheatManager:DebugEquipItem(FName)` (`Helden.hpp:8153`) first --
+  the test profile runs `CheatManagerEnablerMod`, so an instance is likely --
+  and fall back to the icon probe's proven `BeginDeferredActorSpawnFromClass`
+  + `FinishSpawningActor` path
+  (`F:\repos\Grain-Rot-AP\tools\probe\GrainRotAPIconProbe`). Probe-only,
+  never shipped (packaging rule 2).
+
+**Housekeeping done the same session:** `RELEASE_BLOCKERS` cleared with a
+dated note citing the 30 Aug lobby, because both entries were settled there
+and the builder was refusing an honestly ready package. The `main.lua` header
+and two config strings still described F3 / F4 keys that `babc5d5` removed;
+they now say the mod binds nothing. Comment and string changes only; the
+checker accepts, the 19 packaging checks pass, and the profile copy matches.
+
+#### `tools/probe/BetterInteractionAttackProbe/`, `attack-1`
+
+Read-only. F11 toggles a 200 ms recorder that walks the local pawn's
+`EquipedItems` and logs, on change, every item's class, holster state and
+auto-fire fields, plus the attack action's trigger state. Three log-only
+hooks are registered at load and log their own registration either way (rule
+H): `Attack_Server`, `Attack_Multicast` and `SetAutoFireEffect_Server`. Each
+attack line carries the weapon class, the combo index and the gap since the
+previous call of the same kind -- the game's true cadence, measured rather
+than guessed. Deployed to `LetMeLookTest`; the hold probe's `enabled.txt` was
+renamed `.off` there because it also bound F11.
+
+**What the first run has to answer:** (1) `bCanAutoFire` per weapon; (2) the
+gap between `Attack_Server` calls under fast clicking, per weapon; (3) whether
+any weapon produces repeated calls under a plain hold; (4) what `InCombo`
+counts. Not diagnosed until the file says so.
+
+#### `attack-2` -- F10 equips the next weapon, before the first run
+
+Daniel, before running `attack-1`: "it would be really nice to have the hotkey
+to spawn the weapons one by one". So F10 now walks a fixed list of 20 items
+with an attack (14 melee-class including the shield, radar, umbrella and
+battery; 6 ranged for contrast), every Blueprint class path verified against
+the object dump.
+
+Two routes, and the file says which answered. **Route 1**,
+`UHeldenCheatManager:DebugEquipItem(FName)`: the shipping build makes no cheat
+manager and `CheatManagerEnablerMod` is OFF in the profile, so the probe
+constructs one the way that mod does -- `StaticConstructObject` of the
+controller's `CheatClass` with the controller as outer, assigned to
+`CheatManager`. The FName it expects is **not in the dump**; the item data
+asset's short name (`Malet_01`) is the first guess, and half a second later
+the pawn's `EquipedItems` is re-walked to VERIFY rather than trust it.
+**Route 2**, on any failure: spawn the Blueprint class two metres in front of
+the camera through the icon probe's proven deferred-spawn path, and pick it up.
+
+Nothing is held across ticks but plain Lua values; the controller is
+re-resolved at every step. F10 writes to the world, so solo only.
+
+**Hotkeys retired in the profile the same session**, at Daniel's request:
+`BetterInteractionProbe` (F7/F8) and `BetterInteractionReplay` (F9/F10) had
+their `enabled.txt` renamed `.off` beside the hold probe's. `BetterInteractionDev`
+(F7/F8, stash money) stays on because the two-machine test will want it. Of
+the mods that are not ours only `LetMeLook` (F6) is enabled.
+
+**Not diagnosed until it runs:** whether `DebugEquipItem` accepts the asset
+name, whether a constructed cheat manager's functions work at all in a
+shipping build, and whether a spawned weapon is a normal pickup.
+
+#### `attack-3` / `attack-4` -- the equip name, found by elimination
+
+`attack-2`: F10 equipped twelve items and refused eight (both mallets, the
+golden mallet, broom, radar, nail gun, flamethrower, glue gun); the eight fell
+to the spawn route, and a spawned weapon is NOT a pickup, so that route is
+useless. `attack-3` read every `UHeldenItemDataAsset` live and logged the
+table: **`UniqueName` equals the asset file name for all 30 assets**, so it was
+never the discriminator -- and the knife broke because `Knife_01_AI` points at
+the same class and overwrote the lookup.
+
+**Established: `DebugEquipItem` keys on `ItemStatsName`.** The eight refusals
+were exactly the eight whose stats name differs from the file name (`Malet`,
+`Malet_Reinforced`, `Malet_Golden`, `Broom`, `Radar`, `NailGun`,
+`Flamethrower`, `GlueGun`); all twelve that worked have the two equal. That is
+evidence that distinguishes, not merely fits. `attack-4` tries the stats name,
+then the unique name, then the file name, verifying each by re-walking
+`EquipedItems`, and every item but one equipped on the first name.
+
+**Radar is not an equippable item.** All three names refused, and the spawned
+actor wears a nail-gun placeholder mesh -- Daniel's "second bolt spitter". It
+joins the shield on the exclusion list as unreleased content.
+
+#### 2 Sep 2026 -- `attack-4` results: route A's premise, measured
+
+Solo, LetMeLookTest, every attack item cycled through F10, each clicked once,
+fast-clicked ~3 s, then held ~3 s.
+
+**Established, per weapon:**
+
+| class | `bCanAutoFire` | `AutoFireRate` | loop | fast-click gap | hold |
+|---|---|---|---|---|---|
+| HandSaw | **true** | 0.50 | true | 0.50 | **repeats every 0.50 s**, combo stays 0, `bAutoFireEffect` true for the duration |
+| Malet_01 / 02 / Golden | false | 0.50 | true | 0.40-0.44, combo 1..9 | 3.1 s held: **zero swings** |
+| Knife, Machete, Spear, Umbrella, Battery | false | 0.50 | true | 0.41-0.58, combo climbs | no repeat |
+| Broom | false | 0.50 | true | 0.82-0.90 | no repeat |
+| SpikeClub / Elite | false | 0.50 | true | 0.68-1.31 | no repeat |
+| Shield | false | 0.50 | true | 0.98-1.44 | no repeat |
+| ranged: NailGun 0.15, Flamethrower 0.15, GlueGun 0.10, Shotgun 1.0, Sniper 1.5 | **true** | -- | | (no `Attack_*` calls; ranged fires through `Fire_*`) | |
+| GrenadeLauncher | false | 0.50 | | | |
+
+So the game's own auto-fire is real, on, and working on exactly one melee
+weapon, and every other melee weapon carries the same 0.5 s rate with the
+flag off. **The flag is the whole difference between the saw and the mallet,
+as far as the reflected state can see.** Whether the unreflected handler
+also gates on class is what F9 will say.
+
+**Two things that shape the feature:**
+
+- **Auto-fire at 0.5 s is SLOWER than clicking.** A fast-clicked mallet
+  swings every 0.40-0.42 s and climbs the combo chain; the saw's loop runs at
+  0.50 with combo pinned at 0. Route A therefore cannot out-click a human,
+  which settles the "never faster than the game" requirement by construction
+  -- and it means a held mallet would lose the combo. Whether that matters is
+  Daniel's call once he feels it.
+- **The host's own swing never touches `Attack_Server`.** 118 attack calls
+  in the run, all `Attack_Multicast`, zero `_Server` -- the same shape the
+  deposit hook found for `Interact`. The guest-side measurement is still the
+  two-machine test.
+
+**`InCombo` is the combo chain index**: 0 on a fresh swing, climbing by one
+per swing while the chain is sustained, back to 0 after ~1 s idle.
+
+**`SetAutoFireEffect_Server(false)` is called constantly** while a melee
+weapon is out -- roughly every 80 ms -- and `true` only on the saw while held.
+It is a tell, not yet a problem: something re-asserts the effect state every
+tick, and if the same code re-asserts `bCanAutoFire` the reconciler will see
+the revert and log it (rule H).
+
+#### `attack-5` -- F9 flips the flag
+
+F9 finds the Equipped melee weapon on the pawn (holster 1, `AutoFireRate`
+reads as a number), writes `bCanAutoFire = not current`, reads it straight
+back and logs both values, and says if the write did not stick. F9 again
+restores it. One bool, nothing held across ticks.
+
+**Not diagnosed until it runs:** whether a flipped mallet repeats under a
+hold like the saw does. That single line is route A's go / no-go.
+
+#### 2 Sep 2026 -- `attack-5` results: ROUTE A WORKS. And two corrections
+
+**Established: flipping `bCanAutoFire` makes a mallet auto-repeat under a
+plain hold.** Malet_01, flag written true and read back true: eleven swings
+at 0.499-0.510 s with the combo index climbing 0..11 -- unlike the saw, the
+chain is kept. Written back to false: a hold gives one swing again. Flipped a
+second time: repeats again. Same on Malet_Golden_01, three times over. The
+unreflected handler does not gate on class; the flag is the switch.
+
+Daniel: "it only worked for the regular and golden mallet, anything else
+didn't auto-reattack". **That is a probe defect, not a game finding.** Every
+F9 on the knife, machete, broom and Malet_02 logged `no equipped melee
+weapon among 1 carried item(s)` -- the flag was never written. F9 required
+`HolsterState == Equipped` (1), and a weapon handed over by the cheat
+manager reads `None` (0) for as long as it is carried; the two mallets that
+worked were the ones Daniel had picked up from the floor. `attack-6` takes
+the only melee weapon carried when nothing reads Equipped, and logs which.
+
+Daniel: "it was also slightly slower than spam clicking which shouldn't be
+the case." Measured, and he is right: the loop fires every 0.50 s
+(`AutoFireRate`), fast clicking every 0.39-0.42 s. **This revises the Q24
+decision** ("leave `AutoFireRate` alone"): a hold that is slower than a
+human is not the feature. What is NOT yet known is what limits clicking at
+~0.40 -- if it is the swing montage, driving the rate below it changes
+nothing and the game's own clamp sets the cadence; if the rate is the only
+limiter, the mod has to pick a number and 0.40 is the measured human one.
+`attack-6` adds F8, cycling `AutoFireRate` through 0.5 / 0.4 / 0.3 / 0.2 /
+0.1 with readback, so the gaps say which.
+
+**Not diagnosed:** the clicking limiter, and therefore the rate the feature
+should write. Still bucket 2 by expectation, still unmeasured for a guest.
+
+#### 2 Sep 2026 -- `attack-6` results: the rate is the only limiter, and a RUNAWAY
+
+**Established: `AutoFireRate` is the whole cadence.** Written 0.40, the
+mallet looped at 0.400-0.407 s; written 0.30, at 0.295-0.315 s; combo
+climbing throughout. No animation clamp appeared down to 0.3, and 0.2 / 0.1
+were not reached because of what follows. So the feature has to pick a
+number. 0.40 is the measured fastest-click cadence (0.39-0.42 across every
+weapon in `attack-4`), which makes it the honest QoL rate: a hold that
+matches a perfect clicker and never beats one.
+
+**Established: a runaway exists, and it is reproducible.** With the flag
+flipped IN HAND and rate 0.5, the key went `None` at 49.438 and the mallet
+swung six more times (combo 4..9) until 52.209, then the effect went false.
+At rate 0.4 and 0.3 it never stopped: 170+ swings over 60 s while the file
+shows the attack key going down and up a dozen times, none of which ended
+it. Daniel had to abort the run. The saw, which ships with the flag true,
+has stopped on release in every run.
+
+**Best candidate, NOT established:** the stop path is set up when the
+weapon is drawn, from the flag's value at that moment -- so a flag flipped
+after the draw runs a loop with no off switch. It fits (saw vs. mallet, and
+the first loop at 0.5 did eventually stop, which a "no off switch" theory
+does not fully explain -- **that stop at 52.6 is not diagnosed**). It is
+also exactly what the shipped reconciler would avoid by writing every
+weapon before it is ever drawn.
+
+`attack-7` adds **F5**: flag every `HeldenMeleeWeapon` in the world with
+rate 0.40, then holster and re-draw. If a weapon drawn with the flag already
+true stops on release, route A ships as "write before draw". If it still
+runs away, route A is dead and route B (input shaping) is next.
+
+#### 2 Sep 2026 -- `attack-7` results: "write before draw" stops on release; the runaway is a TAP
+
+Daniel: "the knife didn't re-attack at all; the mallet re-attacked but got
+stuck on re-attacking with step 6 of briefly pressing."
+
+**The knife (and Malet_02, Malet_Golden) were spawned by F10 AFTER F5**, so
+they carried the default flag (the file shows the knife
+`bCanAutoFire=false rate=0.500` in hand). Not a game finding: F5 is a
+one-shot, and the shipped reconciler re-walks every pass.
+
+**Established: a mallet flagged before it was drawn stops on release after
+a real hold.** Drawn at 52.4 with `bCanAutoFire=true rate=0.400
+effect=false`; held 54.0-56.3, six swings at 0.40, `bAutoFireEffect` false
+at 56.325, key `None` at 56.524, no further swings. Again at 77.7-79.6:
+five swings, stopped. That is the shipped behaviour and it is clean.
+
+**Established: the runaway is triggered by a TAP.** At 62.465 a press
+started the loop -- and the 200 ms input sampler never saw the key down at
+all, so the press-to-release was under 200 ms. 28 swings followed over 11 s.
+Two later taps (67.8, 68.6, both ~200 ms) did not stop it; a third at 73.7
+did (effect true then false 80 ms apart). **Best candidate, not
+established:** the native release handler ends the loop only when it finds
+the loop in a state it expects, and a release that lands before the first
+swing has finished starting it is discarded. The saw may or may not share
+this -- its Blueprint overrides `OnToggleAutoFireEffect` and has a
+`ReceiveTick`, so it may carry its own stop logic that the mallet lacks.
+Untested on the saw.
+
+**Consequence for the feature:** the mod cannot rely on the game's release
+to end the loop. It needs its own off switch: attack action `None` for two
+samples while `bAutoFireEffect` is still true is a runaway by definition
+(a real release drops the effect within ~100 ms). `attack-8` adds that
+guard on F4 with three candidate kills -- flag off/on, the effect setter,
+the Blueprint toggle -- and the file says which one actually ends the
+swings. The guard is also the shape the shipped code would take: it reads
+the proven `ActionInstanceData` walk once per pass and writes only on a
+runaway.
+
+**Feature shape as of now**, pending the guard result: reconciler writes
+`bCanAutoFire=true` and `AutoFireRate=0.40` on every non-excluded
+`HeldenMeleeWeapon` each pass (a `FindAllOf` per pass at 1 Hz is within rule
+E's throttle, and there is no subsystem holding weapons), and the guard
+kills a loop that outlives its key.
+
+#### 2 Sep 2026 -- `attack-8` results: no reflected kill ends the loop
+
+Daniel: "all 3 guards kept the swinging going on the mallet."
+
+**Established.** On a tap-started runaway, guard A wrote `bCanAutoFire=false`
+(read back false) every 200 ms and 14 more swings followed at 0.40; guard B
+called `SetAutoFireEffect_Server(false)` (the hook saw it) and 13 more
+followed; guard C called `OnToggleAutoFireEffect(false)` thirteen times and
+12 more followed. **B also blinded the guard**: clearing `bAutoFireEffect`
+removed the runaway signature while the swings went on, so the guard fired
+once and never again. The loop is a native timer that none of the three
+reflected handles reach.
+
+**Established, from the same file:** every runaway ended with three
+`SetAutoFireEffect_Server(false)` calls in one frame -- the holster / drop
+signature -- and every real hold (2-5 s) ended cleanly on release. Both
+paths exist; the mod can call neither directly (holster is animation-driven
+and has no reflected entry point).
+
+**The saw:** Daniel reports it did not auto-swing with the guard off. Not
+in the file -- the run's tail is all mallet -- so **not diagnosed**; the saw
+was auto-swinging at 0.50 in attack-4 and attack-5.
+
+**What is left, both cheap, both in `attack-9`:**
+
+- **Guard D, starve the timer.** Write `AutoFireRate = 600000` on a
+  runaway, restore 0.40 on the next press. attack-6 showed the rate is read
+  per swing at least at the start of a hold (F8 changed it between holds);
+  whether a RUNNING loop re-reads it is the question.
+- **Route B's primitive.** F3 calls `Attack_Server(0)` and F2
+  `Attack_Multicast(0)` on the weapon in hand. If the mod can produce a
+  real swing by calling, it can drive the cadence itself from the proven
+  input walk and never touch the game's loop -- and there is nothing to run
+  away. That is the fallback the plan named on 2 Sep.
+
+**If both fail,** route A is dead for the tap case and the honest options
+are: ship hold-to-attack with the runaway documented (a tap on a modded
+mallet keeps swinging until you holster) -- which fails the "never do what
+the player did not ask" test -- or drop the feature. Daniel's call.
+
+#### 2 Sep 2026 -- `attack-9` results: D stops but jams; Attack_Server SWINGS. Route B it is.
+
+**Established: guard D ends a runaway.** Tap at 54.408, guard wrote
+`AutoFireRate=600000` at 54.608 (read back), exactly one more swing at
+54.814, then nothing. The running loop re-reads its rate per swing.
+
+**Established: D then jams the weapon.** Daniel: "pressing LMB just sort of
+dragged it down without actually swinging." The file: after the restore to
+0.40 at 66.099, nine presses over 15 s each toggled `bAutoFireEffect` true
+then false within ~80 ms and produced **zero** `Attack_Multicast` lines,
+until the holster at 106.3. Best candidate: the starved timer is still
+pending 600000 s out and the native loop treats "timer pending" as "already
+attacking", so a new press cannot start. Restoring the rate does not
+reschedule it. **Route A is dead:** the loop can be stopped only by
+starving it, and a starved loop cannot be restarted without a holster.
+
+**Established: the mod can swing the weapon itself.** F3,
+`Attack_Server(0)` on the mallet in hand, twice: each produced an
+`Attack_Server` line and an `Attack_Multicast` line in the same millisecond
+and, per Daniel, a swing "as if normally pressing LMB, both functionally
+and the animation". F2, `Attack_Multicast(0)`, logged the call and swung
+nothing -- the multicast is the cosmetic half, the server call is the
+attack. Consistent with what `Interact_Server` did for the deposits.
+
+**The feature, redesigned as route B.** The game's loop is not used and
+`bCanAutoFire` is never written. Instead:
+
+1. A real press produces a real swing; the `Attack_Multicast` hook sees it
+   and opens a chain. The mod never starts a chain, so every lock the game
+   puts on the first swing is respected.
+2. `attack_rate` (0.40) after the last swing, if the attack action reads
+   Started/Ongoing and a melee weapon is Equipped, call `Attack_Server`
+   with the next combo index. The player could have made that call by
+   clicking: bucket 2, per machine, works against an unmodded host.
+3. No swing follows our call: the game refused; chain closed. Key up:
+   chain closed. Nothing runs when nothing is held -- no scans, no calls.
+
+Two design consequences: the exclusion list (shield, radar) is no longer
+needed, because the game decides what a press does and we only repeat it;
+and there is nothing left for "write before draw" to do. `attack-10` builds
+this as F4 in the probe first, using the same code shape `main.lua` will.
+
+#### 2 Sep 2026 -- `attack-10` results: the repeater works. Feature 6 built into `main.lua`.
+
+Daniel: "they all seem to start and stop perfectly as well as single taps
+just doing single attacks."
+
+**Established, from the file.** Every chain opened on the game's own
+`Attack_Multicast`; every repeat was an `Attack_Server` from the mod at
+0.40-0.42 s that produced its `Attack_Multicast` in the same millisecond;
+every chain closed within one 200 ms sample of the key reading `None`, and a
+tap closed with zero calls made. Mallet: chains of 7, 2, 3, 7 repeats.
+Knife: 8. Combo index climbed as the game's own clicking does. One miss, and
+it is the probe's: the first chain on each cheat-equipped weapon closed on
+"no melee weapon Equipped" because `HolsterState` reads `None` until a
+cheat-handed item is holstered and redrawn; a normal pickup reads `Equipped`
+from the first frame (attack-7, 52.4). The shipped code matches the weapon
+that swung BY CLASS and requires it drawn.
+
+**Feature 6 is in `main.lua`**, bucket 2 declared at the site:
+
+- `HOOK.swing` = `/Script/Helden.HeldenWeapon:Attack_Multicast`, registered
+  in `installHooks` with its own rule-H line. The hook checks the weapon's
+  owner `IsLocallyControlled()` so a guest's replicated swing never opens a
+  chain on the host; if that cannot be read it ignores the swing and says so
+  once. **Not yet measured on a real guest.**
+- `attackTick` runs every pump tick and returns at once unless a chain is
+  live and due. Then: re-find the local controller (rule C), read the attack
+  action from `ActionInstanceData` (Started 2 / Ongoing 4 = held), find the
+  carried item of the swung class with `HolsterState == 1`, and call
+  `FUNC.attack` = `Attack_Server(combo + 1)`. No swing after our call: closed
+  as refused, counted. Key up, weapon gone, world changed: closed.
+- Config: `attack_hold = 1`, `attack_rate = 0.40`, both in the shipped cfg
+  with a section in Daniel's tone; `check_config_matches_lua` passes.
+- The pump is unchanged in shape: still one `LoopAsync`, one
+  `ExecuteInGameThread`; the tick is one more `pcall` after `defer.drain()`.
+
+**Dropped from the plan, with reasons in the file:** the exclusion list
+(the game decides what a press does; the mod only repeats it), the
+reconciler write of `bCanAutoFire` (route A is dead), and "write before
+draw" (nothing to write). The shield and radar need no special casing: the
+radar cannot be equipped at all and the shield's own press decides.
+
+**Checks:** `lua_check` ok, 19 packaging checks pass, `build_thunderstore`
+produces the 1.0.0 zip. Deployed to `LetMeLookTest` (lua and cfg, hashes
+match). CHANGELOG / README lines for the feature are Daniel's to write.
+
+**Not diagnosed until measured:** guest-side behaviour on an unmodded
+host (the two-way lobby test), and the saw -- it has its own loop, and a
+chain opened on the saw's first swing would call `Attack_Server` on top of
+it. Solo the two should be harmless together; it is on the test list.
+
+#### 2 Sep 2026 -- first shipped run: the server does not rate-limit, and the saw double-swings
+
+Daniel: "it still requires to switch back and forth before actually
+applying and it seems all weapons have the same speed which shouldn't be the
+case. some weapons need to automatically attack slower such as the iron bonk
+and rust bonk."
+
+**Established: `Attack_Server` is not rate-limited by the game.** The spike
+club took five mod calls at 0.399-0.412 s and swung on every one, where
+attack-4 measured its fastest click at 0.68 s. So "the game refuses what it
+is not ready for" was true for locks and false for cadence, and a single
+0.40 was a cheat on every slow weapon. **Fixed with data:** a `CADENCE`
+table, per class, from the attack-4 fast-click minima (mallets 0.40-0.41,
+knife 0.41, machete 0.42, spear 0.44, umbrella 0.43, battery 0.39, broom
+0.82, spike clubs 0.68, shield 0.98). An unlisted class is not repeated and
+the log names it once. `attack_rate` is now 0 = per-weapon; a positive value
+is a floor across all weapons, never a ceiling.
+
+**Established: the saw double-swings.** Each mod `Attack_Server(1)` on the
+saw was followed ~80 ms later by the saw's own loop firing combo 0 -- two
+swings per cycle. Weapons whose `bCanAutoFire` reads true are now left to
+the game, with one log line per class.
+
+**"Carried but not drawn":** every fresh weapon's first chain closed on the
+holster check (`HolsterState` None), exactly as the cheat-equipped probe
+items did. Whether a floor pickup shows the same is not diagnosed and no
+longer matters: the swing proves the weapon is in hand, so the check is
+gone and the class match alone decides.
+
+**Not derivable, so far:** no per-weapon attack-speed stat exists
+(`FHeldenStatsData` has damage, crit and movement speeds only), and
+`FHeldenMontage` carries no length. The probe now logs each swing montage's
+`GetPlayLength()` beside the class, so the next file says whether the table
+could become a formula. Until then the table is the truth and a game patch
+that adds a weapon is one line here.
+
+### 5 Sep 2026 -- the 4 Sep crash: UE4SS aborted on a corrupted action ref. NOT ATTRIBUTED to a mod.
+
+**Game only**, Solo profile, 64 minutes in, several in-game days, hitting a
+painting with a golden mallet. Dump `UECC-Windows-BB759C15…`, 20:07:22.787.
+
+**Established from the dump and the UE4SS source (SHA e31aaaa6, the shipped
+build):**
+
+- "Abort signal received" on the GameThread; the stack is the engine tick,
+  twelve ue4ss.dll frames, abort. No game frame faulted. This was not a game
+  crash.
+- The minidump holds a live heap copy of
+  `[Lua::Registry::get_function_ref] Ref was not function`, referenced from
+  the crashed stack: the exception in flight when the process died.
+- `process_simple_actions` fetches the ref OUTSIDE its try, so that error
+  propagates through the engine-tick detour uncaught, and the process aborts.
+  The action list is static and shared by every mod.
+- The LoopAsync thread runs its Lua holding only the per-mod actions lock,
+  never `m_thread_actions_mutex`; `ExecuteInGameThread` does its `luaL_ref`
+  before taking that mutex; the game thread `luaL_unref`s the previous
+  callback's ref right after that callback returns. A LoopAsync-driven pump
+  therefore writes the registry from a second thread while the game thread
+  is still using it. That is a sibling of #1180, not #1180 itself: no mod in
+  the session appends from inside a drained callback (checked: the four
+  Mentalize mods make no queued actions at all; BetterInteraction and
+  LetMeLook each make exactly one, from their LoopAsync body).
+
+**Not established: whose ref.** Two mods ran the same pump shape. The dump
+references heap pages of both mods' Lua states from the crashed stack, which
+is what a drain loop that just finished one mod's action and threw on the
+next looks like either way. Without ue4ss.pdb the frame that threw cannot be
+tied to a state.
+
+**Hypothesis, consistent but unconfirmed:** 109 ms before the abort our
+swing hook logged, for the first time in 73 sessions, `cannot tell whose
+weapon swung (owner BP_HeldenPlayerCharacter_01_C)`. In a solo game that
+means `owner:IsLocallyControlled()` threw inside its pcall, which it has no
+legitimate way to do. A registry already corrupted in *our* state would
+explain that and the abort one tick later. The pcall swallowed the error
+text, so it cannot be confirmed.
+
+**Shipped, unconfirmed as the cause:**
+
+1. The owner check now logs the error text (rule J), so the next occurrence
+   says whether the game refused the call or the Lua state was already broken.
+2. The settle gap: the LoopAsync body waits one full extra pass after it sees
+   `inFlight` clear before it appends again, so the game thread's unref of
+   the previous ref is microseconds old and a whole PUMP_MS behind by the
+   time we take a new one. Rate is unchanged in practice; the drain is once
+   per frame anyway. The LoopAsync body stays allocation-free.
+3. The same gap in LetMeLook, whose callback cleared `inFlight` at its
+   START -- a window the length of the whole callback, at a 100 ms pump.
+
+**What would confirm it:** no "Ref was not function" abort across the next
+several long sessions is weak evidence (one in a week before). A recurrence
+with the new owner-check line carrying an error text that names the Lua
+state (a metatable or `__index` failure) is strong evidence for the
+hypothesis; a recurrence with a clean owner check and a normal log is
+evidence against, and the next step is then to read `process_simple_actions`
+with symbols.

@@ -6,6 +6,7 @@ Read-only instruments. **Nothing in this directory ever ships in a package**
 | Probe | Phase | What it answers |
 |---|---|---|
 | `BetterInteractionProbe` | 0 | the real current value of every interaction knob, per component, grouped by owning actor class |
+| `BetterInteractionAttackProbe` | hold-to-attack | per carried weapon: `bCanAutoFire`, `AutoFireRate` and the loop/effect flags; the attack action's trigger state; and a log-only hook on `Attack_Server` / `Attack_Multicast` giving the game's own swing cadence and combo index. F11 toggles recording (read-only). F10 equips the next of 20 attack items, by cheat manager first and a real spawn second, so every weapon can be tested without farming (writes to the world; solo only). |
 
 ## Installing one by hand
 

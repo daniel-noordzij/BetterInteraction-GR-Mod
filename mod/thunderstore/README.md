@@ -1,36 +1,38 @@
 # BetterInteraction
 
 A Grain Rot mod that takes the spam-clicking out of interacting. Pay a machine in
-one press, and pick up one coin instead of thirty. That's it!
+one press, and pick up a couple coins instead of a whole pile!
 
 ## What it does
 
 Grain Rot takes your money in instalments: 5 gold a press at the elevator, 20 at
 the upgrade machine, one artifact at a time at the gumball machine. This lets one
-press pay as much of what you still owe as you can afford. The price is untouched
-— 100 gold is still 100 gold, it is just one press instead of twenty.
+press pay as much of what you still owe as you can afford.
 
-The grinder pays out in a shower of small coins, one every 0.4 seconds, and each
-one is a separate pickup. This stops the splitting, and merges coins already
-lying near each other into as few as it safely can. It keeps them under 100 gold
-each rather than putting a whole run on one object that could roll under the
-floor, and the total is never changed.
+Normally the grinder is limited to dispensing one coin with a max value of 10
+every 0.4 seconds. Now it not only spits them out faster but it also does so with
+more value per coin, making less total coins required. On top of that, coins
+will get merged together if they're close to eachother up to a value of 100.
 
-Every feature switches off on its own in `BetterInteraction.cfg`, which the mod
-writes itself the first time it runs. Edit it and restart the game. The mod binds
-no keys.
+Every feature is switchable off/on in `BetterInteraction.cfg`, which the mod
+writes itself the first time it runs. Edit it and restart the game.
 
-It never changes what anything costs, never unlocks anything the game locked,
+This never changes what anything costs, never unlocks anything the game locked,
 never touches quest or progression state, and writes nothing into your save.
 
 ## Multiplayer
 
-Only the host needs it. Everything here is something only the server is allowed
-to do, so the mod does it on the host for whoever pressed the button — a guest
-pays from their own purse, in one press, on a completely unmodified game. A guest
-running it too is harmless; their copy stands down.
+Only the host needs this. Everything here is something only the server is allowed
+to do, so the mod does it on the host for whoever pressed the button. A guest
+running it too is harmless; some features will simply be disabled for them.
 
-Tested with two players on two machines.
+The only thing that's client-side only is the `Hold-to-Attack` feature.
+If a guest wants it, they'll need this mod too.
+
+## Upcoming features
+
+These are features that will be added in a later update to the mod:
+- Holding space to skip dialogue instead of having to spam click space.
 
 ## AI usage disclosure and information
 

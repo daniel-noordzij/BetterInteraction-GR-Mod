@@ -57,13 +57,14 @@ ALLOWED_KEYBINDS = {}
 # Thunderstore builder refuses to run while any of these stands, because
 # CLAUDE.md is explicit: "Nothing ships publicly until this is settled on two
 # machines."
-RELEASE_BLOCKERS = [
-    "CO-OP IS UNVERIFIED. Features 1, 2 and 3 write authoritative state and are "
-    "host/solo by nature; feature 5 is bucket 2 but has never run in a lobby. "
-    "The mod page cannot honestly describe co-op behaviour yet.",
-    "THE MOD HAS NEVER RUN ON A SECOND MACHINE. Every measurement in "
-    "docs/DESIGN.md comes from one PC with several other Lua mods loaded.",
-]
+#
+# Cleared 2 Sep 2026. Both earlier blockers ("co-op is unverified", "never run on
+# a second machine") were settled on 30 Aug 2026 in a two-machine, two-account
+# lobby: fourteen sized presses balanced, the sweep engaged and disengaged, and
+# the host log corroborated every part of it (docs/DESIGN.md, "Confirmed, 30 Aug
+# 2026 -- co-op works, on two machines"). Add a new entry here the moment a
+# feature ships that has not had the same treatment.
+RELEASE_BLOCKERS = []
 
 
 class PackagingError(Exception):

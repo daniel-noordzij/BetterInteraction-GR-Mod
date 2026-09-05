@@ -12,7 +12,5 @@ First release.
 - Only the host needs the mod. Guests get all of it on a completely unmodified
   game, because the work happens on the machine that is allowed to do it, for
   whoever pressed the button. A guest running it stands down entirely.
-- Leaves prices, locks, quests and progression alone, and writes nothing into
-  your save.
-- Binds no keys. Every feature is switchable in `BetterInteraction.cfg`, which
+- Every feature is switchable in `BetterInteraction.cfg`, which
   the mod writes itself on first run.

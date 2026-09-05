@@ -54,18 +54,18 @@
     ExecuteWithDelay anywhere. Every delayed step goes through the `defer` queue
     below, which the pump drains on the game thread -- scheduling from inside a
     drained entry is safe by construction because it appends to our live table,
-    never to the one being walked. Keybind callbacks do NOT run on the game
-    thread, so they set a flag and nothing else.
+    never to the one being walked.
 
     CONFIG
     ------
-    <profile>\shimloader\cfg\BetterInteraction.cfg, read at startup and on F4.
-    Every feature independently switchable; 0 means leave the game's value alone.
+    <profile>\shimloader\cfg\BetterInteraction.cfg, read at startup. Every
+    feature independently switchable; 0 means leave the game's value alone.
 
     KEYS
     ----
-      F3   write a diagnostic report and change nothing
-      F4   reload the config file
+    None. The mod binds no keys (packaging rule 2); edit the config and
+    restart the game. Hold-to-attack reads the game's own attack action
+    state; it binds nothing of its own.
 ]]
 
 local MOD     = "BetterInteraction"
@@ -80,6 +80,50 @@ local CLASS = {
     dispenser = "HeldenCoinDispenser",             -- AHeldenCoinDispenser
     subsystem  = "HeldenInteractionSubsystem",
     gameState  = "HeldenGameState",
+    controller = "HeldenPlayerController",         -- hold-to-attack
+}
+
+--- Functions called by name, so a rename is one edit here.
+local FUNC = {
+    attack     = "Attack_Server",                  -- AHeldenWeapon(int32 InCombo), Helden.hpp:7490
+}
+
+--- Hooked function paths (rule H: registration is logged either way).
+local HOOK = {
+    interact   = "/Script/Helden.HeldenInteractableObject:Interact",
+    swing      = "/Script/Helden.HeldenWeapon:Attack_Multicast",
+}
+
+--- The attack input action's own name, lower-cased; a rebind does not change it.
+local ATTACK_ACTION = "ia_attack"
+
+--- HOW FAST EACH MELEE WEAPON CAN BE SWUNG BY CLICKING, in seconds per swing.
+--- Version-fragile data, so it lives here.
+---
+--- Measured 2 Sep 2026 (probe attack-4): the smallest gap between the game's
+--- own Attack_Multicast calls under Daniel's fastest clicking, per weapon.
+--- The gaps cluster within 20-30 ms per weapon, so this is the GAME's limit
+--- for that weapon, not a finger's. It has to be a table because the server
+--- does NOT rate-limit Attack_Server: probe attack-10 showed a spike club
+--- accepting calls at 0.40 s that clicking could only make at 0.68 s. A
+--- repeat faster than the click is the cheat this mod promises not to be.
+---
+--- A class not in this table is NOT repeated, and the log says so once.
+--- The saw is absent on purpose: it ships with the game's own auto-fire on,
+--- and a repeat on top of it double-swings (attack-10 log, 21:46).
+local CADENCE = {
+    BP_Malet_01_C           = 0.40,
+    BP_Malet_02_C           = 0.41,
+    BP_Malet_Golden_01_C    = 0.40,
+    BP_Knife_01_C           = 0.41,
+    BP_Machete_01_C         = 0.42,
+    BP_Spear_01_C           = 0.44,
+    BP_Umbrella_01_C        = 0.43,
+    BP_Battery_01_C         = 0.39,
+    BP_Broom_01_C           = 0.82,
+    BP_SpikeClub_01_C       = 0.68,
+    BP_SpikeClub_Elite_01_C = 0.68,
+    BP_Shield_01_C          = 0.98,
 }
 
 local PROP = {
@@ -113,6 +157,14 @@ local PROP = {
     root       = "RootComponent",                  -- AActor 0x1B8
     relLoc     = "RelativeLocation",               -- USceneComponent 0x148
 
+    -- Hold to attack. All verified against the dump on 2 Sep 2026.
+    pawn       = "Pawn",                           -- AController 0x2F0
+    equipped   = "EquipedItems",                   -- AHeldenCharacter 0x1270 [sic]
+    holster    = "HolsterState",                   -- AHeldenEquipableItem 0x4D9: None 0, Equipped 1, Holsterd 2
+    playerIn   = "PlayerInput",                    -- APlayerController 0x428
+    actionData = "ActionInstanceData",             -- UEnhancedPlayerInput 0x4E8
+    trigger    = "TriggerEvent",                   -- FInputActionInstance 0x13
+    canAuto    = "bCanAutoFire",                   -- AHeldenMeleeWeapon 0xC72: the game's own loop
 }
 
 --- WHAT EACH DEPOSIT DOES, ONE ENTRY PER MACHINE. Version-fragile data, so it
@@ -211,6 +263,28 @@ local LOG_FILE    = "BetterInteraction.log"
 -- body and never from inside a drained callback -- which is the actual hazard
 -- in RE-UE4SS #1180. Nothing about #1180 is rate-dependent.
 --
+-- THE SETTLE GAP (5 Sep 2026). #1180 is not the only race in this pump. Read
+-- out of RE-UE4SS LuaMod.cpp at the shipped SHA e31aaaa6: the LoopAsync
+-- thread runs its Lua WITHOUT m_thread_actions_mutex, ExecuteInGameThread
+-- takes its luaL_ref on the hook state's registry BEFORE taking that mutex,
+-- and the game thread luaL_unref's the previous callback's ref right after
+-- that callback returns. Our callback's last statement is `inFlight = false`,
+-- so the LoopAsync thread could call ExecuteInGameThread -- a registry write
+-- on another thread -- in the microseconds between our return and UE4SS's
+-- unref of the ref it was still holding. And get_function_ref in
+-- process_simple_actions sits OUTSIDE its try, so a ref that comes back
+-- garbage throws through the engine tick, uncaught: "Abort signal received",
+-- with "[Lua::Registry::get_function_ref] Ref was not function" in the
+-- minidump. That is the 4 Sep 2026 crash, 64 minutes in (docs/DESIGN.md).
+--
+-- So the LoopAsync body waits one FULL extra pass after it sees inFlight
+-- clear before it appends again. The unref follows our return by
+-- microseconds on the same thread; a whole PUMP_MS interval on top of that
+-- closes the window in practice without removing the per-frame rate (the
+-- drain is once per frame anyway). The LoopAsync body must stay
+-- allocation-free -- booleans and integers only -- because it too runs
+-- concurrently with game-thread Lua in the same state.
+--
 -- The expensive work does NOT follow the pump. It is gated on ELAPSED TIME
 -- rather than a tick count, because a tick count now means "frames" and would
 -- silently make the deposit pass four times slower on a 60fps machine than the
@@ -255,6 +329,12 @@ local cfg = {
     hold_duration_floor = 0.25,
     apply_interval      = 1.0,
     log_reverts         = 1,
+
+    -- Hold to attack. ON by default. attack_rate 0 = each weapon's own
+    -- measured click cadence (the CADENCE table); a positive number overrides
+    -- it for every weapon, and is floored at the weapon's own cadence.
+    attack_hold         = 1,
+    attack_rate         = 0,
 }
 
 local cfgPath, cfgLoaded = nil, false
@@ -694,9 +774,8 @@ local function writeDefaultConfig(candidates)
         "# " .. MOD .. " " .. VERSION .. " -- written by the mod because"
             .. " no config file was found.",
         "#",
-        "# Every setting the mod has, at its default. Edit it and press F4 in",
-        "# game to reload; no restart is needed. 0 almost always means 'leave",
-        "# the game's own value alone'.",
+        "# Every setting the mod has, at its default. Edit it and restart the",
+        "# game. 0 almost always means 'leave the game's own value alone'.",
         "#",
         "# The fully commented version, explaining what each setting does and",
         "# what it was measured against, ships with the mod and is on its page.",
@@ -739,7 +818,7 @@ local function loadConfig()
         local written = writeDefaultConfig(candidates)
         if written ~= nil then
             log("no " .. CONFIG_FILE .. " found, so one was written with the"
-                .. " defaults: " .. written .. " -- edit it and press F4.")
+                .. " defaults: " .. written .. " -- edit it and restart.")
             handle, path = io.open(written, "r"), written
         end
         if handle == nil then
@@ -1770,10 +1849,258 @@ local function settleDeposit()
 end
 
 local hooksOn = false
+
+-- ==========================================================================
+-- HOLD TO ATTACK -- the mod repeats a swing the game started.
+-- ==========================================================================
+--
+-- THE ANNOYANCE: every melee swing is a click. Holding the button swings once.
+--
+-- CO-OP BUCKET 2, PER MACHINE. Every call this makes is one the player could
+-- have made by clicking, and it is made on the machine whose key is down. A
+-- guest needs the mod for it; the host validates each swing as it does today.
+-- The host's copy does nothing for a guest's key, because it cannot see it.
+--
+-- WHY NOT THE GAME'S OWN AUTO-FIRE. AHeldenMeleeWeapon ships bCanAutoFire,
+-- AutoFireRate and a working loop (the saw uses it). Eight probe versions on
+-- 2 Sep 2026 established that flipping the flag works -- and that a TAP on a
+-- flipped weapon starts a loop the release does not end: 170+ swings that no
+-- reflected write or call could stop (flag off, effect off, Blueprint toggle
+-- off -- all measured, all failed), and starving its rate stops it but jams
+-- the weapon until a holster. docs/DESIGN.md, attack-5 .. attack-9.
+--
+-- WHAT WORKS INSTEAD, measured in attack-9 and attack-10: calling
+-- AHeldenWeapon:Attack_Server(combo) from Lua swings the weapon "as if
+-- normally pressing LMB, both functionally and the animation". So:
+--
+--   1. THE GAME STARTS EVERY CHAIN. A real press produces a real swing, the
+--      Attack_Multicast hook sees it, and a chain opens. The mod never makes
+--      the first swing, so every lock the game puts on it (dialogue, menus,
+--      holstering, stamina) is respected for free.
+--   2. The weapon's own click cadence after the last swing (CADENCE, per
+--      class, measured), while the attack action still reads Started/Ongoing
+--      and the weapon that swung is still carried, call Attack_Server with
+--      the next combo index. The server does not rate-limit that call
+--      (attack-10: a spike club took 0.40 s calls against a 0.68 s click), so
+--      the cadence is the mod's responsibility, not the game's.
+--   3. No swing follows our call: the game refused it; the chain closes and
+--      waits for a fresh real press. Key up: the chain closes. Nothing runs,
+--      resolves or scans while no chain is live.
+--
+-- The controller is re-found at every step (crash rule C) -- a FindAllOf at
+-- most 1/attack_rate times a second, only while the key is held, against the
+-- 5 Hz the removed feature 5 ran in a lobby without incident.
+-- ==========================================================================
+
+--- The live chain: plain values only, never a UObject (rule C).
+local chain = nil
+local attackStats = { chains = 0, calls = 0, refused = 0 }
+
+local function localController()
+    local found = nil
+    pcall(function()
+        for _, controller in ipairs(FindAllOf(CLASS.controller) or {}) do
+            if found == nil and real(controller) then
+                local isLocal = nil
+                pcall(function() isLocal = controller:IsLocalController() end)
+                if isLocal == true then found = controller end
+            end
+        end
+    end)
+    return found
+end
+
+--- Is the attack action down? Walks UEnhancedPlayerInput.ActionInstanceData,
+--- the proven idiom; matches the action by its own name so a rebind is
+--- irrelevant. Started (2) and Ongoing (4) are "down" for a Pressed+Released
+--- trigger pair. Returns nil when the map cannot be read at all.
+local function attackHeld(controller)
+    local input = get(controller, PROP.playerIn)
+    if not real(input) then return nil end
+    local map = get(input, PROP.actionData)
+    if map == nil then return nil end
+    local held, seen = false, false
+    pcall(function()
+        map:ForEach(function(key, value)
+            local action = key
+            pcall(function() action = key:get() end)
+            if shortName(fullName(action)):lower() ~= ATTACK_ACTION then return end
+            seen = true
+            local instance = value
+            pcall(function() instance = value:get() end)
+            local trig = numberProp(instance, PROP.trigger)
+            if trig == 2 or trig == 4 then held = true end
+        end)
+    end)
+    if not seen then return nil end
+    return held
+end
+
+--- The carried item of the class that swung. The swing itself proved it was
+--- in hand; HolsterState is NOT consulted, because an item handed over by
+--- the game's own equip path can read None until it is holstered and redrawn
+--- (attack-10 / first shipped run: "carried but not drawn" on every fresh
+--- weapon), and a swung weapon that is still carried is still the one in hand.
+local function weaponInHand(controller, wantedClass)
+    local pawn = get(controller, PROP.pawn)
+    if not real(pawn) then return nil, "no pawn" end
+    local items = get(pawn, PROP.equipped)
+    if items == nil then return nil, PROP.equipped .. " did not read" end
+    local match = nil
+    pcall(function()
+        items:ForEach(function(_, element)
+            local item = element
+            pcall(function() item = element:get() end)
+            if match == nil and real(item) and className(item) == wantedClass then
+                match = item
+            end
+        end)
+    end)
+    if match ~= nil then return match, "carried" end
+    return nil, "not carried"
+end
+
+--- Seconds between repeats for this weapon class, or nil for "do not repeat".
+local function cadenceFor(class)
+    local own = CADENCE[class]
+    if own == nil then return nil end
+    if cfg.attack_rate > 0 then return math.max(cfg.attack_rate, own) end
+    return own
+end
+
+--- Fed by the Attack_Multicast hook: a weapon swung somewhere. Only a swing
+--- by the LOCAL pawn opens a chain; a guest's swing replicated to this
+--- machine must not make this machine call anything.
+local function noteSwing(weapon, combo)
+    if cfg.attack_hold == 0 then return end
+    local owner = nil
+    pcall(function() owner = weapon:GetOwner() end)
+    local isLocal, why = nil, "owner unreadable, IsLocallyControlled not called"
+    if real(owner) then
+        local ok, err = pcall(function() isLocal = owner:IsLocallyControlled() end)
+        if not ok then
+            why = "IsLocallyControlled threw: " .. tostring(err)
+        elseif type(isLocal) ~= "boolean" then
+            why = "IsLocallyControlled returned " .. tostring(isLocal)
+            isLocal = nil
+        end
+    end
+    if isLocal == false then return end
+    if isLocal == nil then
+        -- Cannot tell whose swing this is. Acting would be wrong in a lobby;
+        -- say so once rather than silently doing nothing (rule H), and say
+        -- WHY (rule J): the 4 Sep 2026 crash was preceded by this line with
+        -- the error swallowed, 109 ms before UE4SS aborted on a corrupted
+        -- registry ref. The text is the only thing that can tell "the game
+        -- refused the call" from "our Lua state is already broken".
+        logOnce("attack:owner", "hold-to-attack: cannot tell whose weapon swung"
+            .. " (owner " .. (real(owner) and className(owner) or "unreadable")
+            .. "; " .. why .. "); the swing is ignored. REPORT THIS.")
+        return
+    end
+    local class = className(weapon)
+    if boolProp(weapon, PROP.canAuto) == true then
+        logOnce("attack:auto:" .. class, "hold-to-attack: " .. class
+            .. " already repeats on its own (the game's auto-fire); left to the game")
+        return
+    end
+    local rate = cadenceFor(class)
+    if rate == nil then
+        logOnce("attack:unknown:" .. class, "hold-to-attack: no measured click"
+            .. " cadence for " .. class .. "; holding it will not repeat. REPORT THIS"
+            .. " with the weapon's name and it can be added.")
+        return
+    end
+    local now = os.clock()
+    if chain == nil then
+        chain = { class = class, combo = combo, rate = rate, nextAt = now + rate,
+                  calledAt = nil, calls = 0, epoch = epoch }
+        attackStats.chains = attackStats.chains + 1
+    else
+        chain.combo = combo
+        chain.nextAt = now + chain.rate
+    end
+    chain.lastSwing = now
+end
+
+--- Every pump tick. Returns immediately unless a chain is live and due.
+local function attackTick()
+    if chain == nil then return end
+    local now = os.clock()
+    if now < chain.nextAt then return end
+    if chain.epoch ~= epoch then chain = nil return end
+
+    if chain.calledAt ~= nil and chain.lastSwing < chain.calledAt then
+        attackStats.refused = attackStats.refused + 1
+        diag(string.format("hold-to-attack: no swing followed Attack_Server(%d) on %s"
+            .. " -- refused by the game; chain closed after %d call(s)",
+            chain.combo + 1, chain.class, chain.calls))
+        chain = nil
+        return
+    end
+
+    local controller = localController()
+    if controller == nil then chain = nil return end
+    local held = attackHeld(controller)
+    if held == nil then
+        logOnce("attack:input", "hold-to-attack: the attack action could not be read"
+            .. " from ActionInstanceData; holding will not repeat. REPORT THIS.")
+        chain = nil
+        return
+    end
+    if not held then
+        if chain.calls > 0 then
+            diag(string.format("hold-to-attack: released; %d repeat(s) on %s",
+                chain.calls, chain.class))
+        end
+        chain = nil
+        return
+    end
+    local weapon, why = weaponInHand(controller, chain.class)
+    if weapon == nil then
+        diag("hold-to-attack: " .. chain.class .. " " .. why .. "; chain closed")
+        chain = nil
+        return
+    end
+
+    local combo = (chain.combo or 0) + 1
+    local ok, err = pcall(function() weapon[FUNC.attack](weapon, combo) end)
+    if not ok then
+        logOnce("attack:call", "hold-to-attack: " .. FUNC.attack .. " threw: "
+            .. tostring(err) .. " -- holding will not repeat. REPORT THIS.")
+        chain = nil
+        return
+    end
+    chain.calls = chain.calls + 1
+    chain.calledAt = now
+    chain.nextAt = now + chain.rate
+    attackStats.calls = attackStats.calls + 1
+end
+
 local function installHooks()
+    if cfg.attack_hold ~= 0 then
+        local swingOn = pcall(function()
+            RegisterHook(HOOK.swing, function(self, combo)
+                pcall(function()
+                    local index = combo
+                    pcall(function() index = combo:get() end)
+                    if type(index) ~= "number" then index = tonumber(tostring(index)) or 0 end
+                    noteSwing(self:get(), index)
+                end)
+            end)
+        end)
+        log(swingOn
+            and ("hold-to-attack hook registered on " .. HOOK.swing
+                .. (cfg.attack_rate > 0
+                    and string.format("; attack_rate override %.2fs (floored per weapon)", cfg.attack_rate)
+                    or "; per-weapon measured cadence"))
+            or "THE ATTACK HOOK WOULD NOT REGISTER -- holding the attack key will"
+               .. " swing once, exactly as the base game does.")
+    end
+
     if cfg.deposit_all == 0 then return end
     hooksOn = pcall(function()
-        RegisterHook("/Script/Helden.HeldenInteractableObject:Interact",
+        RegisterHook(HOOK.interact,
             function(self, pawn)
                 pcall(function() sizeDeposit(self:get(), pawn:get()) end)
             end,
@@ -1790,28 +2117,32 @@ local function installHooks()
 end
 
 -- ==========================================================================
--- F3 -- the diagnostic report. Changes nothing. It is the only instrument a
--- bug reporter has (CLAUDE.md, packaging rule 3).
--- ==========================================================================
-
-
--- ==========================================================================
 -- The pump (crash rule K). One LoopAsync, one ExecuteInGameThread, no
--- ExecuteWithDelay. Keybinds do no work -- they set a flag and the pump does
--- everything, because keybind callbacks are not on the game thread.
+-- ExecuteWithDelay. Everything that touches a UObject runs from here, on the
+-- game thread.
 -- ==========================================================================
 
 local inFlight = false
+local settled  = 0        -- LoopAsync passes seen with nothing in flight
 local ticks    = 0
 local lastScan, lastApply = 0, 0
 
 local pumpStarted = pcall(function()
     LoopAsync(PUMP_MS, function()
-        if inFlight then return false end
+        if inFlight then settled = 0 return false end
+        settled = settled + 1
+        if settled < 2 then return false end   -- the settle gap, see PUMP_MS
         inFlight = true
         ExecuteInGameThread(function()
             ticks = ticks + 1
             defer.drain()
+
+            do
+                local okA, errA = pcall(attackTick)
+                if not okA then
+                    logOnce("attack:" .. tostring(errA), "hold-to-attack tick failed: " .. tostring(errA))
+                end
+            end
 
             -- Both features, one subsystem resolve.
             -- ELAPSED TIME, not a tick count: ticks are frames now.
