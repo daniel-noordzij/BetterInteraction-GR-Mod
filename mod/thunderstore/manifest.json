@@ -1,6 +1,6 @@
 {
     "name": "BetterInteraction",
-    "version_number": "1.0.0",
+    "version_number": "1.0.1",
     "website_url": "https://github.com/daniel-noordzij/BetterInteraction-GR-Mod",
     "description": "Quality of life for interacting. No spam clicking for repeating interactions and changes to coins.",
     "dependencies": [

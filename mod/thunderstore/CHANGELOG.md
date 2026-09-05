@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1
+
+- The mod page: feature names formatted, no wording changed.
+- The coin caps cannot go below what the game itself puts in one coin.
+
 ## 1.0.0
 
 First release.

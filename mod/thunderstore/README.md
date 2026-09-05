@@ -5,20 +5,17 @@ one press, pick up a couple coins instead of a whole pile and hold-to-attack!
 
 ## What it does
 
--- Single Click Deposits
-Grain Rot takes your money in instalments: 5 gold a press at the elevator, 20 at
+<u>**Single Click Deposits**</u>: Grain Rot takes your money in instalments: 5 gold a press at the elevator, 20 at
 the upgrade machine, one artifact at a time at the gumball machine. This lets one
 press pay as much of what you still owe as you can afford.
 
--- Quicker Grinder & Bigger Coins
-Normally the grinder is limited to dispensing one coin with a max value of 10
+<u>**Quicker Grinder & Bigger Coins**</u>: Normally the grinder is limited to dispensing one coin with a max value of 10
 every 0.4 seconds. Now it not only spits them out faster but it also does so with
 more value per coin, making less total coins required. On top of that, coins
 will get merged together if they're close to eachother up to a customizable value
 (default of 100).
 
--- Hold-to-Attack
-As it says on the tin. Allows for holding the attack button to attack with
+<u>**Hold-to-Attack**</u>: As it says on the tin. Allows for holding the attack button to attack with
 offensive items as well as bare-handed.
 
 
