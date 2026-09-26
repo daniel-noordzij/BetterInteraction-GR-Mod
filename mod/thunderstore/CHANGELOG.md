@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.3
+
+- Fixed a bug where having multiple of one weapon only allowing hold-to-attack
+  to work on a single one.
+
 ## 1.0.2
 
 - The mod page: feature names in bold only; Thunderstore does not render underline.

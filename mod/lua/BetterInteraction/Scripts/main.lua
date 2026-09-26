@@ -67,7 +67,7 @@
 ]]
 
 local MOD     = "BetterInteraction"
-local VERSION = "1.0.2"
+local VERSION = "1.0.3"
 
 -- ==========================================================================
 -- Everything version-fragile, in one place. A game patch is an edit here.
@@ -1801,6 +1801,12 @@ local hooksOn = false
 -- most 1/attack_rate times a second, only while the key is held, against the
 -- 5 Hz the removed feature 5 ran in a lobby without incident.
 --
+-- ONE ITEM, NOT ONE CLASS (26 Sep 2026). A chain is keyed to the full name
+-- of the item that swung -- a plain string, so rule C holds -- and every
+-- repeat finds that item again by name. Keyed by class, a SECOND hammer's
+-- chain found the FIRST hammer in EquipedItems (pickup order), read it
+-- Holsterd, and closed: only the oldest copy of any weapon ever repeated.
+--
 -- ON A GUEST THE SWING IS SILENT WITHOUT ONE MORE STEP. Measured 5 Sep 2026,
 -- two machines: a guest's repeats did damage but played no animation. The
 -- game's click path plays the montage on the owning client itself and the
@@ -1857,46 +1863,83 @@ local function attackHeld(controller)
     return held
 end
 
---- The carried item of the class that swung. The swing itself proved it was
---- in hand; HolsterState is NOT consulted, because an item handed over by
---- the game's own equip path can read None until it is holstered and redrawn
---- (attack-10 / first shipped run: "carried but not drawn" on every fresh
---- weapon), and a swung weapon that is still carried is still the one in hand.
+--- The carried item that swung, found again by its FULL NAME (wantedName):
+--- that one object, never merely one of its class. EquipedItems is in pickup
+--- order, so a class match is always the OLDEST copy -- which is how a
+--- second hammer's chain came to read the first, holstered hammer and close
+--- (26 Sep 2026). wantedClass is only for the log, to tell "this item left"
+--- from "another copy of it is still here".
+---
+--- The swing itself proved the item was in hand, so HolsterState is read
+--- only to see it LEAVE the hand:
+---   Holsterd (2)  it was put away: refuse.
+---   Equipped (1)  it is in hand, whatever else reads.
+---   None (0)      an item handed over by the game's own equip path can read
+---                 None until it is holstered and redrawn (attack-10 / first
+---                 shipped run: "carried but not drawn" on every fresh
+---                 weapon), so None is in hand -- unless ANOTHER item reads
+---                 Equipped, which is a switch.
+--- SWITCHING MID-HOLD (5 Sep 2026): a chain is keyed to the item that
+--- started it, and the game never starts a new chain while the key stays
+--- down, so a chain that only checks "still carried" keeps driving the OLD
+--- item after a switch -- the old animation and cadence with the new item's
+--- damage. So the chain closes when its item is not the one drawn.
+---
 --- Returns the item, a reason, and the class of whatever reads Equipped
---- (HolsterState 1) right now -- nil when nothing does. SWITCHING MID-HOLD
---- (5 Sep 2026): a chain is keyed to the item that started it, and the game
---- never starts a new chain while the key stays down, so a chain that only
---- checks "still carried" keeps driving the OLD item after a switch -- the
---- old animation and cadence with the new item's damage. The caller closes
---- the chain when the drawn item is no longer the chain's.
-local function weaponInHand(controller, wantedClass)
+--- (HolsterState 1) right now -- nil when nothing does.
+local function weaponInHand(controller, wantedName, wantedClass)
     local pawn = get(controller, PROP.pawn)
     if not real(pawn) then return nil, "no pawn", nil end
     local items = get(pawn, PROP.equipped)
     if items == nil then return nil, PROP.equipped .. " did not read", nil end
-    local match, matchHolster, drawnClass = nil, nil, nil
+    local match, matchHolster = nil, nil
+    local drawnName, drawnClass, drawnCount = nil, nil, 0
+    local copies, carried = 0, {}
     pcall(function()
         items:ForEach(function(_, element)
             local item = element
             pcall(function() item = element:get() end)
-            if not real(item) then return end
+            local name = fullName(item)
+            if name == "" then return end
             local holster = numberProp(item, PROP.holster)
             local cls = className(item)
-            if holster == 1 and drawnClass == nil then drawnClass = cls end
-            if match == nil and cls == wantedClass then match, matchHolster = item, holster end
+            carried[#carried + 1] = shortName(name) .. "=" .. tostring(holster)
+            if holster == 1 then
+                drawnCount = drawnCount + 1
+                if drawnName == nil then drawnName, drawnClass = name, cls end
+            end
+            if match == nil and name == wantedName then
+                match, matchHolster = item, holster
+            elseif cls == wantedClass then
+                copies = copies + 1
+            end
         end)
     end)
-    if match == nil then return nil, "not carried", drawnClass end
+    if drawnCount > 1 then
+        -- Never seen in any probe snapshot (at most one item has ever read
+        -- Equipped). Rule H: say so, with the whole population.
+        logOnce("attack:twodrawn", "hold-to-attack: " .. drawnCount .. " carried items"
+            .. " read Equipped at once (" .. table.concat(carried, ", ") .. "); a chain"
+            .. " keeps its own item while that item reads Equipped. REPORT THIS.")
+    end
+    if match == nil then
+        if copies > 0 then
+            return nil, "not carried (" .. copies .. " other " .. tostring(wantedClass)
+                .. " carried: " .. table.concat(carried, ", ") .. ")", drawnClass
+        end
+        return nil, "not carried", drawnClass
+    end
     if matchHolster == 2 then return nil, "holstered", drawnClass end
-    if drawnClass ~= nil and drawnClass ~= wantedClass then
-        return nil, "no longer in hand (" .. drawnClass .. " is)", drawnClass
+    if matchHolster ~= 1 and drawnName ~= nil then
+        return nil, "no longer in hand (" .. shortName(drawnName) .. " is)", drawnClass
     end
     return match, "carried", drawnClass
 end
 
---- The class of the item drawn right now, or nil for empty hands.
+--- The class of the item drawn right now, or nil for empty hands. No item
+--- has the name "", so this matches nothing and reports only what is drawn.
 local function drawnItem(controller)
-    local _, _, drawn = weaponInHand(controller, "")
+    local _, _, drawn = weaponInHand(controller, "", nil)
     return drawn
 end
 
@@ -1951,10 +1994,17 @@ local function noteSwing(weapon, combo)
             .. " with the weapon's name and it can be added.")
         return
     end
+    -- The chain's key: this ONE item, as a string (rule C), never its class.
+    local name = fullName(weapon)
+    if name == "" then
+        logOnce("attack:noname:" .. class, "hold-to-attack: a " .. class
+            .. " swung but could not say its own name; the swing is ignored. REPORT THIS.")
+        return
+    end
     -- Rule J: which montage did the GAME use for this combo? Read in place off
     -- the weapon, logged once per class and index, so the guest-side pick can
     -- be checked against it in the file.
-    if chain == nil or chain.calledAt == nil then
+    if chain == nil or chain.item ~= name or chain.calledAt == nil then
         local last = get(get(weapon, PROP.lastMont), PROP.montage)
         pcall(function() last = last:get() end)
         if real(last) then
@@ -1966,8 +2016,20 @@ local function noteSwing(weapon, combo)
 
     local now = os.clock()
     if chain ~= nil and chain.kind == "unarmed" then chain = nil end
+    if chain ~= nil and chain.item ~= name then
+        -- Another item swung while this chain was live. The mod only ever
+        -- calls Attack_Server on the chain's own item, so this swing was a
+        -- real press on a different one (a switch, then a click). Until
+        -- 26 Sep it was folded into the old chain, which then closed on its
+        -- own holstered item and ate the press. It starts its own chain.
+        diag(string.format("hold-to-attack: %s swung while %s's chain was live"
+            .. " (%d repeat(s)); the chain moves to %s",
+            shortName(name), chain.label, chain.calls, shortName(name)))
+        chain = nil
+    end
     if chain == nil then
-        chain = { kind = "weapon", class = class, combo = combo, rate = rate, nextAt = now + rate,
+        chain = { kind = "weapon", item = name, label = shortName(name), class = class,
+                  combo = combo, rate = rate, nextAt = now + rate,
                   calledAt = nil, calls = 0, epoch = epoch }
         attackStats.chains = attackStats.chains + 1
     else
@@ -2060,7 +2122,7 @@ local function notePunch(pawn, montage, section, via)
     local now = os.clock()
     if chain ~= nil and chain.kind ~= "unarmed" then return end
     if chain == nil then
-        chain = { kind = "unarmed", class = short, rate = rate, nextAt = now + rate,
+        chain = { kind = "unarmed", class = short, label = short, rate = rate, nextAt = now + rate,
                   montage = (montPath:gsub("^%S+%s+", "")), section = section,
                   calledAt = nil, calls = 0, epoch = epoch }
         attackStats.chains = attackStats.chains + 1
@@ -2171,7 +2233,7 @@ local function attackTick(beatController)
         attackStats.refused = attackStats.refused + 1
         diag(string.format("hold-to-attack: no swing followed Attack_Server(%d) on %s"
             .. " -- refused by the game; chain closed after %d call(s)",
-            chain.combo + 1, chain.class, chain.calls))
+            chain.combo + 1, chain.label, chain.calls))
         chain = nil
         return
     end
@@ -2188,7 +2250,7 @@ local function attackTick(beatController)
     if not held then
         if chain.calls > 0 then
             diag(string.format("hold-to-attack: released; %d repeat(s) on %s",
-                chain.calls, chain.class))
+                chain.calls, chain.label))
         end
         chain = nil
         return
@@ -2214,9 +2276,10 @@ local function attackTick(beatController)
         return
     end
 
-    local weapon, why = weaponInHand(controller, chain.class)
+    local weapon, why = weaponInHand(controller, chain.item, chain.class)
     if weapon == nil then
-        diag("hold-to-attack: " .. chain.class .. " " .. why .. "; chain closed")
+        diag(string.format("hold-to-attack: %s %s after %d repeat(s); chain closed",
+            chain.label, why, chain.calls))
         chain = nil
         return
     end

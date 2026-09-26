@@ -4427,3 +4427,78 @@ grinder seen this session (`MaxGoldPerCoins` / `MaxArtifactsPerCoin` before
 the mod writes them, plain numbers), 5 gold and 1 artifact as measured on 30
 Aug (Daniel remembered 10; the log says 5). 0 still means "leave alone" /
 "no limit". No ceiling: above the floor the number is the player's.
+
+### 26 Sep 2026 -- hold-to-attack: a second copy of a weapon never repeated
+
+Daniel: "Having multiple of the same item in your inventory makes it so only
+the oldest one actually auto swings ... if i have a hammer in my inventory
+and pick up a 2nd, that 2nd hammer wont autoattack but the 1st one will. no
+matter where they are in the inventory slots."
+
+**Established from the code:** `weaponInHand` found the chain's weapon by
+CLASS and took the first `EquipedItems` element of that class. Two copies of
+`BP_Malet_01_C` share a class, so the newer hammer's chain always resolved
+to the older one. A carried item that is not drawn reads `Holsterd` (2)
+in every probe snapshot, so the first repeat closed the chain as "holstered".
+Nothing in that path depends on the slot, which matches "no matter where".
+
+**Consistent, not proven by the log:** the runtime log for the 1.0.2 session
+of 26 Sep 14:25 shows `BP_Malet_01_C` repeating normally at 14:26:29-35, then
+two chains closing as "BP_Malet_01_C holstered; chain closed" (14:26:37 and
+14:26:38). The line named only the class, and a genuine holster writes the
+same text, so the log alone cannot say which copy was involved. Daniel's
+report is the evidence that picks this cause. That `EquipedItems` is in
+pickup order ("the oldest wins") rests on one probe sample (attack.txt:
+Machete, then HandSaw, then Spear, in the order given) and on his report.
+The earlier "holstered" runs are NOT attributed: the 5 Sep 16:15 cluster
+coincides with real switches in the attack-17 probe, and the 1.0.2 lobby
+cluster on `BP_Malet_Golden_01_C` cannot be told apart.
+
+**Fix, shipped and unconfirmed:** the chain is keyed to the full name of the
+item that swung (`chain.item`, a string, so rule C holds), and `weaponInHand`
+finds that exact object by name on every repeat. `HolsterState` on that item
+decides: `Holsterd` closes; `Equipped` is in hand whatever else reads; `None`
+is in hand unless another item reads `Equipped` (a switch). The 5 Sep
+switch-mid-hold behaviour is unchanged for every state the probes have seen.
+
+**Fixed while there, worth fixing either way:** a swing by a DIFFERENT item
+while a chain was still live (release, switch, press within one cadence)
+was folded into the old chain. The next repeat then found the old item
+holstered and closed, and ate the press. The mod calls `Attack_Server` only
+on the chain's own item, so another item's swing is always a real press.
+It now starts that item's own chain, with a diag line saying so.
+
+**One rule changed, for a state never observed:** if two carried items read
+`Equipped` at once, the old code went with whichever came first. The new code
+keeps the chain's item while it reads `Equipped`, and logs the whole carried
+list once ("attack:twodrawn").
+
+**Assumed, structurally, not measured:** that the `Attack_Multicast` hook's
+`self` is the same object as the `EquipedItems` element, on host and guest.
+The mod already calls `Attack_Server` on the element and sees the multicast
+on it, and the dump has no proxy or visual-weapon actor. If the assumption
+were wrong, every hold on every weapon would swing once and log "<X> not
+carried (1 other <class> carried: <X>=...)" with the same name on both sides.
+A single hold with a single weapon shows it.
+
+**What would confirm it:** Game only. Carry two hammers, draw the newer one
+and hold attack: the log should say "released; N repeat(s) on
+BP_Malet_01_C_<number>" with N > 0, and no "holstered" line. Then do the
+same with the older one; the two lines should carry different numbers.
+Every weapon line now names the instance and the repeat count, so the next
+log can tell this cause from a real holster.
+
+**Confirmed, 26 Sep 2026 19:02 (Game only, `BI_Testing`, solo host).**
+Daniel: "all dupe items auto swing now." The log agrees: four copies of
+`BP_Malet_01_C` in one session (`_2147480516`, `_2147478960`,
+`_2147478556`, `_2147478364`) each logged "released; N repeat(s)" with N > 0
+(5, 4, 2 and 3 such chains). There was no "not carried", "refused", "Equipped at
+once" or "REPORT THIS" line in the whole session. So the assumption above is
+now **measured on the host**: every chain found the item that swung again by
+its full name. On a guest it is still structural, not measured. Three
+"holstered after 1-3 repeat(s)" closes are the switch-mid-hold step, each
+after the chain had been repeating. Fourteen "the chain moves to" lines,
+nine of them 0.32-0.38 s apart with 0 repeats, were Daniel switching and
+clicking faster than one cadence. Each one was a game swing of a different
+copy, since the mod had made no call in those chains ("0 repeat(s)"). Before
+26 Sep, each of those presses was folded into the previous chain.

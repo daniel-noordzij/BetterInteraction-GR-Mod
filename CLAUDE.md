@@ -53,6 +53,7 @@ disclaimer — see "The line between QoL and cheating" below.
 | Binary dir | `Grain Rot\Helden\Binaries\Win64\` |
 | Lua mods directory | `%APPDATA%\Thunderstore Mod Manager\DataFolder\GrainRot\profiles\<profile>\shimloader\mod\` — shimloader redirects `Win64\Mods` here. **Not** `Content\Paks\LogicMods\`, which is for Blueprint pak mods only |
 | Profile config dir | `…\<profile>\shimloader\cfg\` — sits beside `mod`, `overlay`, `pak`. This is where our config file goes |
+| **This project's profile** | **`BI_Testing`** — the ONLY profile this project ever deploys to. See hard rule 9 |
 | Mod layout | `mod\BetterInteraction\Scripts\main.lua` + an empty `mod\BetterInteraction\enabled.txt` |
 | Lua | 5.4 with the full stdlib — `io` (incl. `io.popen`), `os`, `require`, `package`. Write+readback verified. cwd is the `Win64\` dir |
 | Dumps on disk | `Win64\UE4SS_ObjectDump.txt` (33 MB), `Win64\CXXHeaderDump\` (948 headers — `Helden.hpp` 667 KB, `Engine.hpp` 1.7 MB), and a `.usmap` |
@@ -713,16 +714,38 @@ in one builder is a rule the other one breaks.
    | Say | Means |
    |---|---|
    | **No game at all** | Runs on this machine from the repo. Costs seconds, so it should already have been run before Daniel is asked for anything |
-   | **Game only** | Launch through r2modman and play. One machine |
+   | **Game only** | Launch the `BI_Testing` profile through r2modman and play. One machine |
    | **Game, two machines** | A real lobby. Say which machine does what, in order |
 
    If a sequence changes what is needed part-way through, spell that out step by
    step rather than stating it once at the top.
 
 8. **Deploy the change yourself, then verify it landed.** Copy into
-   `<profile>\shimloader\mod\BetterInteraction\Scripts\main.lua`, gate the copy on
-   the checker's exit code (rule I), and `md5sum` both paths. **Guests need a
-   rebuilt zip** — a host-profile deploy reaches nobody else.
+   `BI_Testing\shimloader\mod\BetterInteraction\Scripts\main.lua` (rule 9), gate
+   the copy on the checker's exit code (rule I), and `md5sum` both paths.
+   **Guests need a rebuilt zip** — a host-profile deploy reaches nobody else.
+
+9. **Only ever update this project's dedicated profile: `BI_Testing`.** Daniel,
+   26 Sep 2026. Every other profile (`coop`, `Solo`, `Default`, `LetMeLookTest`,
+   `testtest`, `tyrnel test`, and any added later) belongs to his own play or to
+   another project. Never write into one of them, not even when it holds a byte-identical
+   copy of our file. On 26 Sep a fix was copied into `coop`, `Solo` and
+   `LetMeLookTest` for exactly that reason, and it had to be taken back out.
+
+   - **No dedicated profile?** Make one if you can; otherwise ask Daniel to. An
+     empty profile is only a folder under `…\GrainRot\profiles\` holding a
+     `mods.yml` of `[]`, which is exactly what r2modman wrote for `BI_Testing`,
+     so the folder itself can be made. The dependencies
+     (`Thunderstore-unreal_shimloader`, `Thunderstore-GrainRot_UE4SS`) are
+     downloads through r2modman, and those are Daniel's to do: ask him.
+   - **Install our build as a local mod:**
+     `py tools/build_standalone.py --install "…\profiles\BI_Testing\shimloader"`.
+     Never also install the published `DaanSmoki-BetterInteraction` into the
+     same profile. Two enabled copies both hook `Attack_Multicast` and double
+     every repeat.
+   - **Copy B** (`C:\STEAM2`) is not an r2modman profile. It is the second
+     player for "Game, two machines" tests, and Daniel keeps the current build
+     there.
 
 ## Open questions
 
